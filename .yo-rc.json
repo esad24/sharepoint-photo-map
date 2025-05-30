@@ -1,0 +1,18 @@
+{
+  "@microsoft/generator-sharepoint": {
+    "plusBeta": false,
+    "isCreatingSolution": true,
+    "nodeVersion": "22.14.0",
+    "sdksVersions": {},
+    "version": "1.21.1",
+    "libraryName": "webmap",
+    "libraryId": "07f028c7-df55-44ec-84c8-8ff3752ca201",
+    "environment": "spo",
+    "packageManager": "npm",
+    "solutionName": "webmap",
+    "solutionShortDescription": "webmap description",
+    "skipFeatureDeployment": true,
+    "isDomainIsolated": false,
+    "componentType": "webpart"
+  }
+}
