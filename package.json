@@ -19,6 +19,7 @@
     "@microsoft/sp-property-pane": "1.21.1",
     "@microsoft/sp-webpart-base": "1.21.1",
     "leaflet": "^1.9.4",
+    "leaflet.markercluster": "^1.5.3",
     "tslib": "2.3.1"
   },
   "devDependencies": {
@@ -30,6 +31,7 @@
     "@microsoft/sp-module-interfaces": "1.21.1",
     "@rushstack/eslint-config": "4.0.1",
     "@types/leaflet": "^1.9.18",
+    "@types/leaflet.markercluster": "^1.5.5",
     "@types/webpack-env": "~1.15.2",
     "ajv": "^6.12.5",
     "eslint": "8.57.1",
