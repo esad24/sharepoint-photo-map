@@ -2,9 +2,10 @@
 
 ## Summary
 
-Short summary on functionality and used technologies.
+A foto map that displays images on their gps location, 
+integrated into Sharepoint as a webpart. 
 
-[picture of the solution in action, if possible]
+<img width="560" alt="image" src="https://github.com/user-attachments/assets/0fabe32b-b5cb-4cba-9773-abc7ff20c110" />
 
 ## Used SharePoint Framework Version
 
