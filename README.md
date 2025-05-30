@@ -2,8 +2,8 @@
 
 ## Summary
 
-A foto map that displays images on their gps location, 
-integrated into Sharepoint as a webpart. 
+A photo map that displays images from a sharepoint list, on their gps location.
+Integrated into Sharepoint as a webpart. 
 
 <img width="560" alt="image" src="https://github.com/user-attachments/assets/0fabe32b-b5cb-4cba-9773-abc7ff20c110" />
 
