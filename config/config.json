@@ -18,6 +18,7 @@
     }
   },
   "localizedResources": {
-    "WebmapWebPartStrings": "lib/webparts/webmap/loc/{locale}.js"
+    "WebmapWebPartStrings": "lib/webparts/webmap/loc/{locale}.js",
+    "PropertyControlStrings": "node_modules/@pnp/spfx-property-controls/lib/loc/{locale}.js"
   }
 }
