@@ -31,7 +31,7 @@ import 'leaflet.markercluster/dist/MarkerCluster.Default.css';
 import styles from './WebmapWebPart.module.scss';
 
 /* ------------------------------------------------------------------ */
-/*  ░░  Helpers & typings                                             */
+/*      Helpers & typings                                             */
 /* ------------------------------------------------------------------ */
 
 declare module 'leaflet' {
@@ -57,7 +57,7 @@ export interface IWebmapWebPartProps {
 }
 
 /* ------------------------------------------------------------------ */
-/*  ░░  Web-part                                                      */
+/*      Web-part                                                      */
 /* ------------------------------------------------------------------ */
 
 export default class WebmapWebPart extends BaseClientSideWebPart<IWebmapWebPartProps> {
@@ -74,7 +74,7 @@ export default class WebmapWebPart extends BaseClientSideWebPart<IWebmapWebPartP
   private _listForFields: string | null = null;
 
   /* ------------------------------------------------------------- */
-  /*  ░░  RENDER                                                   */
+  /*      RENDER                                                   */
   /* ------------------------------------------------------------- */
   public render(): void {
     // Host markup
@@ -88,7 +88,7 @@ export default class WebmapWebPart extends BaseClientSideWebPart<IWebmapWebPartP
   }
 
   /* ------------------------------------------------------------- */
-  /*  ░░  Map creation / refresh                                   */
+  /*      Map creation / refresh                                   */
   /* ------------------------------------------------------------- */
   private renderMap(): void {
     /* 1. Dispose previous instance (avoid “Map container is already initialized”) */
@@ -191,7 +191,7 @@ export default class WebmapWebPart extends BaseClientSideWebPart<IWebmapWebPartP
   }
 
   /* ------------------------------------------------------------- */
-  /*  ░░  List→markers                                             */
+  /*      List→markers                                             */
   /* ------------------------------------------------------------- */
   private loadMapData(): void {
     if (!this.markerCluster) return;
@@ -237,7 +237,7 @@ export default class WebmapWebPart extends BaseClientSideWebPart<IWebmapWebPartP
   }
 
   /* ------------------------------------------------------------- */
-  /*  ░░  Property-pane                                            */
+  /*      Property-pane                                            */
   /* ------------------------------------------------------------- */
   protected getPropertyPaneConfiguration(): IPropertyPaneConfiguration {
     return {
@@ -291,7 +291,7 @@ export default class WebmapWebPart extends BaseClientSideWebPart<IWebmapWebPartP
   }
 
   /* ------------------------------------------------------------- */
-  /*  ░░  Dynamic options loader                                   */
+  /*      Dynamic options loader                                   */
   /* ------------------------------------------------------------- */
   protected onPropertyPaneConfigurationStart(): void {
     // Site-scoped list enumeration
@@ -362,7 +362,7 @@ export default class WebmapWebPart extends BaseClientSideWebPart<IWebmapWebPartP
   }
 
   /* ------------------------------------------------------------- */
-  /*  ░░  Clean-up                                                 */
+  /*      Clean-up                                                 */
   /* ------------------------------------------------------------- */
   protected onDispose(): void {
     this.map?.remove();
@@ -370,7 +370,7 @@ export default class WebmapWebPart extends BaseClientSideWebPart<IWebmapWebPartP
   }
 
   /* ------------------------------------------------------------- */
-  /*  ░░  SPFx boiler-plate                                        */
+  /*      SPFx boiler-plate                                        */
   /* ------------------------------------------------------------- */
   protected get dataVersion(): Version {
     return Version.parse('1.0');
