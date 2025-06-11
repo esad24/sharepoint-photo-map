@@ -71,6 +71,35 @@ export default class WebmapWebPart extends BaseClientSideWebPart<IWebmapWebPartP
   private _siteForLists: string | null = null;   // cache invalidation keys
   private _listForFields: string | null = null;
 
+    /* ============================================================= */
+  /*  Helpers – security                                           */
+  /* ============================================================= */
+
+  /** Escape an identifier that will be inserted in an OData path
+   *  (list title, column name …). Doubles quotes → OData spec, then
+   *  URI‑encodes so no reserved chars survive.                     */
+  private escODataIdentifier(id: string): string {               // ⚠ SECURITY
+    const doubled = id.replace(/'/g, "''");
+    return encodeURIComponent(doubled);
+  }
+
+
+  /**  Tiny URL-only sanitizer (no external deps)                   */
+  private sanitizeUrl(url: string): string {
+    try {
+      const u = new URL(url, window.location.origin);
+      return (u.protocol === 'http:' || u.protocol === 'https:') ? u.href : '';
+    } catch { return ''; }
+  }
+  /** Very small HTML‑attribute escaper so no \" or <> slip through. */
+  private escAttr(v: string): string {                            // SECURITY
+    return v.replace(/&/g,  '&amp;')
+            .replace(/"/g, '&quot;')
+            .replace(/</g,  '&lt;')
+            .replace(/>/g,  '&gt;');
+  }
+
+  
   /* ------------------------------------------------------------- */
   /*      RENDER                                                   */
   /* ------------------------------------------------------------- */
@@ -110,31 +139,29 @@ export default class WebmapWebPart extends BaseClientSideWebPart<IWebmapWebPartP
     this.markerCluster = L.markerClusterGroup({
       iconCreateFunction: (cluster) => {
         const first: any = cluster.getAllChildMarkers()[0];
-        const img = (first?.options.data?.img as string);
+        const img = this.sanitizeUrl(first?.options.data?.img as string);
 
         const count  = cluster.getChildCount();
         const digits = String(count).length;
         const badgeH = 22;
         const badgeW = digits === 1 ? badgeH : badgeH + (digits - 1) * 10;
 
-        return L.divIcon({
-          html: `
-            <div style="position:relative;width:60px;height:60px;display:inline-block;">
-              <div style="width:60px;height:60px;border-radius:10px;overflow:hidden;">
-                <img src="${img}" style="width:100%;height:100%;object-fit:cover;" />
-              </div>
-              <div style="
-                position:absolute;top:-8px;right:-8px;width:${badgeW}px;height:${badgeH}px;
-                background:#007AFF;color:#fff;font:700 12px/1 'Segoe UI',sans-serif;
-                padding:0 4px;border-radius:9999px;display:flex;align-items:center;
-                justify-content:center;box-shadow:0 0 2px rgba(0,0,0,.25);">
-                ${count}
-              </div>
+        const html = `
+          <div style="position:relative;width:60px;height:60px;display:inline-block;">
+            <div style="width:60px;height:60px;border-radius:10px;overflow:hidden;">
+              <img src="${this.escAttr(img)}" style="width:100%;height:100%;object-fit:cover;" />
             </div>
-          `,
-          className: '',
-          iconSize: [60, 60]
-        });
+            <div style="
+              position:absolute;top:-8px;right:-8px;width:${badgeW}px;height:${badgeH}px;
+              background:#007AFF;color:#fff;font:700 12px/1 'Segoe UI',sans-serif;
+              padding:0 4px;border-radius:9999px;display:flex;align-items:center;
+              justify-content:center;box-shadow:0 0 2px rgba(0,0,0,.25);">
+              ${count}
+            </div>
+          </div>
+        `;
+
+        return L.divIcon({ html, className: '', iconSize: [60, 60] });
       },
       zoomToBoundsOnClick: false      // stop the automatic zoom-in
 
@@ -147,7 +174,7 @@ export default class WebmapWebPart extends BaseClientSideWebPart<IWebmapWebPartP
       const markers = e.layer.getAllChildMarkers() as L.Marker<any>[];
       if (!markers.length) return;
 
-      const imgList = markers.map(m => (m.options.data?.img as string) || 'fallback.jpg');
+      const imgList = markers.map(m => this.sanitizeUrl(m.options.data?.img as string));
       let current   = 0;
 
       const container = L.DomUtil.create('div', 'custom-popup');
@@ -155,20 +182,28 @@ export default class WebmapWebPart extends BaseClientSideWebPart<IWebmapWebPartP
       container.style.maxWidth        = '100%';           // responsive cap
       container.style.display         = 'flex';
       container.style.flexDirection   = 'column';
-      container.style.alignItems      = 'center';         // ⬅️ horizontal centring
+      container.style.alignItems      = 'center';         // ⬅horizontal centring
       container.style.textAlign       = 'center';         // keep text centred
 
 
       const imgEl  = L.DomUtil.create('img', '', container) as HTMLImageElement;
       imgEl.src           = imgList[0];
-      imgEl.style.width = '100%';           // fill container width
+      imgEl.style.width = 'auto';           // fill container width
+      imgEl.style.maxWidth = '100%';           // fill container width
+
       imgEl.style.height = 'auto'; // or use a max height if needed
       imgEl.style.maxHeight = '300px'; // optional constraint
       imgEl.style.objectFit = 'contain';
       imgEl.style.borderRadius = '10px';
+      imgEl.style.display = 'block';        //Required for margin auto to work
+      imgEl.style.margin = '0 auto';        //Center the image horizontally
 
       const nav           = L.DomUtil.create('div', '', container);
       nav.style.marginTop = '8px';
+      nav.style.display = 'flex';
+      nav.style.justifyContent = 'center';
+      nav.style.gap = '10px'; // Optional: replaces marginLeft on nextBtn
+
 
       const prevBtn = L.DomUtil.create('button', '', nav);
       prevBtn.innerHTML = '◀';
@@ -179,13 +214,12 @@ export default class WebmapWebPart extends BaseClientSideWebPart<IWebmapWebPartP
 
       const nextBtn = L.DomUtil.create('button', '', nav);
       nextBtn.innerHTML = '▶';
-      nextBtn.style.marginLeft = '10px';
       nextBtn.onclick   = () => {
         current = (current + 1) % imgList.length;
         imgEl.src = imgList[current];
       };
 
-      L.popup()
+      L.popup({ className: 'photoGalleryPopup', maxWidth: 350 })
         .setLatLng(e.latlng)
         .setContent(container)
         .openOn(this.map!);
@@ -206,9 +240,14 @@ export default class WebmapWebPart extends BaseClientSideWebPart<IWebmapWebPartP
     if (!listName || !latField || !lonField || !imgField) return;
 
     const site = this.context.pageContext.web.absoluteUrl;
+    const listPart = this.escODataIdentifier(listName);
+    const selectFields = [latField, lonField, imgField]
+                          .map(f => this.escODataIdentifier(f))                            //  Security
+                          .join(',');              
+
     const url =
-      `${site}/_api/web/lists/getByTitle('${listName}')/items` +
-      `?$select=${latField},${lonField},${imgField}`;
+      `${site}/_api/web/lists/getByTitle('${listPart}')/items` +
+      `?$select=${selectFields}`;
 
     this.context.spHttpClient
       .get(url, SPHttpClient.configurations.v1)
@@ -220,11 +259,14 @@ export default class WebmapWebPart extends BaseClientSideWebPart<IWebmapWebPartP
         items.forEach(item => {
           if (!item[latField] || !item[lonField] || !item[imgField].Url) return;
 
+
+          const rawImg = (item[imgField].Url as string);
+          const img = this.sanitizeUrl(rawImg);
+          if (!img) return;
+
           const lat = parseFloat(item[latField]);
           const lon = parseFloat(item[lonField]);
-          const img = (item[imgField].Url as string);
 
-          
 
           const enriched = { ...item, img };     // for gallery / cluster icons
 
@@ -237,7 +279,7 @@ export default class WebmapWebPart extends BaseClientSideWebPart<IWebmapWebPartP
           const marker = L.marker([lat, lon], { icon, data: enriched });
 
           marker.bindPopup(`
-          <div class="custom-popup">
+          <div>
             <img src="${img}" class="${styles.popupImg}" />
           </div>
           `);
@@ -247,6 +289,8 @@ export default class WebmapWebPart extends BaseClientSideWebPart<IWebmapWebPartP
       })
       .catch(err => console.error('Webmap → list fetch failed:', err));
   }
+
+
 
   /* ------------------------------------------------------------- */
   /*      Property-pane                                            */
@@ -335,7 +379,7 @@ export default class WebmapWebPart extends BaseClientSideWebPart<IWebmapWebPartP
 
       const site = this.context.pageContext.web.absoluteUrl;
       const fieldsUrl =
-        `${site}/_api/web/lists/getByTitle('${newValue}')/fields` +
+        `${site}/_api/web/lists/getByTitle('${this.escODataIdentifier(newValue)}')/fields` +
         `?$filter=Hidden eq false and ReadOnlyField eq false`;
 
       this.context.spHttpClient

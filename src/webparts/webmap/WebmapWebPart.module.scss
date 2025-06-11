@@ -33,9 +33,15 @@
 
 }
 
-:global(.leaflet-popup) {
-  box-shadow: none !important;
+/* WebmapWebPart.module.scss (add at end)  */
+.photoGalleryPopup {                   /* any class name you like */
+  .leaflet-popup-content-wrapper,
+  .leaflet-popup-content {
+    margin: 0 !important;             /* kill asymmetric margin   */
+    padding: 0 !important;            /* optional – tighter look  */
+  }
 }
+
 
 
 :global(.leaflet-popup-content-wrapper) {
@@ -53,17 +59,6 @@
   -webkit-backdrop-filter: blur(12px);
   border: 1px solid rgba(255, 255, 255, 0.3);
 }
-
-
-:global(.custom-popup) {
-  padding: 10px;
-  border-radius: 12px;
-  color: white;
-  display: flex;          /* new */
-  flex-direction: column; /* new: stack any buttons under the image */
-  align-items: center;    /* new: centres child elements horizontally */
-}
-
 
 
 .links {
