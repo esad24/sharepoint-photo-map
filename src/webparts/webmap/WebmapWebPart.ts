@@ -13,7 +13,6 @@
 import { Version } from '@microsoft/sp-core-library';
 import {
   IPropertyPaneConfiguration,
-  PropertyPaneTextField,
   PropertyPaneDropdown,
   IPropertyPaneDropdownOption
 } from '@microsoft/sp-property-pane';
@@ -49,7 +48,6 @@ interface IWebmapListItem {
 export interface IWebmapWebPartProps {
   description: string;
 
-  siteUrl:   string;            // blank ⇒ current site
   listName:  string;            // SharePoint list title
   latField:  string;            // internal column names
   lonField:  string;
@@ -137,7 +135,9 @@ export default class WebmapWebPart extends BaseClientSideWebPart<IWebmapWebPartP
           className: '',
           iconSize: [60, 60]
         });
-      }
+      },
+      zoomToBoundsOnClick: false      // stop the automatic zoom-in
+
     });
 
     this.map.addLayer(this.markerCluster);
@@ -199,7 +199,7 @@ export default class WebmapWebPart extends BaseClientSideWebPart<IWebmapWebPartP
     const { listName, latField, lonField, imgField } = this.properties;
     if (!listName || !latField || !lonField || !imgField) return;
 
-    const site = this.properties.siteUrl || this.context.pageContext.web.absoluteUrl;
+    const site = this.context.pageContext.web.absoluteUrl;
     const url =
       `${site}/_api/web/lists/getByTitle('${listName}')/items` +
       `?$select=${latField},${lonField},${imgField}`;
@@ -243,14 +243,11 @@ export default class WebmapWebPart extends BaseClientSideWebPart<IWebmapWebPartP
     return {
       pages: [
         {
-          header: { description: 'Data source' },
+          header: { description: 'Data Source' },
           groups: [
             {
-              groupName: 'Where is the data?',
+              groupName: 'Choose a Photo-List?',
               groupFields: [
-                PropertyPaneTextField('siteUrl', {
-                  label: 'Site URL (leave blank for current site)'
-                }),
                 PropertyPaneDropdown('listName', {
                   label: 'List',
                   options: this._lists,
@@ -277,12 +274,6 @@ export default class WebmapWebPart extends BaseClientSideWebPart<IWebmapWebPartP
                   disabled: !this._fields.length
                 })
               ]
-            },
-            {
-              groupName: 'UI',
-              groupFields: [
-                PropertyPaneTextField('description', { label: 'Description' })
-              ]
             }
           ]
         }
@@ -295,7 +286,7 @@ export default class WebmapWebPart extends BaseClientSideWebPart<IWebmapWebPartP
   /* ------------------------------------------------------------- */
   protected onPropertyPaneConfigurationStart(): void {
     // Site-scoped list enumeration
-    const site = this.properties.siteUrl || this.context.pageContext.web.absoluteUrl;
+    const site = this.context.pageContext.web.absoluteUrl;
     if (site !== this._siteForLists) {
       this._lists = [];
       this._fields = [];
@@ -330,7 +321,7 @@ export default class WebmapWebPart extends BaseClientSideWebPart<IWebmapWebPartP
       this.properties.imgField = '';
       this._listForFields = newValue;
 
-      const site = this.properties.siteUrl || this.context.pageContext.web.absoluteUrl;
+      const site = this.context.pageContext.web.absoluteUrl;
       const fieldsUrl =
         `${site}/_api/web/lists/getByTitle('${newValue}')/fields` +
         `?$filter=Hidden eq false and ReadOnlyField eq false`;
@@ -354,7 +345,7 @@ export default class WebmapWebPart extends BaseClientSideWebPart<IWebmapWebPartP
 
     /* Re-render map whenever any data-source field changes */
     if (
-        ['siteUrl', 'listName', 'latField', 'lonField', 'imgField']
+        ['listName', 'latField', 'lonField', 'imgField']
           .indexOf(path) !== -1           
           ) {
       this.render();
