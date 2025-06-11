@@ -30,7 +30,41 @@
   max-width: 300px;
   max-height: 300px;
   border-radius: 10px;
+
 }
+
+:global(.leaflet-popup) {
+  box-shadow: none !important;
+}
+
+
+:global(.leaflet-popup-content-wrapper) {
+  background: rgba(255, 255, 255, 0.15);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  border-radius: 12px;
+  border: 1px solid rgba(255, 255, 255, 0.3);
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.3); /* 💎 this is the shadow you want */
+}
+
+:global(.leaflet-popup-tip) {
+  background: rgba(255, 255, 255, 0.15);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  border: 1px solid rgba(255, 255, 255, 0.3);
+}
+
+
+:global(.custom-popup) {
+  padding: 10px;
+  border-radius: 12px;
+  color: white;
+  display: flex;          /* new */
+  flex-direction: column; /* new: stack any buttons under the image */
+  align-items: center;    /* new: centres child elements horizontally */
+}
+
+
 
 .links {
   a {

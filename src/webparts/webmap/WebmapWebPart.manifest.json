@@ -18,11 +18,11 @@
   "preconfiguredEntries": [{
     "groupId": "5c03119e-3074-46fd-976b-c60198311f70", // Advanced
     "group": { "default": "Advanced" },
-    "title": { "default": "webmap" },
-    "description": { "default": "webmap description" },
-    "officeFabricIconFontName": "Page",
+    "title": { "default": "Photo Map" },
+    "description": { "default": "Photo Map description" },
+    "officeFabricIconFontName": "MapPin",
     "properties": {
-      "description": "webmap"
+      "description": "Photo Map"
     }
   }]
 }

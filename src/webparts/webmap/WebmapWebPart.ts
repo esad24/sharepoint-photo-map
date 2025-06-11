@@ -100,7 +100,7 @@ export default class WebmapWebPart extends BaseClientSideWebPart<IWebmapWebPartP
     }
 
     /* 2. Create fresh map */
-    this.map = L.map('map').setView([51.1657, 10.4515], 6);
+    this.map = L.map('map').setView([51.4239, 6.9985], 10);
 
     L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
       attribution: '&copy; <a href="https://www.openstreetmap.org/">OpenStreetMap</a>'
@@ -110,7 +110,7 @@ export default class WebmapWebPart extends BaseClientSideWebPart<IWebmapWebPartP
     this.markerCluster = L.markerClusterGroup({
       iconCreateFunction: (cluster) => {
         const first: any = cluster.getAllChildMarkers()[0];
-        const img = (first?.options.data?.img as string) || 'fallback.jpg';
+        const img = (first?.options.data?.img as string);
 
         const count  = cluster.getChildCount();
         const digits = String(count).length;
@@ -150,14 +150,20 @@ export default class WebmapWebPart extends BaseClientSideWebPart<IWebmapWebPartP
       const imgList = markers.map(m => (m.options.data?.img as string) || 'fallback.jpg');
       let current   = 0;
 
-      const container          = L.DomUtil.create('div', '');
-      container.style.maxWidth = '320px';
-      container.style.textAlign = 'center';
+      const container = L.DomUtil.create('div', 'custom-popup');
+      container.style.width           = '320px';          // fixed width
+      container.style.maxWidth        = '100%';           // responsive cap
+      container.style.display         = 'flex';
+      container.style.flexDirection   = 'column';
+      container.style.alignItems      = 'center';         // ⬅️ horizontal centring
+      container.style.textAlign       = 'center';         // keep text centred
+
 
       const imgEl  = L.DomUtil.create('img', '', container) as HTMLImageElement;
       imgEl.src           = imgList[0];
-      imgEl.style.width   = '300px';
-      imgEl.style.height  = '300px';
+      imgEl.style.width = '100%';           // fill container width
+      imgEl.style.height = 'auto'; // or use a max height if needed
+      imgEl.style.maxHeight = '300px'; // optional constraint
       imgEl.style.objectFit = 'contain';
       imgEl.style.borderRadius = '10px';
 
@@ -229,7 +235,13 @@ export default class WebmapWebPart extends BaseClientSideWebPart<IWebmapWebPartP
           });
 
           const marker = L.marker([lat, lon], { icon, data: enriched });
-          marker.bindPopup(`<img src="${img}" class="${styles.popupImg}" />`);
+
+          marker.bindPopup(`
+          <div class="custom-popup">
+            <img src="${img}" class="${styles.popupImg}" />
+          </div>
+          `);
+                  
           this.markerCluster!.addLayer(marker);
         });
       })
