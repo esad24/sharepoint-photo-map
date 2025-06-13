@@ -10,6 +10,8 @@
 /*      • Image column                                                        */
 /* ========================================================================== */
 
+
+
 import { Version } from '@microsoft/sp-core-library';
 import {
   IPropertyPaneConfiguration,
@@ -46,8 +48,6 @@ interface IWebmapListItem {
 }
 
 export interface IWebmapWebPartProps {
-  description: string;
-
   listName:  string;            // SharePoint list title
   latField:  string;            // internal column names
   lonField:  string;
@@ -84,7 +84,7 @@ export default class WebmapWebPart extends BaseClientSideWebPart<IWebmapWebPartP
   }
 
 
-  /**  Tiny URL-only sanitizer (no external deps)                   */
+  /**  Tiny URL-only sanitizer (no external deps)  -> block XSS attacks                 */
   private sanitizeUrl(url: string): string {
     try {
       const u = new URL(url, window.location.origin);
@@ -146,6 +146,9 @@ export default class WebmapWebPart extends BaseClientSideWebPart<IWebmapWebPartP
         const badgeH = 22;
         const badgeW = digits === 1 ? badgeH : badgeH + (digits - 1) * 10;
 
+
+        // cluster icon (bigger) + Dynamic Count Badge 
+
         const html = `
           <div style="position:relative;width:60px;height:60px;display:inline-block;">
             <div style="width:60px;height:60px;border-radius:10px;overflow:hidden;">
@@ -175,34 +178,17 @@ export default class WebmapWebPart extends BaseClientSideWebPart<IWebmapWebPartP
       if (!markers.length) return;
 
       const imgList = markers.map(m => this.sanitizeUrl(m.options.data?.img as string));
-      let current   = 0;
+      let current = 0;
 
-      const container = L.DomUtil.create('div', 'custom-popup');
-      container.style.width           = '320px';          // fixed width
-      container.style.maxWidth        = '100%';           // responsive cap
-      container.style.display         = 'flex';
-      container.style.flexDirection   = 'column';
-      container.style.alignItems      = 'center';         // ⬅horizontal centring
-      container.style.textAlign       = 'center';         // keep text centred
+      const container = L.DomUtil.create('div', styles.galleryContainer);
 
 
-      const imgEl  = L.DomUtil.create('img', '', container) as HTMLImageElement;
-      imgEl.src           = imgList[0];
-      imgEl.style.width = 'auto';           // fill container width
-      imgEl.style.maxWidth = '100%';           // fill container width
+      const imgEl  = L.DomUtil.create('img',styles.popupImg , container) as HTMLImageElement;
+      imgEl.src = imgList[0];
 
-      imgEl.style.height = 'auto'; // or use a max height if needed
-      imgEl.style.maxHeight = '300px'; // optional constraint
-      imgEl.style.objectFit = 'contain';
-      imgEl.style.borderRadius = '10px';
-      imgEl.style.display = 'block';        //Required for margin auto to work
-      imgEl.style.margin = '0 auto';        //Center the image horizontally
 
-      const nav           = L.DomUtil.create('div', '', container);
-      nav.style.marginTop = '8px';
-      nav.style.display = 'flex';
-      nav.style.justifyContent = 'center';
-      nav.style.gap = '10px'; // Optional: replaces marginLeft on nextBtn
+      const nav = L.DomUtil.create('div', styles.galleryNav, container);
+
 
 
       const prevBtn = L.DomUtil.create('button', '', nav);
@@ -219,7 +205,7 @@ export default class WebmapWebPart extends BaseClientSideWebPart<IWebmapWebPartP
         imgEl.src = imgList[current];
       };
 
-      L.popup({ className: 'photoGalleryPopup', maxWidth: 350 })
+      L.popup({ className: 'photoGalleryPopup', maxWidth: 300 })
         .setLatLng(e.latlng)
         .setContent(container)
         .openOn(this.map!);
@@ -270,6 +256,8 @@ export default class WebmapWebPart extends BaseClientSideWebPart<IWebmapWebPartP
 
           const enriched = { ...item, img };     // for gallery / cluster icons
 
+
+          // single image icon ( smaller )
           const icon = L.divIcon({
             html: `<img src="${img}" style="width:40px;height:40px;border-radius:5px;" />`,
             className: '',
@@ -277,6 +265,8 @@ export default class WebmapWebPart extends BaseClientSideWebPart<IWebmapWebPartP
           });
 
           const marker = L.marker([lat, lon], { icon, data: enriched });
+
+          // single image popup 
 
           marker.bindPopup(`
           <div>

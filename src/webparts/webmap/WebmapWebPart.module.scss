@@ -26,12 +26,39 @@
   box-shadow: 0 0 10px rgba(0, 0, 0, 0.2);
 }
 
+// Popup Images
+
 .popupImg {
   max-width: 300px;
   max-height: 300px;
   border-radius: 10px;
-
 }
+
+
+// .galleryImg {
+//   width: auto;
+//   max-width: 100%;
+//   height: auto;
+//   max-height: 300px;
+//   object-fit: contain;
+//   border-radius: 10px;
+//   display: block;
+//   margin: 0 auto;
+// }
+
+
+
+
+// Gallery Container 
+
+.galleryContainer {
+  width: 300px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+}
+
 
 /* WebmapWebPart.module.scss (add at end)  */
 .photoGalleryPopup {                   /* any class name you like */
@@ -43,14 +70,13 @@
 }
 
 
-
 :global(.leaflet-popup-content-wrapper) {
   background: rgba(255, 255, 255, 0.15);
   backdrop-filter: blur(12px);
   -webkit-backdrop-filter: blur(12px);
   border-radius: 12px;
   border: 1px solid rgba(255, 255, 255, 0.3);
-  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.3); /* 💎 this is the shadow you want */
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.3); /*this is the shadow */
 }
 
 :global(.leaflet-popup-tip) {
@@ -58,6 +84,16 @@
   backdrop-filter: blur(12px);
   -webkit-backdrop-filter: blur(12px);
   border: 1px solid rgba(255, 255, 255, 0.3);
+}
+
+
+// gallery navigation bar
+
+.galleryNav {
+  margin-top: 8px;
+  display: flex;
+  justify-content: center;
+  gap: 10px;
 }
 
 
