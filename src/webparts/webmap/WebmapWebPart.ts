@@ -15,7 +15,8 @@ import { Version } from '@microsoft/sp-core-library'; // Used for versioning the
 import {
   IPropertyPaneConfiguration,     // Interface for defining the entire property pane's structure.
   PropertyPaneDropdown,           // A dropdown control for the property pane.
-  IPropertyPaneDropdownOption     // Interface for the options within a dropdown control.
+  IPropertyPaneDropdownOption,     // Interface for the options within a dropdown control.
+  IPropertyPaneGroup
 } from '@microsoft/sp-property-pane';
 import { BaseClientSideWebPart } from '@microsoft/sp-webpart-base'; // The base class for all client-side web parts.
 import { SPHttpClient, SPHttpClientResponse } from '@microsoft/sp-http'; // Used for making REST API calls to SharePoint.
@@ -57,7 +58,7 @@ declare module 'leaflet' {
  * since the actual names for latitude, longitude, and image columns are determined at
  * run-time from the web part properties.
  */
-interface IWebmapListItem {
+export interface IWebmapListItem {
   [key: string]: any;  // Any number and types of properties
   img?: string; // alias image URL
 }
@@ -67,14 +68,16 @@ interface IWebmapListItem {
  * in the property pane. These properties are saved with the web part instance.
  */
 export interface IWebmapWebPartProps {
+  dataSourceType: 'List' | 'DocumentLibrary' | '';  // property to select data source type
   listName: string; // The title of the SharePoint list to fetch data from.
   latField: string; // The internal name of the column containing the latitude.
   lonField: string; // The internal name of the column containing the longitude.
   imgField: string; // The internal name of the column containing the image.
+  libraryName?: string; // for document library
 }
 
 /* ------------------------------------------------------------------ */
-/* Web-part                                                         */
+/* Web-part     iuou                                                      */
 /* ------------------------------------------------------------------ */
 
 export default class WebmapWebPart extends BaseClientSideWebPart<IWebmapWebPartProps> {
@@ -316,46 +319,76 @@ export default class WebmapWebPart extends BaseClientSideWebPart<IWebmapWebPartP
    * Defines the configuration for the web part's property pane (the settings panel).
    */
   protected getPropertyPaneConfiguration(): IPropertyPaneConfiguration {
+    // Start with the base group that is always visible
+    const groups: IPropertyPaneGroup[] = [
+      {
+        groupName: 'Choose Data Source Type',
+        groupFields: [
+          PropertyPaneDropdown('dataSourceType', {
+            label: 'Source Type',
+            options: [
+              // Add a placeholder option for the unselected state
+              { key: '', text: ' ' },
+              { key: 'List', text: 'SharePoint List' },
+              { key: 'DocumentLibrary', text: 'Document Library' }
+            ],
+            // Default to the empty string key
+            selectedKey: this.properties.dataSourceType || '',
+          })
+        ]
+      }
+    ];
+  
+    // --- Conditionally add the next group based on the selection ---
+  
+    // If 'SharePoint List' is selected, push its configuration group
+    if (this.properties.dataSourceType === 'List') {
+      groups.push({
+        groupName: 'Select List and Fields',
+        groupFields: [
+          PropertyPaneDropdown('listName', {
+            label: 'List',
+            options: this._lists,
+            disabled: !this._lists.length
+          }),
+          PropertyPaneDropdown('latField', {
+            label: 'Latitude Field',
+            options: this._fields,
+            disabled: !this._fields.length
+          }),
+          PropertyPaneDropdown('lonField', {
+            label: 'Longitude Field',
+            options: this._fields,
+            disabled: !this._fields.length
+          }),
+          PropertyPaneDropdown('imgField', {
+            label: 'Image Field',
+            options: this._fields,
+            disabled: !this._fields.length
+          }),
+        ]
+      });
+    }
+    // Else if 'Document Library' is selected, push its group
+    else if (this.properties.dataSourceType === 'DocumentLibrary') {
+      groups.push({
+        groupName: 'Select Document Library',
+        groupFields: [
+          PropertyPaneDropdown('libraryName', {
+            label: 'Document Library',
+            options: this._lists,
+            disabled: !this._lists.length
+          })
+        ]
+      });
+    }
+  
     return {
       pages: [
         {
-          header: { description: 'Data Source' },
-          groups: [
-            {
-              groupName: 'Choose a Photo-List?',
-              groupFields: [
-                // Dropdown for selecting the SharePoint list.
-                PropertyPaneDropdown('listName', {
-                  label: 'List',
-                  options: this._lists, // Populated dynamically.
-                  disabled: !this._lists.length // Disabled until lists are loaded.
-                })
-              ]
-            },
-            {
-              groupName: 'Which columns contain…',
-              groupFields: [
-                // Dropdown for the Latitude field.
-                PropertyPaneDropdown('latField', {
-                  label: 'Latitude',
-                  options: this._fields, // Populated dynamically based on selected list.
-                  disabled: !this._fields.length
-                }),
-                // Dropdown for the Longitude field.
-                PropertyPaneDropdown('lonField', {
-                  label: 'Longitude',
-                  options: this._fields,
-                  disabled: !this._fields.length
-                }),
-                // Dropdown for the Image field.
-                PropertyPaneDropdown('imgField', {
-                  label: 'Image',
-                  options: this._fields,
-                  disabled: !this._fields.length
-                })
-              ]
-            }
-          ]
+          header: { description: '' },
+          // Use the dynamically constructed groups array
+          groups: groups
         }
       ]
     };
@@ -376,13 +409,19 @@ export default class WebmapWebPart extends BaseClientSideWebPart<IWebmapWebPartP
       this._lists = [];
       this._fields = [];
       this.properties.listName = '';
+      this.properties.libraryName = '';
+
       this.properties.latField = '';
       this.properties.lonField = '';
       this.properties.imgField = '';
+
       this._siteForLists = site; // Update the cache key.
 
-      // Fetch all non-hidden lists from the current site.
-      const listsUrl = `${site}/_api/web/lists?$filter=Hidden eq false`;
+      // Fetch lists depending on dataSourceType
+      let baseTemplateFilter = this.properties.dataSourceType === 'DocumentLibrary' ? 101 : 100;
+
+      // Fetch all non-hidden lists / documentLibraries from the current site.
+      const listsUrl = `${site}/_api/web/lists?$filter=Hidden eq false and BaseTemplate eq ${baseTemplateFilter}`;
       this.context.spHttpClient
         .get(listsUrl, SPHttpClient.configurations.v1)
         .then((r: SPHttpClientResponse) => r.json())
@@ -404,8 +443,26 @@ export default class WebmapWebPart extends BaseClientSideWebPart<IWebmapWebPartP
    * This SPFx lifecycle method is called whenever a property pane field is changed by the user.
    */
   protected onPropertyPaneFieldChanged(path: string, oldValue: any, newValue: any): void {
+    if (path === 'dataSourceType' && newValue !== oldValue) {
+      this._lists = [];
+      this.properties.listName = '';
+      this.properties.libraryName = '';
+      this._siteForLists = null;  // Reset cache to force reload
+      
+      // Refresh property pane dropdowns immediately
+      this.context.propertyPane.refresh();
+  
+      // Trigger the async fetch of new lists for the selected dataSourceType
+      this.onPropertyPaneConfigurationStart();
+  
+      // Optionally, re-render web part to reflect changes
+      //this.render();
+    }
+
+
+
     /* Reload field dropdowns when the list changes */
-    if (path === 'listName' && newValue && newValue !== this._listForFields) {
+    if (path === 'listName' && newValue && newValue !== this._listForFields && this.properties.dataSourceType === 'List') {
       // Clear old field options and selections.
       this._fields = [];
       this.properties.latField = '';
@@ -440,7 +497,7 @@ export default class WebmapWebPart extends BaseClientSideWebPart<IWebmapWebPartP
 
     /* Re-render map whenever any data-source field changes */
     // If any of the core data properties have changed, trigger a full re-render of the web part.
-    if (['listName', 'latField', 'lonField', 'imgField'].indexOf(path) !== -1) {
+    if (['listName', 'latField', 'lonField', 'imgField', 'libraryName'].indexOf(path) !== -1) {
       this.render();
     }
   }
