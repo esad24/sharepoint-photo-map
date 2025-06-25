@@ -32,6 +32,9 @@ import 'leaflet.markercluster/dist/MarkerCluster.Default.css'; // Default theme 
 // Imports the web part's specific styles defined in a SASS module.
 import styles from './WebmapWebPart.module.scss';
 
+// Impoer security functions
+import { escODataIdentifier, sanitizeUrl, escAttr } from './utils/security'; // Security helpers for escaping identifiers and URLs.
+
 /* ------------------------------------------------------------------ */
 /* Helpers & typings                                                */
 /* ------------------------------------------------------------------ */
@@ -90,51 +93,7 @@ export default class WebmapWebPart extends BaseClientSideWebPart<IWebmapWebPartP
   private _siteForLists: string | null = null;   // The site URL for which the `_lists` cache is valid.
   private _listForFields: string | null = null;  // The list name for which the `_fields` cache is valid.
 
-  /* ============================================================= */
-  /* Helpers – security                                           */
-  /* ============================================================= */
-
-  /**
-   * Escapes an identifier (like a list title or column name) for safe inclusion
-   * in a SharePoint OData REST API URL. It first doubles any single quotes (' → '')
-   * as required by the OData spec, and then URI-encodes the result to handle
-   * spaces, slashes, and other special characters.
-   * @param id The identifier string to escape.
-   * @returns A URL-safe, OData-safe identifier.
-   */
-  private escODataIdentifier(id: string): string { //  SECURITY
-    const doubled = id.replace(/'/g, "''");
-    return encodeURIComponent(doubled);
-  }
-
-  /**
-   * A lightweight URL sanitizer to prevent Cross-Site Scripting (XSS) attacks.
-   * It ensures that a URL string points to a valid 'http:' or 'https:' protocol.
-   * It uses the browser's built-in URL parser for robustness.
-   * @param url The URL string to sanitize.
-   * @returns A safe URL or an empty string if the URL is invalid/unsafe.
-   */
-  private sanitizeUrl(url: string): string {
-    try {
-      // The second argument provides a base URL for relative paths.
-      const u = new URL(url, window.location.origin);
-      return (u.protocol === 'http:' || u.protocol === 'https:') ? u.href : '';
-    } 
-    catch { return ''; } // Return empty string if URL parsing fails.
-  }
-
-  /**
-   * Escapes a string for safe use within an HTML attribute value. This prevents
-   * an attacker from breaking out of an attribute and injecting malicious HTML or scripts.
-   * @param v The string value to escape.
-   * @returns A sanitized string safe for HTML attributes.
-   */
-  private escAttr(v: string): string { // SECURITY
-    return v.replace(/&/g,  '&amp;')
-           .replace(/"/g, '&quot;')
-           .replace(/</g,  '&lt;')
-           .replace(/>/g,  '&gt;');
-  }
+  
 
   
   /* ------------------------------------------------------------- */
@@ -173,10 +132,10 @@ export default class WebmapWebPart extends BaseClientSideWebPart<IWebmapWebPartP
       this.map = undefined;
     }
     // If a data refresh timer is running, clear it.
-    if (this.dataTimer) {
-      window.clearInterval(this.dataTimer);
-      this.dataTimer = undefined;
-    }
+    // if (this.dataTimer) {
+    //   window.clearInterval(this.dataTimer);
+    //   this.dataTimer = undefined;
+    // }
 
     /* 2. Create fresh map */
     // Initialize a new map on the 'map' div, setting an initial view (coordinates and zoom level).
@@ -184,9 +143,10 @@ export default class WebmapWebPart extends BaseClientSideWebPart<IWebmapWebPartP
 
     // Add the base tile layer to the map. This provides the visual map background (roads, etc.).
     // We use OpenStreetMap here, which requires attribution.
-    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-      attribution: '&copy; <a href="https://www.openstreetmap.org/">OpenStreetMap</a>'
+    L.tileLayer('https://{s}.tile.openstreetmap.de/tiles/osmde/{z}/{x}/{y}.png', {
+      attribution: '&copy; <a href="https://www.openstreetmap.org/">OpenStreetMap</a> contributors',
     }).addTo(this.map);
+    
 
     /* 3. Cluster layer */
     // Initialize the marker cluster group.
@@ -195,7 +155,7 @@ export default class WebmapWebPart extends BaseClientSideWebPart<IWebmapWebPartP
       iconCreateFunction: (cluster) => {
         // Get the first marker in the cluster to use its image for the cluster icon.
         const first: any = cluster.getAllChildMarkers()[0];
-        const img = this.sanitizeUrl(first?.options.data?.img as string);
+        const img = sanitizeUrl(first?.options.data?.img as string);
 
         const count  = cluster.getChildCount(); // How many markers are in this cluster.
         const digits = String(count).length;     // Number of digits in the count.
@@ -206,15 +166,21 @@ export default class WebmapWebPart extends BaseClientSideWebPart<IWebmapWebPartP
         // The HTML for the custom cluster icon.
         // Note the use of `escAttr` for security when inserting the image URL.
         const html = `
-          <div class="${styles.clusterIconContainer}">
-            <div class="${styles.clusterImageWrapper}">
-              <img src="${this.escAttr(img)}" class="${styles.clusterImage}" />
+          <div style="position:relative;width:60px;height:60px;display:inline-block;">
+            <div style="width:60px;height:60px;border-radius:10px;overflow:hidden;">
+              <img src="${escAttr(img)}" style="width:100%;height:100%;object-fit:cover;" />
             </div>
-            <div class="${styles.clusterCountBadge}" style="width:${badgeW}px;">
+            <div style="
+              position:absolute;top:-8px;right:-8px;width:${badgeW}px;height:${badgeH}px;
+              background:#007AFF;color:#fff;font:700 12px/1 'Segoe UI',sans-serif;
+              padding:0 4px;border-radius:9999px;display:flex;align-items:center;
+              justify-content:center;box-shadow:0 0 2px rgba(0,0,0,.25);">
               ${count}
             </div>
           </div>
         `;
+
+        return L.divIcon({ html, className: '', iconSize: [60, 60] });
 
         // Return a DivIcon, which allows using custom HTML for an icon.
         return L.divIcon({ html, className: '', iconSize: [60, 60] });
@@ -232,7 +198,7 @@ export default class WebmapWebPart extends BaseClientSideWebPart<IWebmapWebPartP
       if (!markers.length) return;
 
       // Create a simple image gallery from all the images within the cluster.
-      const imgList = markers.map(m => this.sanitizeUrl(m.options.data?.img as string));
+      const imgList = markers.map(m => sanitizeUrl(m.options.data?.img as string));
       let current = 0; // Index of the currently displayed image.
 
       // Programmatically create the HTML elements for the gallery popup using Leaflet's DOM utilities.
@@ -266,7 +232,7 @@ export default class WebmapWebPart extends BaseClientSideWebPart<IWebmapWebPartP
 
     /* 5. First data load + 30-sec interval */
     this.loadMapData(); // Load the data immediately.
-    this.dataTimer = window.setInterval(() => this.loadMapData(), 30_000); // And then reload every 30 seconds.
+    //this.dataTimer = window.setInterval(() => this.loadMapData(), 30_000); // And then reload every 30 seconds.
   }
 
   /* ------------------------------------------------------------- */
@@ -286,10 +252,10 @@ export default class WebmapWebPart extends BaseClientSideWebPart<IWebmapWebPartP
 
     // Construct the SharePoint REST API URL.
     const site = this.context.pageContext.web.absoluteUrl;
-    const listPart = this.escODataIdentifier(listName); // Safely escape list name.
+    const listPart = escODataIdentifier(listName); // Safely escape list name.
     // Select only the columns we need, escaping each field name for security.
     const selectFields = [latField, lonField, imgField]
-      .map(f => this.escODataIdentifier(f)) // Security
+      .map(f => escODataIdentifier(f)) // Security
       .join(',');
 
     const url =
@@ -309,7 +275,7 @@ export default class WebmapWebPart extends BaseClientSideWebPart<IWebmapWebPartP
           if (!item[latField] || !item[lonField] || !item[imgField]?.Url) return;
 
           const rawImg = (item[imgField].Url as string);
-          const img = this.sanitizeUrl(rawImg); // Sanitize the URL before use.
+          const img = sanitizeUrl(rawImg); // Sanitize the URL before use.
           if (!img) return; // Skip if the URL is invalid.
 
           // Parse coordinates.
@@ -450,7 +416,7 @@ export default class WebmapWebPart extends BaseClientSideWebPart<IWebmapWebPartP
       const site = this.context.pageContext.web.absoluteUrl;
       // Fetch all non-hidden, non-readonly fields for the newly selected list.
       const fieldsUrl =
-        `${site}/_api/web/lists/getByTitle('${this.escODataIdentifier(newValue)}')/fields` +
+        `${site}/_api/web/lists/getByTitle('${escODataIdentifier(newValue)}')/fields` +
         `?$filter=Hidden eq false and ReadOnlyField eq false`;
 
       this.context.spHttpClient
