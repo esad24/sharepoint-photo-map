@@ -1,13 +1,13 @@
 /* ========================================================================== */
-/* WebmapWebPart.ts                                                          */
-/* - SPFx client-side web-part                                                 */
-/* - Leaflet map with clustered picture markers                                */
-/* - Fully configurable in the property-pane:                                  */
-/* - Site URL                                                                   */
-/* - List                                                                       */
-/* - Latitude column                                                            */
-/* - Longitude column                                                           */
-/* - Image column                                                               */
+/* WebmapWebPart.ts                                                           */
+/* - SPFx client-side web-part                                                */
+/* - Leaflet map with clustered picture markers                               */
+/* - Fully configurable in the property-pane:                                 */
+/* - Site URL                                                                 */
+/* - List                                                                     */
+/* - Latitude column                                                          */
+/* - Longitude column                                                         */
+/* - Image column                                                             */
 /* ========================================================================== */
 
 // Imports from the SharePoint Framework (SPFx) libraries.
@@ -273,6 +273,9 @@ export default class WebmapWebPart extends BaseClientSideWebPart<IWebmapWebPartP
         const items = json.value as IWebmapListItem[];
         this.markerCluster!.clearLayers(); // Clear all old markers before adding new ones.
 
+        // NEW: Create an array to hold all valid coordinates
+        const allLatLngs: L.LatLng[] = [];
+
         items.forEach(item => {
           // Ensure the item has the necessary data. The image is often in a sub-property like 'Url'.
           if (!item[latField] || !item[lonField] || !item[imgField]?.Url) return;
@@ -284,6 +287,12 @@ export default class WebmapWebPart extends BaseClientSideWebPart<IWebmapWebPartP
           // Parse coordinates.
           const lat = parseFloat(item[latField]);
           const lon = parseFloat(item[lonField]);
+
+          // NEW: Check if coordinates are valid numbers before using them
+          if (isNaN(lat) || isNaN(lon)) return;
+
+          // NEW: Add the valid coordinates to our array
+          allLatLngs.push(L.latLng(lat, lon));
 
           // Create an "enriched" version of the item with the sanitized img URL for easy access.
           const enriched = { ...item, img };  // copy all properties of item and add sanitized img url
@@ -308,6 +317,17 @@ export default class WebmapWebPart extends BaseClientSideWebPart<IWebmapWebPartP
           // Add the final marker to the cluster layer.
           this.markerCluster!.addLayer(marker);
         });
+
+
+        // NEW: After processing all items, check if we have any coordinates
+        if (allLatLngs.length > 0 && this.map) {
+          // Create a bounding box around all points
+          const bounds = L.latLngBounds(allLatLngs);
+          // Tell the map to fit itself to these bounds, with a little padding
+          this.map.fitBounds(bounds.pad(0.1));
+        }
+
+
       })
       .catch(err => console.error('Webmap → list fetch failed:', err));
   }
