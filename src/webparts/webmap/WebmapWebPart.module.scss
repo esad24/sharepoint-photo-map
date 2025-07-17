@@ -50,11 +50,13 @@
 
 
 /* WebmapWebPart.module.scss (add at end)  */
-.photoGalleryPopup {                   /* any class name you like */
-  .leaflet-popup-content-wrapper,
-  .leaflet-popup-content {
-    margin: 0 !important;             /* kill asymmetric margin   */
-    padding: 0 !important;            /* optional – tighter look  */
+.photoGalleryPopup {
+  :global {
+    .leaflet-popup-content-wrapper,
+    .leaflet-popup-content {
+      margin: 0 !important;
+      padding: 0 !important;
+    }
   }
 }
 

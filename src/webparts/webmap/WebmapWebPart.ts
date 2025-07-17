@@ -15,20 +15,25 @@ import { Version } from '@microsoft/sp-core-library'; // Used for versioning the
 import {
   IPropertyPaneConfiguration,     // Interface for defining the entire property pane's structure.
   PropertyPaneDropdown,           // A dropdown control for the property pane.
-  IPropertyPaneDropdownOption,     // Interface for the options within a dropdown control.
+  IPropertyPaneDropdownOption,    // Interface for the options within a dropdown control.
   IPropertyPaneGroup
 } from '@microsoft/sp-property-pane';
 import { BaseClientSideWebPart } from '@microsoft/sp-webpart-base'; // The base class for all client-side web parts.
 import { SPHttpClient, SPHttpClientResponse } from '@microsoft/sp-http'; // Used for making REST API calls to SharePoint.
 
 
-// Imports for the Leaflet mapping library and its marker cluster plugin.
-import * as L from 'leaflet';              // The core Leaflet library.
-import 'leaflet/dist/leaflet.css';         // Default CSS for Leaflet for proper rendering of map controls, etc.
 
+
+// Imports for the Leaflet mapping library and its marker cluster plugin.
+import * as L from 'leaflet';               // The core Leaflet library.
+import 'leaflet/dist/leaflet.css';       // Default CSS for Leaflet for proper rendering of map controls, etc.
 import 'leaflet.markercluster';            // The marker cluster plugin logic.
-import 'leaflet.markercluster/dist/MarkerCluster.css';         // Main CSS for the cluster plugin.
+import 'leaflet.markercluster/dist/MarkerCluster.css';       // Main CSS for the cluster plugin.
 import 'leaflet.markercluster/dist/MarkerCluster.Default.css'; // Default theme for the cluster icons.
+
+//import 'esri-leaflet'; // This import makes L.esri available
+
+
 
 // Imports the web part's specific styles defined in a SASS module.
 import styles from './WebmapWebPart.module.scss';
@@ -37,8 +42,13 @@ import styles from './WebmapWebPart.module.scss';
 import { escODataIdentifier, sanitizeUrl, escAttr } from './utils/security'; // Security helpers for escaping identifiers and URLs.
 
 /* ------------------------------------------------------------------ */
-/* Helpers & typings                                                */
+/* Helpers & typings                                                  */
 /* ------------------------------------------------------------------ */
+
+// FIX: Define types for SharePoint objects to avoid using 'any'.
+interface ISPList { Title: string; }
+interface ISPField { TypeAsString: string; InternalName: string; Title: string; }
+interface IClusterClickEvent extends L.LeafletEvent { layer: L.MarkerCluster; latlng: L.LatLng; }
 
 /**
  * This is a TypeScript feature called "module augmentation".
@@ -48,7 +58,7 @@ import { escODataIdentifier, sanitizeUrl, escAttr } from './utils/security'; // 
  */
 declare module 'leaflet' {
   interface MarkerOptions {
-    data?: any; // Allow storing the raw list item.
+    data?: IWebmapListItem; // FIX: Use the specific item interface instead of 'any'.
   }
 }
 
@@ -59,7 +69,7 @@ declare module 'leaflet' {
  * run-time from the web part properties.
  */
 export interface IWebmapListItem {
-  [key: string]: any;  // Any number and types of properties
+  [key: string]: unknown;  // FIX: Use 'unknown' instead of 'any' for better type safety.
   img?: string; // alias image URL
 }
 
@@ -77,16 +87,16 @@ export interface IWebmapWebPartProps {
 }
 
 /* ------------------------------------------------------------------ */
-/* Web-part     iuou                                                      */
+/* Web-part                                                           */
 /* ------------------------------------------------------------------ */
 
 export default class WebmapWebPart extends BaseClientSideWebPart<IWebmapWebPartProps> {
 
   /* ––– Members that survive re-renders ––––––––––––––––––––––––––– */
   // These class members hold state that should persist across web part re-renders.
-  private map: L.Map | undefined;                      // Holds the Leaflet map instance.
+  private map: L.Map | undefined;                       // Holds the Leaflet map instance.
   private markerCluster: L.MarkerClusterGroup | undefined; // Holds the marker cluster layer instance.
-  private dataTimer: number | undefined;               // Holds the ID of the setInterval timer for data refreshes.
+  private dataTimer: number | undefined;                   // Holds the ID of the setInterval timer for data refreshes.
 
   // Caching for property pane dropdown options to avoid redundant API calls.
   private _lists: IPropertyPaneDropdownOption[] = [];  // Cached list of SharePoint lists.
@@ -96,11 +106,11 @@ export default class WebmapWebPart extends BaseClientSideWebPart<IWebmapWebPartP
   private _siteForLists: string | null = null;   // The site URL for which the `_lists` cache is valid.
   private _listForFields: string | null = null;  // The list name for which the `_fields` cache is valid.
 
-  
 
-  
+
+
   /* ------------------------------------------------------------- */
-  /* RENDER                                                      */
+  /* RENDER                                                        */
   /* ------------------------------------------------------------- */
   /**
    * The main render method called by the SPFx framework to display the web part.
@@ -121,7 +131,7 @@ export default class WebmapWebPart extends BaseClientSideWebPart<IWebmapWebPartP
   }
 
   /* ------------------------------------------------------------- */
-  /* Map creation / refresh                                     */
+  /* Map creation / refresh                                        */
   /* ------------------------------------------------------------- */
   /**
    * Initializes or refreshes the Leaflet map instance. This method handles
@@ -146,9 +156,15 @@ export default class WebmapWebPart extends BaseClientSideWebPart<IWebmapWebPartP
 
     // Add the base tile layer to the map. This provides the visual map background (roads, etc.).
     // We use OpenStreetMap here, which requires attribution.
-    L.tileLayer('https://{s}.tile.openstreetmap.de/tiles/osmde/{z}/{x}/{y}.png', {
-      attribution: '&copy; <a href="https://www.openstreetmap.org/">OpenStreetMap</a> contributors',
-    }).addTo(this.map);
+
+    // L.tileLayer('https://{s}.tile.openstreetmap.de/tiles/osmde/{z}/{x}/{y}.png', {
+    //   attribution: '&copy; <a href="https://www.openstreetmap.org/">OpenStreetMap</a> contributors',
+    // }).addTo(this.map);
+
+    
+    /* 3. Add ArcGIS tile layer instead of OpenStreetMap */
+    this.addArcGISTileLayer();
+
     
 
     /* 3. Cluster layer */
@@ -157,7 +173,7 @@ export default class WebmapWebPart extends BaseClientSideWebPart<IWebmapWebPartP
       // `iconCreateFunction` is a customization that defines how a cluster icon looks.
       iconCreateFunction: (cluster) => {
         // Get the first marker in the cluster to use its image for the cluster icon.
-        const first: any = cluster.getAllChildMarkers()[0];
+        const first: L.Marker = cluster.getAllChildMarkers()[0]; // FIX: Use the specific L.Marker type instead of 'any'.
         const img = sanitizeUrl(first?.options.data?.img as string);
 
         const count  = cluster.getChildCount(); // How many markers are in this cluster.
@@ -185,8 +201,6 @@ export default class WebmapWebPart extends BaseClientSideWebPart<IWebmapWebPartP
 
         return L.divIcon({ html, className: '', iconSize: [60, 60] });
 
-        // Return a DivIcon, which allows using custom HTML for an icon.
-        return L.divIcon({ html, className: '', iconSize: [60, 60] });
       },
       zoomToBoundsOnClick: false // Disable the default behavior of zooming in when a cluster is clicked.
     });
@@ -196,8 +210,8 @@ export default class WebmapWebPart extends BaseClientSideWebPart<IWebmapWebPartP
 
     /* 4. Gallery popup on cluster click */
     // Since zoomToBoundsOnClick is false, we can define our own click behavior.
-    this.markerCluster.on('clusterclick', (e: any) => {
-      const markers = e.layer.getAllChildMarkers() as L.Marker<any>[];
+    this.markerCluster.on('clusterclick', (e: IClusterClickEvent) => { // FIX: Use a specific event type instead of 'any'.
+      const markers = e.layer.getAllChildMarkers(); // FIX: Removed unnecessary cast to 'L.Marker<any>[]'.
       if (!markers.length) return;
 
       // Create a simple image gallery from all the images within the cluster.
@@ -206,19 +220,19 @@ export default class WebmapWebPart extends BaseClientSideWebPart<IWebmapWebPartP
 
       // Programmatically create the HTML elements for the gallery popup using Leaflet's DOM utilities.
       const container = L.DomUtil.create('div', styles.galleryContainer);
-      
+
       const imgEl = L.DomUtil.create('img', styles.popupImg, container) as HTMLImageElement;
       imgEl.src = imgList[0];
-      
+
       const nav = L.DomUtil.create('div', styles.galleryNav, container);
-      
+
       const prevBtn = L.DomUtil.create('button', '', nav);
       prevBtn.innerHTML = '◀';
       prevBtn.onclick = () => {
         current = (current - 1 + imgList.length) % imgList.length; // Cycle backwards.
         imgEl.src = imgList[current];
       };
-      
+
       const nextBtn = L.DomUtil.create('button', '', nav);
       nextBtn.innerHTML = '▶';
       nextBtn.onclick = () => {
@@ -238,10 +252,450 @@ export default class WebmapWebPart extends BaseClientSideWebPart<IWebmapWebPartP
     //this.dataTimer = window.setInterval(() => this.loadMapData(), 30_000); // And then reload every 30 seconds.
   }
 
+
+
+
+
+
+
+
+
+
+
+
+
+
+/**
+ * Add ArcGIS tile layer to the map
+ */
+private addArcGISTileLayer(): void {
+  if (!this.map) return;
+
+  // Your ArcGIS webmap ID extracted from the URL
+  const webmapId = '37606acca6044778bd937f21303a4503';
+  
+  // ArcGIS Online tile service URL pattern
+  const arcgisTileUrl = 'https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}';
+
+  try {
+    L.tileLayer(arcgisTileUrl, {
+      attribution: 'Tiles &copy; Esri &mdash; Source: Esri, i-cubed, USDA, USGS, AEX, GeoEye, Getmapping, Aerogrid, IGN, IGP, UPR-EGP, and the GIS User Community',
+      maxZoom: 18,
+      id: 'arcgis-tiles'
+    }).addTo(this.map);
+
+    // Add vector tile layer with proper styling
+    this.addArcGISVectorLayer(webmapId);
+  } catch (error) {
+    console.error('Failed to add ArcGIS tile layer:', error);
+    this.addFallbackTileLayer();
+  }
+}
+
+/**
+ * Fallback tile layer in case ArcGIS fails
+ */
+private addFallbackTileLayer(): void {
+  if (!this.map) return;
+
+  L.tileLayer('https://{s}.tile.openstreetmap.de/tiles/osmde/{z}/{x}/{y}.png', {
+    attribution: '&copy; <a href="https://www.openstreetmap.org/">OpenStreetMap</a> contributors',
+  }).addTo(this.map);
+}
+
+/**
+ * Add ArcGIS vector layer (webmap content)
+ */
+private addArcGISVectorLayer(webmapId: string): void {
+  if (!this.map) return;
+
+  const webmapUrl = `https://hochtiefinfra.maps.arcgis.com/sharing/rest/content/items/${webmapId}/data?f=json`;
+  
+  // Fetch webmap definition
+  fetch(webmapUrl)
+    .then(response => {
+      if (!response.ok) {
+        throw new Error(`HTTP error! status: ${response.status}`);
+      }
+      return response.json();
+    })
+    .then(webmapData => {
+      if (webmapData && typeof webmapData === 'object') {
+        console.log('Webmap data:', webmapData);
+        
+        // Process operational layers from the webmap
+        if (webmapData.operationalLayers && Array.isArray(webmapData.operationalLayers)) {
+          webmapData.operationalLayers.forEach((layer: any) => {
+            console.log('Processing layer:', layer.title, layer.layerType);
+            
+            // Handle Group Layers (like BR_Leverkusen_01)
+            if (layer && layer.layerType === 'GroupLayer' && layer.layers && Array.isArray(layer.layers)) {
+              console.log(`Found Group Layer: ${layer.title} with ${layer.layers.length} sublayers`);
+              
+              layer.layers.forEach((sublayer: any) => {
+                console.log('Processing sublayer:', sublayer.title, sublayer.layerType, sublayer.url);
+                
+                if (sublayer && sublayer.layerType === 'ArcGISFeatureLayer' && sublayer.url) {
+                  // Remove the visibility check - load all layers
+                  this.addArcGISFeatureLayer(sublayer);
+                }
+              });
+            }
+            // Handle direct ArcGIS Feature Layers
+            else if (layer && layer.layerType === 'ArcGISFeatureLayer' && layer.url) {
+              this.addArcGISFeatureLayer(layer);
+            }
+            // Handle direct ArcGIS Map Service Layers
+            else if (layer && layer.layerType === 'ArcGISMapServiceLayer' && layer.url) {
+              this.addArcGISMapServiceLayer(layer);
+            }
+          });
+        }
+        
+        // Also check for baseMap layers
+        if (webmapData.baseMap && webmapData.baseMap.baseMapLayers && Array.isArray(webmapData.baseMap.baseMapLayers)) {
+          webmapData.baseMap.baseMapLayers.forEach((layer: any) => {
+            if (layer && layer.url) {
+              this.addArcGISMapServiceLayer(layer);
+            }
+          });
+        }
+      }
+    })
+    .catch(error => {
+      console.warn('Could not load webmap data:', error);
+    });
+}
+
+/**
+ * Convert ESRI color array to CSS color string
+ */
+private esriColorToCSS(esriColor: number[]): string {
+  if (!esriColor || esriColor.length < 3) return '#3388ff';
+  
+  const [r, g, b, a = 255] = esriColor;
+  if (a < 255) {
+    return `rgba(${r}, ${g}, ${b}, ${a / 255})`;
+  }
+  return `rgb(${r}, ${g}, ${b})`;
+}
+
+/**
+ * Get layer styling information from ArcGIS service
+ */
+private async getLayerDrawingInfo(serviceUrl: string): Promise<any> {
+  try {
+    // Ensure we're getting the correct layer info URL
+    const url = String(serviceUrl);
+    const layerInfoUrl = url.indexOf('?') !== -1 ? `${url}&f=json` : `${url}?f=json`;
+    console.log('Fetching layer info from:', layerInfoUrl);
+    
+    const response = await fetch(layerInfoUrl);
+    if (!response.ok) {
+      console.warn(`Failed to fetch layer info: ${response.status}`);
+      return null;
+    }
+    
+    const layerInfo = await response.json();
+    console.log('Layer info:', layerInfo);
+    
+    return layerInfo.drawingInfo || null;
+  } catch (error) {
+    console.error('Failed to get layer drawing info:', error);
+    return null;
+  }
+}
+
+/**
+ * Create style function for GeoJSON layer based on ArcGIS renderer
+ */
+private createStyleFunction(drawingInfo: any): (feature: any) => any {
+  return (feature: any) => {
+    const defaultStyle = {
+      color: '#3388ff',
+      weight: 2,
+      opacity: 0.8,
+      fillOpacity: 0.4,
+      fillColor: '#3388ff'
+    };
+
+    if (!drawingInfo || !drawingInfo.renderer) {
+      return defaultStyle;
+    }
+
+    const renderer = drawingInfo.renderer;
+    
+    // Handle unique value renderer (most common for your data)
+    if (renderer.type === 'uniqueValue') {
+      const fieldValue = feature.properties[renderer.field1];
+      
+      // Find matching unique value info
+      const matchingInfo = renderer.uniqueValueInfos?.find((info: any) => 
+        info.value === fieldValue || info.value === String(fieldValue)
+      );
+      
+      if (matchingInfo && matchingInfo.symbol) {
+        return this.convertEsriSymbolToLeafletStyle(matchingInfo.symbol);
+      }
+      
+      // Use default symbol if no match found
+      if (renderer.defaultSymbol) {
+        return this.convertEsriSymbolToLeafletStyle(renderer.defaultSymbol);
+      }
+    }
+    
+    // Handle simple renderer
+    if (renderer.type === 'simple' && renderer.symbol) {
+      return this.convertEsriSymbolToLeafletStyle(renderer.symbol);
+    }
+    
+    return defaultStyle;
+  };
+}
+
+/**
+ * Convert ESRI symbol to Leaflet style
+ */
+private convertEsriSymbolToLeafletStyle(symbol: any): any {
+  const style: any = {};
+  
+  if (symbol.type === 'esriSLS') { // Simple Line Symbol
+    style.color = this.esriColorToCSS(symbol.color);
+    style.weight = symbol.width || 2;
+    style.opacity = symbol.color && symbol.color.length > 3 ? symbol.color[3] / 255 : 1;
+    
+    // Handle line style
+    if (symbol.style === 'esriSLSDash') {
+      style.dashArray = '5,5';
+    } else if (symbol.style === 'esriSLSDot') {
+      style.dashArray = '2,2';
+    } else if (symbol.style === 'esriSLSDashDot') {
+      style.dashArray = '5,2,2,2';
+    }
+  } else if (symbol.type === 'esriSFS') { // Simple Fill Symbol
+    style.fillColor = this.esriColorToCSS(symbol.color);
+    style.fillOpacity = symbol.color && symbol.color.length > 3 ? symbol.color[3] / 255 : 0.6;
+    
+    // Handle outline
+    if (symbol.outline) {
+      style.color = this.esriColorToCSS(symbol.outline.color);
+      style.weight = symbol.outline.width || 1;
+      style.opacity = symbol.outline.color && symbol.outline.color.length > 3 ? 
+        symbol.outline.color[3] / 255 : 1;
+    }
+  } else if (symbol.type === 'esriSMS') { // Simple Marker Symbol
+    style.radius = symbol.size || 6;
+    style.fillColor = this.esriColorToCSS(symbol.color);
+    style.fillOpacity = symbol.color && symbol.color.length > 3 ? symbol.color[3] / 255 : 1;
+    
+    // Handle outline
+    if (symbol.outline) {
+      style.color = this.esriColorToCSS(symbol.outline.color);
+      style.weight = symbol.outline.width || 1;
+      style.opacity = symbol.outline.color && symbol.outline.color.length > 3 ? 
+        symbol.outline.color[3] / 255 : 1;
+    }
+  }
+  
+  return style;
+}
+
+/**
+ * Add an ArcGIS Feature Layer with proper styling (Optimized for performance)
+ */
+private async addArcGISFeatureLayer(layerConfig: any): Promise<void> {
+  if (!this.map || !layerConfig || !layerConfig.url) return;
+
+  const featureServiceUrl = layerConfig.url;
+  console.log(`Loading feature layer: ${layerConfig.title} from ${featureServiceUrl}`);
+  
+  try {
+    // First, get the layer info to understand the data
+    const layerInfoUrl = `${featureServiceUrl}?f=json`;
+    const infoResponse = await fetch(layerInfoUrl);
+    const layerInfo = await infoResponse.json();
+    
+    // Get the maximum record count from layer info
+    const maxRecordCount = layerInfo.maxRecordCount || 1000;
+    
+    // Get drawing info for styling
+    const drawingInfo = layerInfo.drawingInfo || await this.getLayerDrawingInfo(featureServiceUrl);
+    
+    // Query all features - handle pagination if needed
+    let allFeatures: any[] = [];
+    let resultOffset = 0;
+    let hasMore = true;
+    
+    while (hasMore) {
+      const queryParams = new URLSearchParams({
+        'where': '1=1',
+        'outFields': 'Layer,RefName,Entity', // Only request fields needed for styling
+        'f': 'geojson',
+        'outSR': '4326',
+        'returnGeometry': 'true',
+        'resultOffset': resultOffset.toString(),
+        'resultRecordCount': maxRecordCount.toString(),
+        'geometryPrecision': '6' // Reduce precision for better performance
+      });
+      
+      const queryUrl = `${featureServiceUrl}/query?${queryParams.toString()}`;
+      
+      const response = await fetch(queryUrl);
+      if (!response.ok) {
+        throw new Error(`HTTP error! status: ${response.status}`);
+      }
+      
+      const geojsonData = await response.json();
+      
+      if (geojsonData && geojsonData.features && geojsonData.features.length > 0) {
+        allFeatures = allFeatures.concat(geojsonData.features);
+        resultOffset += geojsonData.features.length;
+        hasMore = geojsonData.features.length === maxRecordCount;
+      } else {
+        hasMore = false;
+      }
+    }
+    
+    console.log(`Total features fetched for ${layerConfig.title}: ${allFeatures.length}`);
+    
+    if (allFeatures.length > 0) {
+      // Create the complete GeoJSON object
+      const completeGeoJSON = {
+        type: 'FeatureCollection' as const,
+        features: allFeatures
+      } as any;
+      
+      // Create style function based on drawing info
+      const styleFunction = this.createStyleFunction(drawingInfo);
+      
+      // Create a GeoJSON layer optimized for performance
+      const geoJsonLayer = L.geoJSON(completeGeoJSON, {
+        style: (feature) => {
+          const style = styleFunction(feature);
+          // Ensure polygon visibility
+          if (layerConfig.title && layerConfig.title.includes('Polys')) {
+            style.fillOpacity = style.fillOpacity || 0.6;
+            style.weight = style.weight || 1; // Reduce line weight for performance
+          }
+          return style;
+        },
+        pointToLayer: (feature, latlng) => {
+          const style = styleFunction(feature);
+          return L.circleMarker(latlng, style);
+        },
+        // Disable all interactivity for better performance
+        interactive: false,
+        bubblingMouseEvents: false
+      });
+
+      // Add the layer to the map
+      geoJsonLayer.addTo(this.map!);
+      
+      console.log(`✓ Successfully added feature layer: ${layerConfig.title} with ${allFeatures.length} features`);
+      
+      // Zoom to the layer bounds if it's the BR_Leverkusen layer
+      if (layerConfig.title && layerConfig.title.includes('Leverkusen') && allFeatures.length > 0) {
+        const bounds = geoJsonLayer.getBounds();
+        if (bounds.isValid()) {
+          this.map!.fitBounds(bounds, { padding: [50, 50] });
+        }
+      }
+    }
+  } catch (error) {
+    console.error(`Failed to load feature layer ${layerConfig.title || 'Unknown'}:`, error);
+  }
+}
+
+/**
+ * Create popup content for features
+ */
+
+/*
+private createPopupContent(properties: any, layerConfig: any): string {
+  let content = `<div style="max-width: 300px;">`;
+  content += `<h4>${layerConfig.title || 'Feature'}</h4>`;
+  
+  // Show key properties
+  const keyFields = ['RefName', 'Layer', 'Entity', 'DocName', 'Color'];
+  
+  keyFields.forEach(field => {
+    if (properties[field] !== undefined && properties[field] !== null && properties[field] !== '') {
+      content += `<strong>${field}:</strong> ${properties[field]}<br>`;
+    }
+  });
+  
+  // Add a "Show all" details section
+  content += `<details style="margin-top: 10px;">`;
+  content += `<summary>Show all properties</summary>`;
+  
+  Object.keys(properties).forEach(key => {
+    if (keyFields.indexOf(key) === -1 && properties[key] !== undefined && properties[key] !== null && properties[key] !== '') {
+      content += `<strong>${key}:</strong> ${properties[key]}<br>`;
+    }
+  });
+  
+  content += `</details>`;
+  content += `</div>`;
+  
+  return content;
+}
+*/
+
+/**
+ * Add an ArcGIS Map Service Layer
+ */
+private addArcGISMapServiceLayer(layerConfig: any): void {
+  if (!this.map || !layerConfig) return;
+
+  const baseUrl = layerConfig.url;
+  if (!baseUrl) return;
+  
+  console.log(`Adding map service layer: ${layerConfig.title} from ${baseUrl}`);
+  
+  // For each sublayer, add as a tile layer
+  if (layerConfig.layers && Array.isArray(layerConfig.layers)) {
+    layerConfig.layers.forEach((sublayer: any) => {
+      if (sublayer && sublayer.defaultVisibility && typeof sublayer.id !== 'undefined') {
+        const tileUrl = `${baseUrl}/${sublayer.id}/tile/{z}/{y}/{x}`;
+        
+        L.tileLayer(tileUrl, {
+          opacity: layerConfig.opacity || 1,
+          attribution: 'ArcGIS Map Service'
+        }).addTo(this.map!);
+        
+        console.log(`Added sublayer ${sublayer.id} as tile layer`);
+      }
+    });
+  } else {
+    // If no sublayers, try to add the service directly
+    const tileUrl = `${baseUrl}/tile/{z}/{y}/{x}`;
+    
+    L.tileLayer(tileUrl, {
+      opacity: layerConfig.opacity || 1,
+      attribution: 'ArcGIS Map Service'
+    }).addTo(this.map!);
+    
+    console.log(`Added map service as tile layer: ${layerConfig.title}`);
+  }
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
   /* ------------------------------------------------------------- */
-  /* List→markers                                                */
+  /* List→markers                                                  */
   /* ------------------------------------------------------------- */
-  /** 
+  /**
    * Fetches data from the configured SharePoint list and populates the map with markers.
    */
   private loadMapData(): void {
@@ -268,7 +722,7 @@ export default class WebmapWebPart extends BaseClientSideWebPart<IWebmapWebPartP
     // Use spHttpClient to make the GET request to SharePoint.
     this.context.spHttpClient
       .get(url, SPHttpClient.configurations.v1)
-      .then((r: SPHttpClientResponse) => r.json()) // Parse the response as JSON.
+      .then((r: SPHttpClientResponse) => r.json())
       .then(json => {
         const items = json.value as IWebmapListItem[];
         this.markerCluster!.clearLayers(); // Clear all old markers before adding new ones.
@@ -277,16 +731,18 @@ export default class WebmapWebPart extends BaseClientSideWebPart<IWebmapWebPartP
         const allLatLngs: L.LatLng[] = [];
 
         items.forEach(item => {
+          // FIX: Add type assertions when accessing properties from an 'unknown' type.
+          const imgData = item[imgField] as { Url: string };
           // Ensure the item has the necessary data. The image is often in a sub-property like 'Url'.
-          if (!item[latField] || !item[lonField] || !item[imgField]?.Url) return;
+          if (!item[latField] || !item[lonField] || !imgData?.Url) return;
 
-          const rawImg = (item[imgField].Url as string);
+          const rawImg = imgData.Url;
           const img = sanitizeUrl(rawImg); // Sanitize the URL before use.
           if (!img) return; // Skip if the URL is invalid.
 
           // Parse coordinates.
-          const lat = parseFloat(item[latField]);
-          const lon = parseFloat(item[lonField]);
+          const lat = parseFloat(item[latField] as string);
+          const lon = parseFloat(item[lonField] as string);
 
           // NEW: Check if coordinates are valid numbers before using them
           if (isNaN(lat) || isNaN(lon)) return;
@@ -313,7 +769,7 @@ export default class WebmapWebPart extends BaseClientSideWebPart<IWebmapWebPartP
             <img src="${img}" class="${styles.popupImg}" />
           </div>
           `);
-                  
+
           // Add the final marker to the cluster layer.
           this.markerCluster!.addLayer(marker);
         });
@@ -333,7 +789,7 @@ export default class WebmapWebPart extends BaseClientSideWebPart<IWebmapWebPartP
   }
 
   /* ------------------------------------------------------------- */
-  /* Property-pane                                              */
+  /* Property-pane                                                 */
   /* ------------------------------------------------------------- */
   /**
    * Defines the configuration for the web part's property pane (the settings panel).
@@ -358,9 +814,9 @@ export default class WebmapWebPart extends BaseClientSideWebPart<IWebmapWebPartP
         ]
       }
     ];
-  
+
     // --- Conditionally add the next group based on the selection ---
-  
+
     // If 'SharePoint List' is selected, push its configuration group
     if (this.properties.dataSourceType === 'List') {
       groups.push({
@@ -402,7 +858,7 @@ export default class WebmapWebPart extends BaseClientSideWebPart<IWebmapWebPartP
         ]
       });
     }
-  
+
     return {
       pages: [
         {
@@ -415,7 +871,7 @@ export default class WebmapWebPart extends BaseClientSideWebPart<IWebmapWebPartP
   }
 
   /* ------------------------------------------------------------- */
-  /* Dynamic options loader                                     */
+  /* Dynamic options loader                                        */
   /* ------------------------------------------------------------- */
   /**
    * This SPFx lifecycle method is called when the property pane is opened.
@@ -438,7 +894,8 @@ export default class WebmapWebPart extends BaseClientSideWebPart<IWebmapWebPartP
       this._siteForLists = site; // Update the cache key.
 
       // Fetch lists depending on dataSourceType
-      let baseTemplateFilter = this.properties.dataSourceType === 'DocumentLibrary' ? 101 : 100;
+      // FIX: Use 'const' because this variable is never reassigned.
+      const baseTemplateFilter = this.properties.dataSourceType === 'DocumentLibrary' ? 101 : 100;
 
       // Fetch all non-hidden lists / documentLibraries from the current site.
       const listsUrl = `${site}/_api/web/lists?$filter=Hidden eq false and BaseTemplate eq ${baseTemplateFilter}`;
@@ -447,7 +904,8 @@ export default class WebmapWebPart extends BaseClientSideWebPart<IWebmapWebPartP
         .then((r: SPHttpClientResponse) => r.json())
         .then(json => {
           // Map the API response to the format required by PropertyPaneDropdown.
-          this._lists = json.value.map((l: any) => ({
+          // FIX: Use the specific ISPList interface instead of 'any'.
+          this._lists = json.value.map((l: ISPList) => ({
             key: l.Title,
             text: l.Title
           })) as IPropertyPaneDropdownOption[];
@@ -462,19 +920,19 @@ export default class WebmapWebPart extends BaseClientSideWebPart<IWebmapWebPartP
   /**
    * This SPFx lifecycle method is called whenever a property pane field is changed by the user.
    */
-  protected onPropertyPaneFieldChanged(path: string, oldValue: any, newValue: any): void {
+  protected onPropertyPaneFieldChanged(path: string, oldValue: unknown, newValue: unknown): void {
     if (path === 'dataSourceType' && newValue !== oldValue) {
       this._lists = [];
       this.properties.listName = '';
       this.properties.libraryName = '';
       this._siteForLists = null;  // Reset cache to force reload
-      
+
       // Refresh property pane dropdowns immediately
       this.context.propertyPane.refresh();
-  
+
       // Trigger the async fetch of new lists for the selected dataSourceType
       this.onPropertyPaneConfigurationStart();
-  
+
       // Optionally, re-render web part to reflect changes
       //this.render();
     }
@@ -488,12 +946,12 @@ export default class WebmapWebPart extends BaseClientSideWebPart<IWebmapWebPartP
       this.properties.latField = '';
       this.properties.lonField = '';
       this.properties.imgField = '';
-      this._listForFields = newValue; // Update the cache key.
+      this._listForFields = newValue as string; // Update the cache key.
 
       const site = this.context.pageContext.web.absoluteUrl;
       // Fetch all non-hidden, non-readonly fields for the newly selected list.
       const fieldsUrl =
-        `${site}/_api/web/lists/getByTitle('${escODataIdentifier(newValue)}')/fields` +
+        `${site}/_api/web/lists/getByTitle('${escODataIdentifier(newValue as string)}')/fields` +
         `?$filter=Hidden eq false and ReadOnlyField eq false`;
 
       this.context.spHttpClient
@@ -502,9 +960,10 @@ export default class WebmapWebPart extends BaseClientSideWebPart<IWebmapWebPartP
         .then(json => {
           // Only show field types that are likely to contain the required data.
           const okTypes = ['Text', 'Number', 'URL'];
+          // FIX: Use the specific ISPField interface instead of 'any'.
           this._fields = json.value
-            .filter((f: any) => okTypes.indexOf(f.TypeAsString) !== -1)
-            .map((f: any) => ({
+            .filter((f: ISPField) => okTypes.indexOf(f.TypeAsString) !== -1)
+            .map((f: ISPField) => ({
               key: f.InternalName, // Use the internal name for API calls.
               text: f.Title        // Show the user-friendly display name.
             })) as IPropertyPaneDropdownOption[];
@@ -523,7 +982,7 @@ export default class WebmapWebPart extends BaseClientSideWebPart<IWebmapWebPartP
   }
 
   /* ------------------------------------------------------------- */
-  /* Clean-up                                                   */
+  /* Clean-up                                                      */
   /* ------------------------------------------------------------- */
   /**
    * This SPFx lifecycle method is called when the web part is removed from the page.
@@ -537,7 +996,7 @@ export default class WebmapWebPart extends BaseClientSideWebPart<IWebmapWebPartP
   }
 
   /* ------------------------------------------------------------- */
-  /* SPFx boiler-plate                                          */
+  /* SPFx boiler-plate                                             */
   /* ------------------------------------------------------------- */
   /**
    * Standard SPFx property to get the version of the data structure.

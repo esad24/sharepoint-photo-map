@@ -1,0 +1,175 @@
+
+  /**
+   * Add ArcGIS tile layer to the map
+   */
+  private addArcGISTileLayer(): void {
+    if (!this.map) return;
+
+    // Your ArcGIS webmap ID extracted from the URL
+    const webmapId = '37606acca6044778bd937f21303a4503';
+    
+    // ArcGIS Online tile service URL pattern
+    // This uses the standard ArcGIS Online World Imagery basemap
+    // You can replace this with your organization's tile service if needed
+    const arcgisTileUrl = 'https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}';
+    
+    // Alternative: If you have access to your organization's tile service, use:
+    // const arcgisTileUrl = 'https://companyTest.maps.arcgis.com/arcgis/rest/services/YourTileService/MapServer/tile/{z}/{y}/{x}';
+
+    try {
+      L.tileLayer(arcgisTileUrl, {
+        attribution: 'Tiles &copy; Esri &mdash; Source: Esri, i-cubed, USDA, USGS, AEX, GeoEye, Getmapping, Aerogrid, IGN, IGP, UPR-EGP, and the GIS User Community',
+        maxZoom: 18,
+        id: 'arcgis-tiles'
+      }).addTo(this.map);
+
+      // Optional: Add vector tile layer if you need the actual webmap content
+      // This requires additional setup and authentication
+      this.addArcGISVectorLayer(webmapId);
+    } catch (error) {
+      console.error('Failed to add ArcGIS tile layer:', error);
+      // Fallback to OpenStreetMap if ArcGIS fails
+      this.addFallbackTileLayer();
+    }
+  }
+
+  /**
+   * Fallback tile layer in case ArcGIS fails
+   */
+  private addFallbackTileLayer(): void {
+    if (!this.map) return;
+
+    L.tileLayer('https://{s}.tile.openstreetmap.de/tiles/osmde/{z}/{x}/{y}.png', {
+      attribution: '&copy; <a href="https://www.openstreetmap.org/">OpenStreetMap</a> contributors',
+    }).addTo(this.map);
+  }
+
+  /**
+   * Add ArcGIS vector layer (webmap content)
+   */
+  
+/**
+ * Add ArcGIS vector layer (webmap content)
+ */
+private addArcGISVectorLayer(webmapId: string): void {
+  if (!this.map) return;
+
+  const webmapUrl = `https://hochtiefinfra.maps.arcgis.com/sharing/rest/content/items/${webmapId}/data?f=json`;
+  
+  // Fetch webmap definition
+  fetch(webmapUrl)
+    .then(response => {
+      if (!response.ok) {
+        throw new Error(`HTTP error! status: ${response.status}`);
+      }
+      return response.json();
+    })
+    .then(webmapData => {
+      // Safely check for webmap structure
+      if (webmapData && typeof webmapData === 'object') {
+        // Process operational layers from the webmap
+        if (webmapData.operationalLayers && Array.isArray(webmapData.operationalLayers)) {
+          webmapData.operationalLayers.forEach((layer: any) => {
+            // Handle Group Layers (like BR_Leverkusen_01)
+            if (layer && layer.layerType === 'GroupLayer' && layer.layers && Array.isArray(layer.layers)) {
+              layer.layers.forEach((sublayer: any) => {
+                if (sublayer && sublayer.layerType === 'ArcGISFeatureLayer' && sublayer.url) {
+                  this.addArcGISFeatureLayer(sublayer);
+                }
+              });
+            }
+            // Handle direct ArcGIS Map Service Layers
+            else if (layer && layer.layerType === 'ArcGISMapServiceLayer' && layer.url) {
+              this.addArcGISMapServiceLayer(layer);
+            }
+          });
+        }
+        
+        // Also check for baseMap layers
+        if (webmapData.baseMap && webmapData.baseMap.baseMapLayers && Array.isArray(webmapData.baseMap.baseMapLayers)) {
+          webmapData.baseMap.baseMapLayers.forEach((layer: any) => {
+            if (layer && layer.url) {
+              this.addArcGISMapServiceLayer(layer);
+            }
+          });
+        }
+      }
+    })
+    .catch(error => {
+      console.warn('Could not load webmap data:', error);
+      // Fallback to basic tile layer (already added above)
+    });
+}
+
+/**
+ * Add an ArcGIS Feature Layer
+ */
+private addArcGISFeatureLayer(layerConfig: any): void {
+  if (!this.map || !layerConfig || !layerConfig.url) return;
+
+  // Extract the feature service URL and get features
+  const featureServiceUrl = layerConfig.url;
+  const queryUrl = `${featureServiceUrl}/query?where=1%3D1&outFields=*&f=geojson`;
+
+  fetch(queryUrl)
+    .then(response => {
+      if (!response.ok) {
+        throw new Error(`HTTP error! status: ${response.status}`);
+      }
+      return response.json();
+    })
+    .then(geojsonData => {
+      if (geojsonData && geojsonData.features) {
+        // Create a GeoJSON layer with basic styling
+        const geoJsonLayer = L.geoJSON(geojsonData, {
+          style: {
+            color: '#3388ff',
+            weight: 2,
+            opacity: 0.8,
+            fillOpacity: 0.2
+          }
+        });
+
+        // Add the layer to the map
+        geoJsonLayer.addTo(this.map!);
+        
+        console.log(`Added feature layer: ${layerConfig.title || 'Unknown'} with ${geojsonData.features.length} features`);
+      }
+    })
+    .catch(error => {
+      console.error(`Failed to load feature layer ${layerConfig.title || 'Unknown'}:`, error);
+    });
+}
+
+  /**
+   * Add an ArcGIS Map Service Layer
+   */
+  private addArcGISMapServiceLayer(layerConfig: any): void {
+    if (!this.map || !layerConfig) return;
+
+    // Extract the base URL for tiles
+    const baseUrl = layerConfig.url;
+    if (!baseUrl) return;
+    
+    // For each sublayer, add as a tile layer
+    if (layerConfig.layers && Array.isArray(layerConfig.layers)) {
+      layerConfig.layers.forEach((sublayer: any) => {
+        if (sublayer && sublayer.defaultVisibility && typeof sublayer.id !== 'undefined') {
+          const tileUrl = `${baseUrl}/${sublayer.id}/tile/{z}/{y}/{x}`;
+          
+          L.tileLayer(tileUrl, {
+            opacity: layerConfig.opacity || 1,
+            attribution: 'ArcGIS Map Service'
+          }).addTo(this.map!);
+        }
+      });
+    } else {
+      // If no sublayers, try to add the service directly
+      const tileUrl = `${baseUrl}/tile/{z}/{y}/{x}`;
+      
+      L.tileLayer(tileUrl, {
+        opacity: layerConfig.opacity || 1,
+        attribution: 'ArcGIS Map Service'
+      }).addTo(this.map!);
+    }
+  }

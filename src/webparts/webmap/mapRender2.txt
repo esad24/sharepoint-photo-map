@@ -1,0 +1,421 @@
+import * as L from 'leaflet';
+
+export interface ArcGISLayerConfig {
+  webmapId: string;
+  organizationUrl?: string;
+  fallbackTileUrl?: string;
+  maxZoom?: number;
+}
+
+export class ArcGISEnhancedLoader {
+  private map: L.Map | null = null;
+  private config: ArcGISLayerConfig;
+
+  constructor(config: ArcGISLayerConfig) {
+    this.config = {
+      organizationUrl: 'https://hochtiefinfra.maps.arcgis.com',
+      fallbackTileUrl: 'https://{s}.tile.openstreetmap.de/tiles/osmde/{z}/{x}/{y}.png',
+      maxZoom: 18,
+      ...config
+    };
+  }
+
+  /**
+   * Initialize the loader with a Leaflet map instance
+   */
+  public initialize(map: L.Map): void {
+    this.map = map;
+  }
+
+  /**
+   * Load all ArcGIS layers (tile layer + vector layers)
+   */
+  public async loadAllLayers(): Promise<void> {
+    if (!this.map) {
+      throw new Error('Map not initialized. Call initialize() first.');
+    }
+
+    try {
+      // Add base tile layer
+      await this.addArcGISTileLayer();
+      
+      // Add vector layers with styling
+      await this.addArcGISVectorLayer();
+    } catch (error) {
+      console.error('Failed to load ArcGIS layers:', error);
+      throw error;
+    }
+  }
+
+  /**
+   * Add ArcGIS tile layer to the map
+   */
+  private async addArcGISTileLayer(): Promise<void> {
+    if (!this.map) return;
+
+    // ArcGIS Online tile service URL pattern
+    const arcgisTileUrl = 'https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}';
+
+    try {
+      L.tileLayer(arcgisTileUrl, {
+        attribution: 'Tiles &copy; Esri &mdash; Source: Esri, i-cubed, USDA, USGS, AEX, GeoEye, Getmapping, Aerogrid, IGN, IGP, UPR-EGP, and the GIS User Community',
+        maxZoom: this.config.maxZoom!,
+        id: 'arcgis-tiles'
+      }).addTo(this.map);
+
+      console.log('✓ ArcGIS tile layer added successfully');
+    } catch (error) {
+      console.error('Failed to add ArcGIS tile layer:', error);
+      this.addFallbackTileLayer();
+    }
+  }
+
+  /**
+   * Fallback tile layer in case ArcGIS fails
+   */
+  private addFallbackTileLayer(): void {
+    if (!this.map) return;
+
+    L.tileLayer(this.config.fallbackTileUrl!, {
+      attribution: '&copy; <a href="https://www.openstreetmap.org/">OpenStreetMap</a> contributors',
+    }).addTo(this.map);
+
+    console.log('✓ Fallback tile layer added');
+  }
+
+  /**
+   * Add ArcGIS vector layer (webmap content)
+   */
+  private async addArcGISVectorLayer(): Promise<void> {
+    if (!this.map) return;
+
+    const webmapUrl = `${this.config.organizationUrl}/sharing/rest/content/items/${this.config.webmapId}/data?f=json`;
+    
+    try {
+      const response = await fetch(webmapUrl);
+      if (!response.ok) {
+        throw new Error(`HTTP error! status: ${response.status}`);
+      }
+      
+      const webmapData = await response.json();
+      
+      if (webmapData && typeof webmapData === 'object') {
+        // Process operational layers from the webmap
+        if (webmapData.operationalLayers && Array.isArray(webmapData.operationalLayers)) {
+          for (const layer of webmapData.operationalLayers) {
+            await this.processOperationalLayer(layer);
+          }
+        }
+        
+        // Also check for baseMap layers
+        if (webmapData.baseMap && webmapData.baseMap.baseMapLayers && Array.isArray(webmapData.baseMap.baseMapLayers)) {
+          for (const layer of webmapData.baseMap.baseMapLayers) {
+            if (layer && layer.url) {
+              this.addArcGISMapServiceLayer(layer);
+            }
+          }
+        }
+      }
+    } catch (error) {
+      console.error('Could not load webmap data:', error);
+      throw error;
+    }
+  }
+
+  /**
+   * Process different types of operational layers
+   */
+  private async processOperationalLayer(layer: any): Promise<void> {
+    if (!layer) return;
+
+    // Handle Group Layers (like BR_Leverkusen_01)
+    if (layer.layerType === 'GroupLayer' && layer.layers && Array.isArray(layer.layers)) {
+      for (const sublayer of layer.layers) {
+        if (sublayer && sublayer.layerType === 'ArcGISFeatureLayer' && sublayer.url) {
+          await this.addArcGISFeatureLayer(sublayer);
+        }
+      }
+    }
+    // Handle direct ArcGIS Feature Layers
+    else if (layer.layerType === 'ArcGISFeatureLayer' && layer.url) {
+      await this.addArcGISFeatureLayer(layer);
+    }
+    // Handle direct ArcGIS Map Service Layers
+    else if (layer.layerType === 'ArcGISMapServiceLayer' && layer.url) {
+      this.addArcGISMapServiceLayer(layer);
+    }
+  }
+
+  /**
+   * Convert ESRI color array to CSS color string
+   */
+  private esriColorToCSS(esriColor: number[]): string {
+    if (!esriColor || esriColor.length < 3) return '#3388ff';
+    
+    const [r, g, b, a = 255] = esriColor;
+    if (a < 255) {
+      return `rgba(${r}, ${g}, ${b}, ${a / 255})`;
+    }
+    return `rgb(${r}, ${g}, ${b})`;
+  }
+
+  /**
+   * Get layer styling information from ArcGIS service
+   */
+  private async getLayerDrawingInfo(serviceUrl: string): Promise<any> {
+    try {
+      const response = await fetch(`${serviceUrl}?f=json`);
+      if (!response.ok) return null;
+      
+      const layerInfo = await response.json();
+      return layerInfo.drawingInfo || null;
+    } catch (error) {
+      console.error('Failed to get layer drawing info:', error);
+      return null;
+    }
+  }
+
+  /**
+   * Create style function for GeoJSON layer based on ArcGIS renderer
+   */
+  private createStyleFunction(drawingInfo: any): (feature: any) => any {
+    return (feature: any) => {
+      const defaultStyle = {
+        color: '#3388ff',
+        weight: 2,
+        opacity: 0.8,
+        fillOpacity: 0.2,
+        fillColor: '#3388ff'
+      };
+
+      if (!drawingInfo || !drawingInfo.renderer) {
+        return defaultStyle;
+      }
+
+      const renderer = drawingInfo.renderer;
+      
+      // Handle unique value renderer (most common for your data)
+      if (renderer.type === 'uniqueValue') {
+        const fieldValue = feature.properties[renderer.field1];
+        
+        // Find matching unique value info
+        const matchingInfo = renderer.uniqueValueInfos?.find((info: any) => 
+          info.value === fieldValue
+        );
+        
+        if (matchingInfo && matchingInfo.symbol) {
+          return this.convertEsriSymbolToLeafletStyle(matchingInfo.symbol);
+        }
+        
+        // Use default symbol if no match found
+        if (renderer.defaultSymbol) {
+          return this.convertEsriSymbolToLeafletStyle(renderer.defaultSymbol);
+        }
+      }
+      
+      // Handle simple renderer
+      if (renderer.type === 'simple' && renderer.symbol) {
+        return this.convertEsriSymbolToLeafletStyle(renderer.symbol);
+      }
+      
+      return defaultStyle;
+    };
+  }
+
+  /**
+   * Convert ESRI symbol to Leaflet style
+   */
+  private convertEsriSymbolToLeafletStyle(symbol: any): any {
+    const style: any = {};
+    
+    if (symbol.type === 'esriSLS') { // Simple Line Symbol
+      style.color = this.esriColorToCSS(symbol.color);
+      style.weight = symbol.width || 1;
+      style.opacity = symbol.color && symbol.color.length > 3 ? symbol.color[3] / 255 : 1;
+      
+      // Handle line style
+      if (symbol.style === 'esriSLSDash') {
+        style.dashArray = '5,5';
+      } else if (symbol.style === 'esriSLSDot') {
+        style.dashArray = '2,2';
+      } else if (symbol.style === 'esriSLSDashDot') {
+        style.dashArray = '5,2,2,2';
+      }
+    } else if (symbol.type === 'esriSFS') { // Simple Fill Symbol
+      style.fillColor = this.esriColorToCSS(symbol.color);
+      style.fillOpacity = symbol.color && symbol.color.length > 3 ? symbol.color[3] / 255 : 0.5;
+      
+      // Handle outline
+      if (symbol.outline) {
+        style.color = this.esriColorToCSS(symbol.outline.color);
+        style.weight = symbol.outline.width || 1;
+        style.opacity = symbol.outline.color && symbol.outline.color.length > 3 ? 
+          symbol.outline.color[3] / 255 : 1;
+      }
+    } else if (symbol.type === 'esriSMS') { // Simple Marker Symbol
+      style.radius = symbol.size || 6;
+      style.fillColor = this.esriColorToCSS(symbol.color);
+      style.fillOpacity = symbol.color && symbol.color.length > 3 ? symbol.color[3] / 255 : 1;
+      
+      // Handle outline
+      if (symbol.outline) {
+        style.color = this.esriColorToCSS(symbol.outline.color);
+        style.weight = symbol.outline.width || 1;
+        style.opacity = symbol.outline.color && symbol.outline.color.length > 3 ? 
+          symbol.outline.color[3] / 255 : 1;
+      }
+    }
+    
+    return style;
+  }
+
+  /**
+   * Add an ArcGIS Feature Layer with proper styling
+   */
+  private async addArcGISFeatureLayer(layerConfig: any): Promise<void> {
+    if (!this.map || !layerConfig || !layerConfig.url) return;
+
+    const featureServiceUrl = layerConfig.url;
+    
+    try {
+      // Get drawing info for styling
+      const drawingInfo = await this.getLayerDrawingInfo(featureServiceUrl);
+      
+      // Query all features (remove visibility restriction)
+      const queryUrl = `${featureServiceUrl}/query?where=1%3D1&outFields=*&f=geojson&outSR=4326`;
+      
+      const response = await fetch(queryUrl);
+      if (!response.ok) {
+        throw new Error(`HTTP error! status: ${response.status}`);
+      }
+      
+      const geojsonData = await response.json();
+      
+      if (geojsonData && geojsonData.features && geojsonData.features.length > 0) {
+        // Create style function based on drawing info
+        const styleFunction = this.createStyleFunction(drawingInfo);
+        
+        // Create a GeoJSON layer with proper styling
+        const geoJsonLayer = L.geoJSON(geojsonData, {
+          style: styleFunction,
+          pointToLayer: (feature, latlng) => {
+            const style = styleFunction(feature);
+            return L.circleMarker(latlng, style);
+          },
+          onEachFeature: (feature, layer) => {
+            // Add popup with feature properties
+            if (feature.properties) {
+              const popupContent = this.createPopupContent(feature.properties, layerConfig);
+              layer.bindPopup(popupContent);
+            }
+          }
+        });
+
+        // Add the layer to the map
+        geoJsonLayer.addTo(this.map!);
+        
+        console.log(`✓ Added feature layer: ${layerConfig.title || 'Unknown'} with ${geojsonData.features.length} features`);
+      } else {
+        console.warn(`No features found for layer: ${layerConfig.title || 'Unknown'}`);
+      }
+    } catch (error) {
+      console.error(`Failed to load feature layer ${layerConfig.title || 'Unknown'}:`, error);
+    }
+  }
+
+  /**
+   * Create popup content for features
+   */
+  private createPopupContent(properties: any, layerConfig: any): string {
+    let content = `<div style="max-width: 300px;">`;
+    content += `<h4>${layerConfig.title || 'Feature'}</h4>`;
+    
+    // Show key properties
+    const keyFields = ['RefName', 'Layer', 'Entity', 'DocName', 'Color'];
+    
+    keyFields.forEach(field => {
+      if (properties[field] !== undefined && properties[field] !== null) {
+        content += `<strong>${field}:</strong> ${properties[field]}<br>`;
+      }
+    });
+    
+    // Add a "Show all" details section
+    content += `<details style="margin-top: 10px;">`;
+    content += `<summary>Show all properties</summary>`;
+    
+    Object.keys(properties).forEach(key => {
+      if (!keyFields.includes(key) && properties[key] !== undefined && properties[key] !== null) {
+        content += `<strong>${key}:</strong> ${properties[key]}<br>`;
+      }
+    });
+    
+    content += `</details>`;
+    content += `</div>`;
+    
+    return content;
+  }
+
+  /**
+   * Add an ArcGIS Map Service Layer
+   */
+  private addArcGISMapServiceLayer(layerConfig: any): void {
+    if (!this.map || !layerConfig) return;
+
+    const baseUrl = layerConfig.url;
+    if (!baseUrl) return;
+    
+    // For each sublayer, add as a tile layer
+    if (layerConfig.layers && Array.isArray(layerConfig.layers)) {
+      layerConfig.layers.forEach((sublayer: any) => {
+        if (sublayer && sublayer.defaultVisibility && typeof sublayer.id !== 'undefined') {
+          const tileUrl = `${baseUrl}/${sublayer.id}/tile/{z}/{y}/{x}`;
+          
+          L.tileLayer(tileUrl, {
+            opacity: layerConfig.opacity || 1,
+            attribution: 'ArcGIS Map Service'
+          }).addTo(this.map!);
+        }
+      });
+    } else {
+      // If no sublayers, try to add the service directly
+      const tileUrl = `${baseUrl}/tile/{z}/{y}/{x}`;
+      
+      L.tileLayer(tileUrl, {
+        opacity: layerConfig.opacity || 1,
+        attribution: 'ArcGIS Map Service'
+      }).addTo(this.map!);
+    }
+  }
+
+  /**
+   * Public method to add a custom feature layer
+   */
+  public async addCustomFeatureLayer(url: string, title?: string): Promise<void> {
+    if (!this.map) {
+      throw new Error('Map not initialized. Call initialize() first.');
+    }
+
+    const layerConfig = {
+      url,
+      title: title || 'Custom Layer',
+      layerType: 'ArcGISFeatureLayer'
+    };
+
+    await this.addArcGISFeatureLayer(layerConfig);
+  }
+
+  /**
+   * Public method to clear all layers from the map
+   */
+  public clearAllLayers(): void {
+    if (!this.map) return;
+
+    this.map.eachLayer((layer) => {
+      if (layer instanceof L.TileLayer || layer instanceof L.GeoJSON) {
+        this.map!.removeLayer(layer);
+      }
+    });
+
+    console.log('✓ All layers cleared');
+  }
+}
