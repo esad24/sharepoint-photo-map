@@ -2,12 +2,10 @@
 /* WebmapWebPart.ts                                                           */
 /* - SPFx client-side web-part                                                */
 /* - Leaflet map with clustered picture markers                               */
-/* - Fully configurable in the property-pane:                                 */
-/* - Site URL                                                                 */
-/* - List                                                                     */
-/* - Latitude column                                                          */
-/* - Longitude column                                                         */
-/* - Image column                                                             */
+/* - Displays images from SharePoint document libraries                       */
+/* - Configurable GPS extraction method:                                      */
+/*   - EXIF data extraction                                                   */
+/*   - Manual coordinate fields                                               */
 /* ========================================================================== */
 
 // Imports from the SharePoint Framework (SPFx) libraries.
@@ -43,7 +41,7 @@ import styles from './WebmapWebPart.module.scss';
 import { escODataIdentifier, sanitizeUrl, escAttr } from './utils/security'; // Security helpers for escaping identifiers and URLs.
 
 // Import the new DataService
-import { DataService, IMapItem } from './services/DataService'; // The service that handles data fetching from SharePoint lists.
+import { DataService, IMapItem } from './services/DataService';
 
 /* ------------------------------------------------------------------ */
 /* Helpers & typings                                                  */
@@ -82,12 +80,10 @@ export interface IWebmapListItem {
  * in the property pane. These properties are saved with the web part instance.
  */
 export interface IWebmapWebPartProps {
-  dataSourceType: 'List' | 'DocumentLibrary' | '';  // property to select data source type
-  listName: string; // The title of the SharePoint list to fetch data from.
+  libraryName: string; // for document library
+  locationMethod: 'exif' | 'manual'; // method for getting GPS coordinates
   latField: string; // The internal name of the column containing the latitude.
   lonField: string; // The internal name of the column containing the longitude.
-  imgField: string; // The internal name of the column containing the image.
-  libraryName?: string; // for document library
 }
 
 /* ------------------------------------------------------------------ */
@@ -105,12 +101,12 @@ export default class WebmapWebPart extends BaseClientSideWebPart<IWebmapWebPartP
   private dataService: DataService | undefined;        // Holds the data service instance.
 
   // Caching for property pane dropdown options to avoid redundant API calls.
-  private _lists: IPropertyPaneDropdownOption[] = [];  // Cached list of SharePoint lists.
-  private _fields: IPropertyPaneDropdownOption[] = []; // Cached list of fields for the selected list.
+  private _libraries: IPropertyPaneDropdownOption[] = [];  // Cached list of SharePoint document libraries.
+  private _fields: IPropertyPaneDropdownOption[] = []; // Cached list of fields for the selected library.
 
   // Keys to check if the cache is still valid.
-  private _siteForLists: string | null = null;   // The site URL for which the `_lists` cache is valid.
-  private _listForFields: string | null = null;  // The list name for which the `_fields` cache is valid.
+  private _siteForLibraries: string | null = null;   // The site URL for which the `_libraries` cache is valid.
+  private _libraryForFields: string | null = null;  // The library name for which the `_fields` cache is valid.
 
 
 
@@ -327,10 +323,10 @@ export default class WebmapWebPart extends BaseClientSideWebPart<IWebmapWebPartP
 
 
   /* ------------------------------------------------------------- */
-  /* List→markers                                                  */
+  /* Load data from map                                            */
   /* ------------------------------------------------------------- */
   /**
-   * Fetches data from the configured SharePoint list and populates the map with markers.
+   * Fetches data from the configured SharePoint document library and populates the map with markers.
    */
   private async loadMapData(): Promise<void> {
     // Guard clause: do nothing if the cluster layer isn't ready.
@@ -380,12 +376,9 @@ export default class WebmapWebPart extends BaseClientSideWebPart<IWebmapWebPartP
     }
 
     // Show any errors that occurred during fetching
-    // Only show toast messages for Document Library errors
-    if (this.properties.dataSourceType === 'DocumentLibrary') {
-      result.errors.forEach((error: any) => {
-        this.showToast(error, 'error');
-      });
-    }
+    result.errors.forEach(error => {
+      this.showToast(error, 'error');
+    });
   }
 
   /* ------------------------------------------------------------- */
@@ -395,38 +388,33 @@ export default class WebmapWebPart extends BaseClientSideWebPart<IWebmapWebPartP
    * Defines the configuration for the web part's property pane (the settings panel).
    */
   protected getPropertyPaneConfiguration(): IPropertyPaneConfiguration {
-    // Start with the base group that is always visible
+    // Start with the base groups
     const groups: IPropertyPaneGroup[] = [
       {
-        groupName: 'Choose Data Source Type',
+        groupName: 'Data Source Configuration',
         groupFields: [
-          PropertyPaneDropdown('dataSourceType', {
-            label: 'Source Type',
+          PropertyPaneDropdown('libraryName', {
+            label: 'Document Library',
+            options: this._libraries,
+            disabled: !this._libraries.length
+          }),
+          PropertyPaneDropdown('locationMethod', {
+            label: 'Location Method',
             options: [
-              // Add a placeholder option for the unselected state
-              { key: '', text: ' ' },
-              { key: 'List', text: 'SharePoint List' },
-              { key: 'DocumentLibrary', text: 'Document Library' }
+              { key: 'exif', text: 'Extract from Image EXIF Data' },
+              { key: 'manual', text: 'Select latitude and longitude fields' }
             ],
-            // Default to the empty string key
-            selectedKey: this.properties.dataSourceType || '',
+            selectedKey: this.properties.locationMethod || 'exif'
           })
         ]
       }
     ];
 
-    // --- Conditionally add the next group based on the selection ---
-
-    // If 'SharePoint List' is selected, push its configuration group
-    if (this.properties.dataSourceType === 'List') {
+    // If manual method is selected, show field selectors
+    if (this.properties.locationMethod === 'manual') {
       groups.push({
-        groupName: 'Select List and Fields',
+        groupName: 'Coordinate Fields',
         groupFields: [
-          PropertyPaneDropdown('listName', {
-            label: 'List',
-            options: this._lists,
-            disabled: !this._lists.length
-          }),
           PropertyPaneDropdown('latField', {
             label: 'Latitude Field',
             options: this._fields,
@@ -434,41 +422,6 @@ export default class WebmapWebPart extends BaseClientSideWebPart<IWebmapWebPartP
           }),
           PropertyPaneDropdown('lonField', {
             label: 'Longitude Field',
-            options: this._fields,
-            disabled: !this._fields.length
-          }),
-          PropertyPaneDropdown('imgField', {
-            label: 'Image Field',
-            options: this._fields,
-            disabled: !this._fields.length
-          }),
-        ]
-      });
-    }
-    // Else if 'Document Library' is selected, push its group
-    else if (this.properties.dataSourceType === 'DocumentLibrary') {
-      groups.push({
-        groupName: 'Select Document Library',
-        groupFields: [
-          PropertyPaneDropdown('libraryName', {
-            label: 'Document Library',
-            options: this._lists,
-            disabled: !this._lists.length
-          })
-        ]
-      });
-
-      // Always show optional coordinate fields for document library
-      groups.push({
-        groupName: 'Set GPS data manually (Optional)',
-        groupFields: [
-          PropertyPaneDropdown('latField', {
-            label: 'Latitude',
-            options: this._fields,
-            disabled: !this._fields.length
-          }),
-          PropertyPaneDropdown('lonField', {
-            label: 'Longitude',
             options: this._fields,
             disabled: !this._fields.length
           })
@@ -480,7 +433,6 @@ export default class WebmapWebPart extends BaseClientSideWebPart<IWebmapWebPartP
       pages: [
         {
           header: { description: '' },
-          // Use the dynamically constructed groups array
           groups: groups
         }
       ]
@@ -492,45 +444,38 @@ export default class WebmapWebPart extends BaseClientSideWebPart<IWebmapWebPartP
   /* ------------------------------------------------------------- */
   /**
    * This SPFx lifecycle method is called when the property pane is opened.
-   * It's used here to dynamically load the list of available SharePoint lists.
+   * It's used here to dynamically load the list of available SharePoint document libraries.
    */
   protected onPropertyPaneConfigurationStart(): void {
     const site = this.context.pageContext.web.absoluteUrl;
-    // Check if we need to fetch lists (i.e., if the site context has changed).
-    if (site !== this._siteForLists) {
+    // Check if we need to fetch libraries (i.e., if the site context has changed).
+    if (site !== this._siteForLibraries) {
       // Clear all cached options and selections.
-      this._lists = [];
+      this._libraries = [];
       this._fields = [];
-      this.properties.listName = '';
       this.properties.libraryName = '';
-
       this.properties.latField = '';
       this.properties.lonField = '';
-      this.properties.imgField = '';
 
-      this._siteForLists = site; // Update the cache key.
+      this._siteForLibraries = site; // Update the cache key.
 
-      // Fetch lists depending on dataSourceType
-      // FIX: Use 'const' because this variable is never reassigned.
-      const baseTemplateFilter = this.properties.dataSourceType === 'DocumentLibrary' ? 101 : 100;
-
-      // Fetch all non-hidden lists / documentLibraries from the current site.
-      const listsUrl = `${site}/_api/web/lists?$filter=Hidden eq false and BaseTemplate eq ${baseTemplateFilter}`;
+      // Fetch all non-hidden document libraries from the current site.
+      const librariesUrl = `${site}/_api/web/lists?$filter=Hidden eq false and BaseTemplate eq 101`;
       this.context.spHttpClient
-        .get(listsUrl, SPHttpClient.configurations.v1)
+        .get(librariesUrl, SPHttpClient.configurations.v1)
         .then((r: SPHttpClientResponse) => r.json())
         .then(json => {
           // Map the API response to the format required by PropertyPaneDropdown.
           // FIX: Use the specific ISPList interface instead of 'any'.
-          this._lists = json.value.map((l: ISPList) => ({
+          this._libraries = json.value.map((l: ISPList) => ({
             key: l.Title,
             text: l.Title
           })) as IPropertyPaneDropdownOption[];
 
-          // Refresh the property pane to show the newly loaded lists.
+          // Refresh the property pane to show the newly loaded libraries.
           this.context.propertyPane.refresh();
         })
-        .catch(err => console.error('Webmap → list enumeration failed:', err));
+        .catch(err => console.error('Webmap → library enumeration failed:', err));
     }
   }
 
@@ -538,35 +483,35 @@ export default class WebmapWebPart extends BaseClientSideWebPart<IWebmapWebPartP
    * This SPFx lifecycle method is called whenever a property pane field is changed by the user.
    */
   protected onPropertyPaneFieldChanged(path: string, oldValue: unknown, newValue: unknown): void {
-    if (path === 'dataSourceType' && newValue !== oldValue) {
-      this._lists = [];
-      this.properties.listName = '';
-      this.properties.libraryName = '';
-      this._siteForLists = null;  // Reset cache to force reload
-
-      // Refresh property pane dropdowns immediately
+    /* Handle location method change */
+    if (path === 'locationMethod') {
+      // Clear field selections when switching methods
+      this.properties.latField = '';
+      this.properties.lonField = '';
+      this._fields = [];
+      
+      // If switching to manual method, trigger field loading
+      if (newValue === 'manual' && this.properties.libraryName) {
+        this._libraryForFields = null; // Force reload
+        this.onPropertyPaneFieldChanged('libraryName', '', this.properties.libraryName);
+      }
+      
       this.context.propertyPane.refresh();
-
-      // Trigger the async fetch of new lists for the selected dataSourceType
-      this.onPropertyPaneConfigurationStart();
-
-      // Optionally, re-render web part to reflect changes
-      //this.render();
     }
 
-    /* Reload field dropdowns when the list/library changes */
-    if ((path === 'listName' || path === 'libraryName') && newValue && newValue !== this._listForFields) {
-      // Always load fields for both List and Document Library
+    /* Reload field dropdowns when the library changes */
+    if (path === 'libraryName' && newValue && newValue !== this._libraryForFields) {
+      // Only load fields if we're using manual method
+      if (this.properties.locationMethod !== 'manual') return;
       
       // Clear old field options and selections.
       this._fields = [];
       this.properties.latField = '';
       this.properties.lonField = '';
-      this.properties.imgField = '';
-      this._listForFields = newValue as string; // Update the cache key.
+      this._libraryForFields = newValue as string; // Update the cache key.
 
       const site = this.context.pageContext.web.absoluteUrl;
-      // Fetch all non-hidden, non-readonly fields for the newly selected list.
+      // Fetch all non-hidden, non-readonly fields for the newly selected library.
       const fieldsUrl =
         `${site}/_api/web/lists/getByTitle('${escODataIdentifier(newValue as string)}')/fields` +
         `?$filter=Hidden eq false and ReadOnlyField eq false`;
@@ -593,7 +538,7 @@ export default class WebmapWebPart extends BaseClientSideWebPart<IWebmapWebPartP
 
     /* Re-render map whenever any data-source field changes */
     // If any of the core data properties have changed, trigger a full re-render of the web part.
-    if (['listName', 'latField', 'lonField', 'imgField', 'libraryName'].indexOf(path) !== -1) {
+    if (['libraryName', 'locationMethod', 'latField', 'lonField'].indexOf(path) !== -1) {
       this.render();
     }
   }

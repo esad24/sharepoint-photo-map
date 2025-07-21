@@ -357,13 +357,6 @@ export class ArcGISMapService {
             
             console.log(`✓ Successfully added feature layer: ${layerConfig.title} with ${allFeatures.length} features`);
             
-            // Zoom to the layer bounds if it's the BR_Leverkusen layer
-            // if (layerConfig.title && layerConfig.title.includes('Leverkusen') && allFeatures.length > 0) {
-            //     const bounds = geoJsonLayer.getBounds();
-            //     if (bounds.isValid()) {
-            //         this.map!.fitBounds(bounds, { padding: [50, 50] });
-            //     }
-            // }
         }
     } 
     catch (error) {
