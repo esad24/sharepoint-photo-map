@@ -42,8 +42,8 @@ import styles from './WebmapWebPart.module.scss';
 // Import security functions
 import { escODataIdentifier, sanitizeUrl, escAttr } from './utils/security'; // Security helpers for escaping identifiers and URLs.
 
-// Import EXIF parsing library
-import * as EXIF from 'exif-js';
+// Import the new DataService
+import { DataService, IMapItem } from './services/DataService'; // The service that handles data fetching from SharePoint lists.
 
 /* ------------------------------------------------------------------ */
 /* Helpers & typings                                                  */
@@ -88,8 +88,6 @@ export interface IWebmapWebPartProps {
   lonField: string; // The internal name of the column containing the longitude.
   imgField: string; // The internal name of the column containing the image.
   libraryName?: string; // for document library
-  libraryMethod?: 'columns' | 'exif'; // method for document library
-  useExifData?: boolean; // flag to use EXIF data extraction
 }
 
 /* ------------------------------------------------------------------ */
@@ -104,6 +102,7 @@ export default class WebmapWebPart extends BaseClientSideWebPart<IWebmapWebPartP
   private markerCluster: L.MarkerClusterGroup | undefined; // Holds the marker cluster layer instance.
   private dataTimer: number | undefined;                   // Holds the ID of the setInterval timer for data refreshes.
   private arcgisMap: ArcGISMapService | undefined;     // Holds the ArcGIS service instance.
+  private dataService: DataService | undefined;        // Holds the data service instance.
 
   // Caching for property pane dropdown options to avoid redundant API calls.
   private _lists: IPropertyPaneDropdownOption[] = [];  // Cached list of SharePoint lists.
@@ -125,6 +124,11 @@ export default class WebmapWebPart extends BaseClientSideWebPart<IWebmapWebPartP
   private mapId: string = `map-${Math.random().toString(36).substr(2, 9)}`;
 
   public render(): void {
+    // Initialize the data service if not already done
+    if (!this.dataService) {
+      this.dataService = new DataService(this.context);
+    }
+
     // Sets the basic HTML structure for the web part.
     // It creates a container `div` with a unique ID ('map') that Leaflet will use to initialize the map.
     this.domElement.innerHTML = `
@@ -261,64 +265,6 @@ export default class WebmapWebPart extends BaseClientSideWebPart<IWebmapWebPartP
     //this.dataTimer = window.setInterval(() => this.loadMapData(), 30_000); // And then reload every 30 seconds.
   }
 
-
-  /* ------------------------------------------------------------- */
-  /* EXIF Data Extraction                                          */
-  /* ------------------------------------------------------------- */
-  /**
-   * Extracts GPS coordinates from image EXIF data
-   */
-  private extractGPSFromExif(imageUrl: string): Promise<{lat: number, lon: number} | null> {
-    return new Promise((resolve) => {
-      const img = new Image();
-      img.crossOrigin = 'anonymous'; // Enable CORS
-      
-      img.onload = function() {
-        EXIF.getData(img as any, function() {
-          const lat = EXIF.getTag(this, 'GPSLatitude');
-          const lon = EXIF.getTag(this, 'GPSLongitude');
-          const latRef = EXIF.getTag(this, 'GPSLatitudeRef');
-          const lonRef = EXIF.getTag(this, 'GPSLongitudeRef');
-          
-          if (lat && lon) {
-            // Convert GPS coordinates from degrees/minutes/seconds to decimal
-            const decimalLat = WebmapWebPart.convertDMSToDD(lat, latRef);
-            const decimalLon = WebmapWebPart.convertDMSToDD(lon, lonRef);
-            
-            if (decimalLat !== null && decimalLon !== null) {
-              resolve({ lat: decimalLat, lon: decimalLon });
-            } else {
-              resolve(null);
-            }
-          } else {
-            resolve(null);
-          }
-        });
-      };
-      
-      img.onerror = () => {
-        resolve(null);
-      };
-      
-      img.src = imageUrl;
-    });
-  }
-
-  /**
-   * Converts GPS coordinates from degrees/minutes/seconds to decimal degrees
-   */
-  private static convertDMSToDD(dms: number[], ref: string): number | null {
-    if (!dms || dms.length !== 3) return null;
-    
-    let dd = dms[0] + dms[1]/60 + dms[2]/3600;
-    
-    if (ref === 'S' || ref === 'W') {
-      dd = dd * -1;
-    }
-    
-    return dd;
-  }
-
   /**
    * Shows a toast notification
    */
@@ -328,7 +274,8 @@ export default class WebmapWebPart extends BaseClientSideWebPart<IWebmapWebPartP
     toast.style.cssText = `
       position: fixed;
       bottom: 20px;
-      right: 20px;
+      left: 50%;
+      transform: translateX(-50%);
       background: ${type === 'error' ? '#d32f2f' : '#1976d2'};
       color: white;
       padding: 16px 24px;
@@ -336,16 +283,32 @@ export default class WebmapWebPart extends BaseClientSideWebPart<IWebmapWebPartP
       box-shadow: 0 2px 5px rgba(0,0,0,0.2);
       z-index: 9999;
       font-family: 'Segoe UI', sans-serif;
-      animation: slideIn 0.3s ease-out;
+      animation: slideUp 0.3s ease-out;
     `;
     toast.textContent = message;
     
     // Add animation
     const style = document.createElement('style');
     style.textContent = `
-      @keyframes slideIn {
-        from { transform: translateX(100%); }
-        to { transform: translateX(0); }
+      @keyframes slideUp {
+        from { 
+          transform: translateX(-50%) translateY(100%);
+          opacity: 0;
+        }
+        to { 
+          transform: translateX(-50%) translateY(0);
+          opacity: 1;
+        }
+      }
+      @keyframes slideDown {
+        from { 
+          transform: translateX(-50%) translateY(0);
+          opacity: 1;
+        }
+        to { 
+          transform: translateX(-50%) translateY(100%);
+          opacity: 0;
+        }
       }
     `;
     document.head.appendChild(style);
@@ -354,7 +317,7 @@ export default class WebmapWebPart extends BaseClientSideWebPart<IWebmapWebPartP
     
     // Remove after 3 seconds
     setTimeout(() => {
-      toast.style.animation = 'slideOut 0.3s ease-in';
+      toast.style.animation = 'slideDown 0.3s ease-in';
       setTimeout(() => {
         document.body.removeChild(toast);
         document.head.removeChild(style);
@@ -371,226 +334,58 @@ export default class WebmapWebPart extends BaseClientSideWebPart<IWebmapWebPartP
    */
   private async loadMapData(): Promise<void> {
     // Guard clause: do nothing if the cluster layer isn't ready.
-    if (!this.markerCluster) return;
+    if (!this.markerCluster || !this.dataService) return;
 
-    // Handle different data source types
-    if (this.properties.dataSourceType === 'List') {
-      await this.loadListData();
-    } else if (this.properties.dataSourceType === 'DocumentLibrary') {
-      await this.loadDocumentLibraryData();
-    }
-  }
+    // Use the DataService to fetch data
+    const result = await this.dataService.fetchMapData(this.properties);
 
-  /**
-   * Loads data from SharePoint list
-   */
-  private async loadListData(): Promise<void> {
-    const { listName, latField, lonField, imgField } = this.properties;
-    // Guard clause: do nothing if essential properties are not configured.
-    if (!listName || !latField || !lonField || !imgField) return;
+    // Clear all old markers before adding new ones.
+    this.markerCluster.clearLayers();
 
-    // Construct the SharePoint REST API URL.
-    const site = this.context.pageContext.web.absoluteUrl;
-    const listPart = escODataIdentifier(listName); // Safely escape list name.
-    // Select only the columns we need, escaping each field name for security.
-    const selectFields = [latField, lonField, imgField]
-      .map(f => escODataIdentifier(f)) // Security
-      .join(',');
+    // Create an array to hold all valid coordinates
+    const allLatLngs: L.LatLng[] = [];
 
-    const url =
-      `${site}/_api/web/lists/getByTitle('${listPart}')/items` +
-      `?$select=${selectFields}`;
+    // Process the fetched items
+    result.items.forEach((item: IMapItem) => {
+      // Add the valid coordinates to our array
+      allLatLngs.push(L.latLng(item.lat, item.lon));
 
-    try {
-      const response = await this.context.spHttpClient.get(url, SPHttpClient.configurations.v1);
-      const json = await response.json();
-      const items = json.value as IWebmapListItem[];
-      
-      this.markerCluster!.clearLayers(); // Clear all old markers before adding new ones.
-
-      // NEW: Create an array to hold all valid coordinates
-      const allLatLngs: L.LatLng[] = [];
-
-      items.forEach(item => {
-        // FIX: Add type assertions when accessing properties from an 'unknown' type.
-        const imgData = item[imgField] as { Url: string };
-        // Ensure the item has the necessary data. The image is often in a sub-property like 'Url'.
-        if (!item[latField] || !item[lonField] || !imgData?.Url) return;
-
-        const rawImg = imgData.Url;
-        const img = sanitizeUrl(rawImg); // Sanitize the URL before use.
-        if (!img) return; // Skip if the URL is invalid.
-
-        // Parse coordinates.
-        const lat = parseFloat(item[latField] as string);
-        const lon = parseFloat(item[lonField] as string);
-
-        // NEW: Check if coordinates are valid numbers before using them
-        if (isNaN(lat) || isNaN(lon)) return;
-
-        // NEW: Add the valid coordinates to our array
-        allLatLngs.push(L.latLng(lat, lon));
-
-        // Create an "enriched" version of the item with the sanitized img URL for easy access.
-        const enriched = { ...item, img };  // copy all properties of item and add sanitized img url
-
-        // Create a custom icon for the individual marker (not a cluster).
-        const icon = L.divIcon({
-          html: `<img src="${img}" style="width:40px;height:40px;border-radius:5px;" />`,
-          className: '',
-          iconSize: [40, 40]
-        });
-
-        // Create the Leaflet marker with coordinates, the custom icon, and our enriched data payload.
-        const marker = L.marker([lat, lon], { icon, data: enriched });
-
-        // Bind a simple popup to the individual marker, showing its image.
-        marker.bindPopup(`
-        <div>
-          <img src="${img}" class="${styles.popupImg}" />
-        </div>
-        `);
-
-        // Add the final marker to the cluster layer.
-        this.markerCluster!.addLayer(marker);
+      // Create a custom icon for the individual marker (not a cluster).
+      const icon = L.divIcon({
+        html: `<img src="${item.img}" style="width:40px;height:40px;border-radius:5px;" />`,
+        className: '',
+        iconSize: [40, 40]
       });
 
-      // NEW: After processing all items, check if we have any coordinates
-      if (allLatLngs.length > 0 && this.map) {
-        // Create a bounding box around all points
-        const bounds = L.latLngBounds(allLatLngs);
-        // Tell the map to fit itself to these bounds, with a little padding
-        this.map.fitBounds(bounds.pad(0.1));
-      }
-    } catch (err) {
-      console.error('Webmap → list fetch failed:', err);
+      // Create the Leaflet marker with coordinates, the custom icon, and our enriched data payload.
+      const marker = L.marker([item.lat, item.lon], { icon, data: item.data });
+
+      // Bind a simple popup to the individual marker, showing its image.
+      marker.bindPopup(`
+        <div>
+          <img src="${item.img}" class="${styles.popupImg}" />
+        </div>
+      `);
+
+      // Add the final marker to the cluster layer.
+      this.markerCluster!.addLayer(marker);
+    });
+
+    // After processing all items, check if we have any coordinates
+    if (allLatLngs.length > 0 && this.map) {
+      // Create a bounding box around all points
+      const bounds = L.latLngBounds(allLatLngs);
+      // Tell the map to fit itself to these bounds, with a little padding
+      this.map.fitBounds(bounds.pad(0.1));
     }
-  }
 
-  /**
-   * Loads data from Document Library
-   */
-  private async loadDocumentLibraryData(): Promise<void> {
-    const { libraryName, libraryMethod, latField, lonField, imgField } = this.properties;
-    
-    if (!libraryName) return;
-
-    const site = this.context.pageContext.web.absoluteUrl;
-    const libraryPart = escODataIdentifier(libraryName);
-
-    try {
-      let url: string;
-      let selectFields: string;
-
-      if (libraryMethod === 'columns' && latField && lonField && imgField) {
-        // Method 1: Use columns from the library
-        selectFields = ['FileRef', latField, lonField, imgField]
-          .map(f => escODataIdentifier(f))
-          .join(',');
-        
-        url = `${site}/_api/web/lists/getByTitle('${libraryPart}')/items?$select=${selectFields}&$filter=FSObjType eq 0`;
-      } else {
-        // Method 2: Use EXIF data - just get image files
-        url = `${site}/_api/web/lists/getByTitle('${libraryPart}')/items?$select=FileRef,FileLeafRef&$filter=FSObjType eq 0`;
-      }
-
-      const response = await this.context.spHttpClient.get(url, SPHttpClient.configurations.v1);
-      const json = await response.json();
-      const items = json.value;
-      
-      this.markerCluster!.clearLayers();
-      const allLatLngs: L.LatLng[] = [];
-      
-      let noGpsCount = 0;
-
-      for (const item of items) {
-        const fileUrl = `${site}${item.FileRef}`;
-        const fileName = item.FileLeafRef;
-        
-        // Check if it's an image file
-        if (!this.isImageFile(fileName)) continue;
-
-        let lat: number | null = null;
-        let lon: number | null = null;
-        let img: string = fileUrl;
-
-        if (libraryMethod === 'columns' && latField && lonField) {
-          // Method 1: Get coordinates from columns
-          if (item[latField] && item[lonField]) {
-            lat = parseFloat(item[latField] as string);
-            lon = parseFloat(item[lonField] as string);
-          }
-          
-          // Get image URL if specified
-          if (imgField && item[imgField]) {
-            const imgData = item[imgField] as { Url: string } | string;
-            img = typeof imgData === 'object' ? imgData.Url : imgData;
-          }
-        } else {
-          // Method 2: Extract from EXIF
-          const gpsData = await this.extractGPSFromExif(fileUrl);
-          if (gpsData) {
-            lat = gpsData.lat;
-            lon = gpsData.lon;
-          } else {
-            noGpsCount++;
-          }
-        }
-
-        // Skip if no valid coordinates
-        if (!lat || !lon || isNaN(lat) || isNaN(lon)) continue;
-
-        // Add valid coordinates
-        allLatLngs.push(L.latLng(lat, lon));
-
-        // Create marker
-        const sanitizedImg = sanitizeUrl(img);
-        if (!sanitizedImg) continue;
-
-        const enriched = { ...item, img: sanitizedImg };
-
-        const icon = L.divIcon({
-          html: `<img src="${sanitizedImg}" style="width:40px;height:40px;border-radius:5px;" />`,
-          className: '',
-          iconSize: [40, 40]
-        });
-
-        const marker = L.marker([lat, lon], { icon, data: enriched });
-        
-        marker.bindPopup(`
-          <div>
-            <img src="${sanitizedImg}" class="${styles.popupImg}" />
-            <p style="margin: 10px 0 0; text-align: center; font-size: 12px;">${fileName}</p>
-          </div>
-        `);
-
-        this.markerCluster!.addLayer(marker);
-      }
-
-      // Show toast if EXIF method and some images had no GPS data
-      if (libraryMethod === 'exif' && noGpsCount > 0) {
-        this.showToast(`${noGpsCount} image(s) have no GPS data in EXIF`, 'error');
-      }
-
-      // Fit map to bounds
-      if (allLatLngs.length > 0 && this.map) {
-        const bounds = L.latLngBounds(allLatLngs);
-        this.map.fitBounds(bounds.pad(0.1));
-      }
-
-    } catch (err) {
-      console.error('Webmap → document library fetch failed:', err);
-      this.showToast('Failed to load images from document library', 'error');
+    // Show any errors that occurred during fetching
+    // Only show toast messages for Document Library errors
+    if (this.properties.dataSourceType === 'DocumentLibrary') {
+      result.errors.forEach((error: any) => {
+        this.showToast(error, 'error');
+      });
     }
-  }
-
-  /**
-   * Checks if a file is an image based on its extension
-   */
-  private isImageFile(fileName: string): boolean {
-    const imageExtensions = ['.jpg', '.jpeg', '.png', '.gif', '.bmp', '.webp'];
-    const ext = fileName.toLowerCase().substring(fileName.lastIndexOf('.'));
-    return imageExtensions.indexOf(ext) !== -1;
   }
 
   /* ------------------------------------------------------------- */
@@ -659,41 +454,26 @@ export default class WebmapWebPart extends BaseClientSideWebPart<IWebmapWebPartP
             label: 'Document Library',
             options: this._lists,
             disabled: !this._lists.length
-          }),
-          PropertyPaneDropdown('libraryMethod', {
-            label: 'Location Method',
-            options: [
-              { key: 'columns', text: 'Use Library Columns' },
-              { key: 'exif', text: 'Extract from Image EXIF Data' }
-            ],
-            selectedKey: this.properties.libraryMethod || 'exif'
           })
         ]
       });
 
-      // If columns method is selected, show field selectors
-      if (this.properties.libraryMethod === 'columns') {
-        groups.push({
-          groupName: 'Select Location Columns',
-          groupFields: [
-            PropertyPaneDropdown('latField', {
-              label: 'Latitude Field',
-              options: this._fields,
-              disabled: !this._fields.length
-            }),
-            PropertyPaneDropdown('lonField', {
-              label: 'Longitude Field',
-              options: this._fields,
-              disabled: !this._fields.length
-            }),
-            PropertyPaneDropdown('imgField', {
-              label: 'Image Field (optional)',
-              options: this._fields,
-              disabled: !this._fields.length
-            })
-          ]
-        });
-      }
+      // Always show optional coordinate fields for document library
+      groups.push({
+        groupName: 'Set GPS data manually (Optional)',
+        groupFields: [
+          PropertyPaneDropdown('latField', {
+            label: 'Latitude',
+            options: this._fields,
+            disabled: !this._fields.length
+          }),
+          PropertyPaneDropdown('lonField', {
+            label: 'Longitude',
+            options: this._fields,
+            disabled: !this._fields.length
+          })
+        ]
+      });
     }
 
     return {
@@ -762,7 +542,6 @@ export default class WebmapWebPart extends BaseClientSideWebPart<IWebmapWebPartP
       this._lists = [];
       this.properties.listName = '';
       this.properties.libraryName = '';
-      this.properties.libraryMethod = 'exif'; // Default to EXIF method
       this._siteForLists = null;  // Reset cache to force reload
 
       // Refresh property pane dropdowns immediately
@@ -775,31 +554,10 @@ export default class WebmapWebPart extends BaseClientSideWebPart<IWebmapWebPartP
       //this.render();
     }
 
-    /* Handle library method change */
-    if (path === 'libraryMethod') {
-      // Clear field selections when switching methods
-      this.properties.latField = '';
-      this.properties.lonField = '';
-      this.properties.imgField = '';
-      this._fields = [];
-      
-      // If switching to columns method, trigger field loading
-      if (newValue === 'columns' && this.properties.libraryName) {
-        this._listForFields = null; // Force reload
-        this.onPropertyPaneFieldChanged('libraryName', '', this.properties.libraryName);
-      }
-      
-      this.context.propertyPane.refresh();
-    }
-
     /* Reload field dropdowns when the list/library changes */
     if ((path === 'listName' || path === 'libraryName') && newValue && newValue !== this._listForFields) {
-      // Only load fields if we're using columns method for document library
-      const shouldLoadFields = this.properties.dataSourceType === 'List' || 
-                              (this.properties.dataSourceType === 'DocumentLibrary' && this.properties.libraryMethod === 'columns');
+      // Always load fields for both List and Document Library
       
-      if (!shouldLoadFields) return;
-
       // Clear old field options and selections.
       this._fields = [];
       this.properties.latField = '';
@@ -835,7 +593,7 @@ export default class WebmapWebPart extends BaseClientSideWebPart<IWebmapWebPartP
 
     /* Re-render map whenever any data-source field changes */
     // If any of the core data properties have changed, trigger a full re-render of the web part.
-    if (['listName', 'latField', 'lonField', 'imgField', 'libraryName', 'libraryMethod'].indexOf(path) !== -1) {
+    if (['listName', 'latField', 'lonField', 'imgField', 'libraryName'].indexOf(path) !== -1) {
       this.render();
     }
   }
