@@ -6,6 +6,9 @@
 /* - Configurable GPS extraction method:                                      */
 /*   - EXIF data extraction                                                   */
 /*   - Manual coordinate fields                                               */
+/* - Configurable map types:                                                  */
+/*   - OpenStreetMap                                                          */
+/*   - ArcGIS Web Map                                                         */
 /* ========================================================================== */
 
 // Imports from the SharePoint Framework (SPFx) libraries.
@@ -15,6 +18,7 @@ import {
   PropertyPaneDropdown,           // A dropdown control for the property pane.
   IPropertyPaneDropdownOption,    // Interface for the options within a dropdown control.
   IPropertyPaneGroup,
+  PropertyPaneTextField,
   //PropertyPaneCheckbox
 } from '@microsoft/sp-property-pane';
 import { BaseClientSideWebPart } from '@microsoft/sp-webpart-base'; // The base class for all client-side web parts.
@@ -52,6 +56,9 @@ interface ISPList { Title: string; }
 interface ISPField { TypeAsString: string; InternalName: string; Title: string; }
 interface IClusterClickEvent extends L.LeafletEvent { layer: L.MarkerCluster; latlng: L.LatLng; }
 
+// Map type options
+type MapType = 'openstreetmap' | 'arcgis';
+
 /**
  * This is a TypeScript feature called "module augmentation".
  * We are extending the original 'leaflet' module to add a custom 'data' property
@@ -84,6 +91,8 @@ export interface IWebmapWebPartProps {
   locationMethod: 'exif' | 'manual'; // method for getting GPS coordinates
   latField: string; // The internal name of the column containing the latitude.
   lonField: string; // The internal name of the column containing the longitude.
+  mapType: MapType; // The type of map to use
+  arcgisMapUrl: string; // The ArcGIS web map URL
 }
 
 /* ------------------------------------------------------------------ */
@@ -161,22 +170,27 @@ export default class WebmapWebPart extends BaseClientSideWebPart<IWebmapWebPartP
     // Initialize a new map on the 'map' div, setting an initial view (coordinates and zoom level).
     this.map = L.map(this.mapId).setView([51.4239, 6.9985], 10); // Default view over Hochtief location
 
-    // Add the base tile layer to the map. This provides the visual map background (roads, etc.).
-    // We use OpenStreetMap here, which requires attribution.
+    /* 3. Add base layer based on map type */
+    if (this.properties.mapType === 'arcgis' && this.properties.arcgisMapUrl) {
+      // Extract webmap ID and domain from URL
+      const webmapId = this.extractWebmapId(this.properties.arcgisMapUrl);
+      const domain = this.extractArcGISDomain(this.properties.arcgisMapUrl);
+      
+      if (webmapId && domain) {
+        this.arcgisMap = new ArcGISMapService(this.map);
+        this.arcgisMap.addArcGISTileLayer(webmapId, domain);
+      } else {
+        console.error('Invalid ArcGIS map URL format');
+        this.showToast('Invalid ArcGIS map URL format', 'error');
+        // Fallback to OpenStreetMap
+        this.addOpenStreetMapLayer();
+      }
+    } else {
+      // Default to OpenStreetMap
+      this.addOpenStreetMapLayer();
+    }
 
-    // L.tileLayer('https://{s}.tile.openstreetmap.de/tiles/osmde/{z}/{x}/{y}.png', {
-    //   attribution: '&copy; <a href="https://www.openstreetmap.org/">OpenStreetMap</a> contributors',
-    // }).addTo(this.map);
-
-    
- /* 3. Add ArcGIS tile layer */
-    // Initialize the ArcGIS service and add the tile layer
-    this.arcgisMap = new ArcGISMapService(this.map);
-    this.arcgisMap.addArcGISTileLayer();
-
-    
-
-    /* 3. Cluster layer */
+    /* 4. Cluster layer */
     // Initialize the marker cluster group.
     this.markerCluster = L.markerClusterGroup({
       // `iconCreateFunction` is a customization that defines how a cluster icon looks.
@@ -217,7 +231,7 @@ export default class WebmapWebPart extends BaseClientSideWebPart<IWebmapWebPartP
     // Add the newly created cluster layer to the map.
     this.map.addLayer(this.markerCluster);
 
-    /* 4. Gallery popup on cluster click */
+    /* 5. Gallery popup on cluster click */
     // Since zoomToBoundsOnClick is false, we can define our own click behavior.
     this.markerCluster.on('clusterclick', (e: IClusterClickEvent) => { // FIX: Use a specific event type instead of 'any'.
       const markers = e.layer.getAllChildMarkers(); // FIX: Removed unnecessary cast to 'L.Marker<any>[]'.
@@ -230,7 +244,14 @@ export default class WebmapWebPart extends BaseClientSideWebPart<IWebmapWebPartP
       // Programmatically create the HTML elements for the gallery popup using Leaflet's DOM utilities.
       const container = L.DomUtil.create('div', styles.galleryContainer);
 
-      const imgEl = L.DomUtil.create('img', styles.popupImg, container) as HTMLImageElement;
+      // Create a wrapper link for the image
+      const imgLink = L.DomUtil.create('a', '', container) as HTMLAnchorElement;
+      imgLink.href = imgList[0];
+      imgLink.target = '_blank';
+      imgLink.rel = 'noopener noreferrer';
+      imgLink.style.cursor = 'pointer';
+
+      const imgEl = L.DomUtil.create('img', styles.popupImg, imgLink) as HTMLImageElement;  
       imgEl.src = imgList[0];
 
       const nav = L.DomUtil.create('div', styles.galleryNav, container);
@@ -240,6 +261,7 @@ export default class WebmapWebPart extends BaseClientSideWebPart<IWebmapWebPartP
       prevBtn.onclick = () => {
         current = (current - 1 + imgList.length) % imgList.length; // Cycle backwards.
         imgEl.src = imgList[current];
+        imgLink.href = imgList[current]; // Update the link href
       };
 
       const nextBtn = L.DomUtil.create('button', '', nav);
@@ -247,6 +269,7 @@ export default class WebmapWebPart extends BaseClientSideWebPart<IWebmapWebPartP
       nextBtn.onclick = () => {
         current = (current + 1) % imgList.length; // Cycle forwards.
         imgEl.src = imgList[current];
+        imgLink.href = imgList[current]; // Update the link href
       };
 
       // Create and open the Leaflet popup at the cluster's location, containing the gallery.
@@ -256,67 +279,83 @@ export default class WebmapWebPart extends BaseClientSideWebPart<IWebmapWebPartP
         .openOn(this.map!);
     });
 
-    /* 5. First data load + 30-sec interval */
+    /* 6. First data load + 30-sec interval */
     this.loadMapData(); // Load the data immediately.
     //this.dataTimer = window.setInterval(() => this.loadMapData(), 30_000); // And then reload every 30 seconds.
+  }
+
+  /**
+   * Add OpenStreetMap tile layer
+   */
+  private addOpenStreetMapLayer(): void {
+    if (!this.map) return;
+    
+    L.tileLayer('https://{s}.tile.openstreetmap.de/tiles/osmde/{z}/{x}/{y}.png', {
+      attribution: '&copy; <a href="https://www.openstreetmap.org/">OpenStreetMap</a> contributors',
+    }).addTo(this.map);
+  }
+
+  /**
+   * Extract webmap ID from ArcGIS URL
+   */
+  private extractWebmapId(url: string): string | null {
+    if (!url) return null;
+    
+    // Pattern: https://{domain}.maps.arcgis.com/apps/mapviewer/index.html?webmap={webmap_id}
+    const urlPattern = /https?:\/\/[^\/]+\.maps\.arcgis\.com\/apps\/mapviewer\/index\.html\?webmap=([a-zA-Z0-9]+)/;
+    const match = url.match(urlPattern);
+    
+    if (match && match[1]) {
+      return match[1];
+    }
+    
+    // Also check for webmap ID in other common ArcGIS URL formats
+    const webmapPattern = /webmap=([a-zA-Z0-9]+)/;
+    const webmapMatch = url.match(webmapPattern);
+    
+    if (webmapMatch && webmapMatch[1]) {
+      return webmapMatch[1];
+    }
+    
+    return null;
+  }
+
+  /**
+   * Extract domain from ArcGIS URL
+   */
+  private extractArcGISDomain(url: string): string | null {
+    if (!url) return null;
+    
+    // Pattern to extract the domain part (e.g., "hochtiefinfra" from "hochtiefinfra.maps.arcgis.com")
+    const domainPattern = /https?:\/\/([^\/]+)\.maps\.arcgis\.com/;
+    const match = url.match(domainPattern);
+    
+    if (match && match[1]) {
+      return match[1];
+    }
+    
+    return null;
   }
 
   /**
    * Shows a toast notification
    */
   private showToast(message: string, type: 'info' | 'error' = 'info'): void {
-    // Create toast element
     const toast = document.createElement('div');
-    toast.style.cssText = `
-      position: fixed;
-      bottom: 20px;
-      left: 50%;
-      transform: translateX(-50%);
-      background: ${type === 'error' ? '#d32f2f' : '#1976d2'};
-      color: white;
-      padding: 16px 24px;
-      border-radius: 4px;
-      box-shadow: 0 2px 5px rgba(0,0,0,0.2);
-      z-index: 9999;
-      font-family: 'Segoe UI', sans-serif;
-      animation: slideUp 0.3s ease-out;
-    `;
+    toast.className = `${styles.toast} ${type === 'error' ? styles.toastError : ''}`;
     toast.textContent = message;
-    
-    // Add animation
-    const style = document.createElement('style');
-    style.textContent = `
-      @keyframes slideUp {
-        from { 
-          transform: translateX(-50%) translateY(100%);
-          opacity: 0;
-        }
-        to { 
-          transform: translateX(-50%) translateY(0);
-          opacity: 1;
-        }
-      }
-      @keyframes slideDown {
-        from { 
-          transform: translateX(-50%) translateY(0);
-          opacity: 1;
-        }
-        to { 
-          transform: translateX(-50%) translateY(100%);
-          opacity: 0;
-        }
-      }
-    `;
-    document.head.appendChild(style);
-    
+  
+    // Add animation manually (optional, fallback for older browsers)
+    toast.style.animation = 'slideUp 0.3s ease-out';
+  
     document.body.appendChild(toast);
-    
-    // Remove after 3 seconds
+  
     setTimeout(() => {
       toast.style.animation = 'slideDown 0.3s ease-in';
       setTimeout(() => {
-        document.body.removeChild(toast);
-        document.head.removeChild(style);
+        if (toast.parentElement) {
+          document.body.removeChild(toast);
+        }
       }, 300);
     }, 3000);
   }
@@ -359,7 +398,9 @@ export default class WebmapWebPart extends BaseClientSideWebPart<IWebmapWebPartP
       // Bind a simple popup to the individual marker, showing its image.
       marker.bindPopup(`
         <div>
-          <img src="${item.img}" class="${styles.popupImg}" />
+          <a href="${item.img}" target="_blank" rel="noopener noreferrer" style="cursor: pointer;">
+            <img src="${item.img}" class="${styles.popupImg}" />
+          </a>
         </div>
       `);
 
@@ -391,24 +432,51 @@ export default class WebmapWebPart extends BaseClientSideWebPart<IWebmapWebPartP
     // Start with the base groups
     const groups: IPropertyPaneGroup[] = [
       {
-        groupName: 'Data Source Configuration',
+        groupName: 'Map Configuration',
         groupFields: [
-          PropertyPaneDropdown('libraryName', {
-            label: 'Document Library',
-            options: this._libraries,
-            disabled: !this._libraries.length
-          }),
-          PropertyPaneDropdown('locationMethod', {
-            label: 'Location Method',
+          PropertyPaneDropdown('mapType', {
+            label: 'Map Type',
             options: [
-              { key: 'exif', text: 'Extract from Image EXIF Data' },
-              { key: 'manual', text: 'Select latitude and longitude fields' }
+              { key: 'openstreetmap', text: 'OpenStreetMap' },
+              { key: 'arcgis', text: 'ArcGIS Web Map' }
             ],
-            selectedKey: this.properties.locationMethod || 'exif'
+            selectedKey: this.properties.mapType || 'openstreetmap'
           })
         ]
       }
     ];
+
+    // If ArcGIS is selected, show URL field
+    if (this.properties.mapType === 'arcgis') {
+      groups[0].groupFields.push(
+        PropertyPaneTextField('arcgisMapUrl', {
+          label: 'ArcGIS Map URL',
+          description: 'Enter the ArcGIS web map URL (e.g., https://domain.maps.arcgis.com/apps/mapviewer/index.html?webmap=xxxxx)',
+          placeholder: 'https://domain.maps.arcgis.com/apps/mapviewer/index.html?webmap=xxxxx',
+          value: this.properties.arcgisMapUrl
+        })
+      );
+    }
+
+    // Data source configuration group
+    groups.push({
+      groupName: 'Data Source Configuration',
+      groupFields: [
+        PropertyPaneDropdown('libraryName', {
+          label: 'Document Library',
+          options: this._libraries,
+          disabled: !this._libraries.length
+        }),
+        PropertyPaneDropdown('locationMethod', {
+          label: 'Location Method',
+          options: [
+            { key: 'exif', text: 'Extract from Image EXIF Data' },
+            { key: 'manual', text: 'Select latitude and longitude fields' }
+          ],
+          selectedKey: this.properties.locationMethod || 'exif'
+        })
+      ]
+    });
 
     // If manual method is selected, show field selectors
     if (this.properties.locationMethod === 'manual') {
@@ -483,6 +551,23 @@ export default class WebmapWebPart extends BaseClientSideWebPart<IWebmapWebPartP
    * This SPFx lifecycle method is called whenever a property pane field is changed by the user.
    */
   protected onPropertyPaneFieldChanged(path: string, oldValue: unknown, newValue: unknown): void {
+    /* Handle map type change */
+    if (path === 'mapType') {
+      // Clear ArcGIS URL if switching away from ArcGIS
+      if (newValue !== 'arcgis') {
+        this.properties.arcgisMapUrl = '';
+      }
+      this.context.propertyPane.refresh();
+    }
+
+    /* Validate ArcGIS URL when it changes */
+    if (path === 'arcgisMapUrl' && newValue) {
+      const webmapId = this.extractWebmapId(newValue as string);
+      if (!webmapId) {
+        console.error('Invalid ArcGIS map URL format. Expected format: https://domain.maps.arcgis.com/apps/mapviewer/index.html?webmap=xxxxx');
+      }
+    }
+
     /* Handle location method change */
     if (path === 'locationMethod') {
       // Clear field selections when switching methods
@@ -538,7 +623,7 @@ export default class WebmapWebPart extends BaseClientSideWebPart<IWebmapWebPartP
 
     /* Re-render map whenever any data-source field changes */
     // If any of the core data properties have changed, trigger a full re-render of the web part.
-    if (['libraryName', 'locationMethod', 'latField', 'lonField'].indexOf(path) !== -1) {
+    if (['libraryName', 'locationMethod', 'latField', 'lonField', 'mapType', 'arcgisMapUrl'].indexOf(path) !== -1) {
       this.render();
     }
   }

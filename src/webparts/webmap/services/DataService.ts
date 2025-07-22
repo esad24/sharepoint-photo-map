@@ -61,7 +61,7 @@ export class DataService {
     const result: IDataFetchResult = { items: [], errors: [] };
     
     if (!libraryName) {
-      result.errors.push('Missing library name');
+      //result.errors.push('Missing library name');
       return result;
     }
 

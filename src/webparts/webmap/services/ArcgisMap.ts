@@ -2,6 +2,7 @@
 /* ArcGISMapService.ts                                                        */
 /* - Service class for handling ArcGIS map layers and operations             */
 /* - Extracted from WebmapWebPart for better code organization               */
+/* - Now accepts webmap ID as parameter instead of hardcoding                 */
 /* ========================================================================== */
 
 import * as L from 'leaflet';
@@ -15,13 +16,12 @@ export class ArcGISMapService {
 
   /**
    * Add ArcGIS tile layer to the map -> loading many little image tiles and putting them together on the screen.
+   * @param webmapId The ArcGIS webmap ID extracted from the URL
+   * @param domain The ArcGIS domain (e.g., 'hochtiefinfra' from 'hochtiefinfra.maps.arcgis.com')
    */
-  public addArcGISTileLayer(): void {
-    if (!this.map) return;
+  public addArcGISTileLayer(webmapId: string, domain: string): void {
+    if (!this.map || !webmapId || !domain) return;
 
-    // ArcGIS webmap ID extracted from the URL
-    const webmapId = '37606acca6044778bd937f21303a4503';
-    
     // ArcGIS Online tile service URL pattern
     const arcgisTileUrl = 'https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}';
 
@@ -31,10 +31,8 @@ export class ArcGISMapService {
         id: 'arcgis-tiles'
       }).addTo(this.map);
 
-
-
       // Add vector tile layer with proper styling
-      this.addArcGISVectorLayer(webmapId);
+      this.addArcGISVectorLayer(webmapId, domain);
     } catch (error) {
       console.error('Failed to add ArcGIS tile layer:', error);
       this.addFallbackTileLayer();
@@ -54,11 +52,16 @@ export class ArcGISMapService {
 
   /**
    * Add ArcGIS vector layer (webmap content)
+   * @param webmapId The ArcGIS webmap ID
+   * @param domain The ArcGIS domain (e.g., 'hochtiefinfra')
    */
-  private addArcGISVectorLayer(webmapId: string): void {
-    if (!this.map) return;
+  private addArcGISVectorLayer(webmapId: string, domain: string): void {
+    if (!this.map || !webmapId || !domain) return;
 
-    const webmapUrl = `https://hochtiefinfra.maps.arcgis.com/sharing/rest/content/items/${webmapId}/data?f=json`;
+    // Construct the webmap URL using the provided domain
+    const webmapUrl = `https://${domain}.maps.arcgis.com/sharing/rest/content/items/${webmapId}/data?f=json`;
+    
+    console.log(`Fetching webmap from: ${webmapUrl}`);
     
     // Fetch webmap definition
     fetch(webmapUrl)
@@ -113,6 +116,7 @@ export class ArcGISMapService {
       })
       .catch(error => {
         console.warn('Could not load webmap data:', error);
+        console.warn(`Please check if the domain '${domain}' and webmap ID '${webmapId}' are correct.`);
       });
   }
 
