@@ -43,3 +43,51 @@ return v.replace(/&/g,  '&amp;')
         .replace(/</g,  '&lt;')
         .replace(/>/g,  '&gt;');
 }
+
+/**
+ * Simple ArcGIS URL validator - just checks it's HTTPS and contains maps.arcgis.com
+ * @param url The ArcGIS URL to validate
+ * @returns The sanitized URL or null if invalid
+ */
+
+/**
+ * Allowed ArcGIS domains for security validation
+ */
+const ALLOWED_ARCGIS_DOMAINS: string[] = [
+    'maps.arcgis.com',
+    'mapsdevext.arcgis.com', 
+    'maps.arcgis.de',
+    'maps.arcgis.eu'
+  ];
+  
+  /**
+ * Simple ArcGIS URL validator - checks HTTPS and allowed domains
+ * @param url The ArcGIS URL to validate
+ * @returns The sanitized URL or null if invalid
+ */
+export function validateArcGISUrl(url: string): string | null {
+    if (!url) return null;
+    
+    try {
+      const parsedUrl = new URL(url.trim());
+      
+      // Must be HTTPS protocol
+      if (parsedUrl.protocol !== 'https:') {
+        return null;
+      }
+      
+      // Check if hostname ends with any allowed domain (compatible with older JS)
+      const hostname = parsedUrl.hostname.toLowerCase();
+      const isValidDomain = ALLOWED_ARCGIS_DOMAINS.some(domain => {
+        return hostname === domain || hostname.indexOf('.' + domain) === hostname.length - domain.length - 1;
+      });
+      
+      if (isValidDomain) {
+        return parsedUrl.href;
+      }
+    } catch {
+      // Invalid URL format
+    }
+    
+    return null;
+  }
