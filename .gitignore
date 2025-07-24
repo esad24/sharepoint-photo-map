@@ -10,9 +10,9 @@ node_modules
 dist
 lib
 release
-solution
+#solution
 temp
-*.sppkg
+#*.sppkg
 .heft
 
 # Coverage directory used by tools like istanbul
@@ -31,4 +31,4 @@ obj
 *.resx.ts
 
 # Styles Generated Code
-*.scss.ts
+#*.scss.ts
