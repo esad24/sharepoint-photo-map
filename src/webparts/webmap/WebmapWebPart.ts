@@ -327,6 +327,8 @@ export default class WebmapWebPart extends BaseClientSideWebPart<IWebmapWebPartP
 
   /**
    * Add OpenStreetMap tile layer
+   * OpenStreetMap is a free, community-driven mapping service
+   * It's very reliable and doesn't require any API keys or authentication
    */
   private addOpenStreetMapLayer(): void {
     if (!this.map) return; // Safety check - exit if map doesn't exist

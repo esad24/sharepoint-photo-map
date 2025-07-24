@@ -1,21 +1,19 @@
 /* ========================================================================== */
 /* ArcGISMapService.ts                                                        */
 /* - Service class for handling ArcGIS map layers and operations             */
-/* - Extracted from WebmapWebPart for better code organization               */
 /* - Now accepts webmap ID as parameter instead of hardcoding                 */
 /* ========================================================================== */
 
 /*
  * WHAT IS ARCGIS?
  * ArcGIS is a mapping platform by Esri that allows organizations to create, manage, 
- * and share interactive maps and spatial data. Think of it like Google Maps, but for 
- * businesses and organizations to create their own custom maps with their own data.
+ * and share interactive maps and spatial data. 
  * 
  * KEY CONCEPTS:
  * - Webmap: A saved map configuration that includes layers, styling, and settings
  * - Layer: A collection of geographic features (like roads, buildings, or boundaries)
  * - Feature: An individual map element (like a specific road or building)
- * - Tile: Small square images that make up the map background (like puzzle pieces)
+ * - Tile: Small square images that make up the map background 
  * - Service: A web endpoint that provides map data or functionality
  */
 
@@ -38,7 +36,7 @@ export class ArcGISMapService {
    * WHAT ARE TILES?
    * Maps are made up of small square images called "tiles" (usually 256x256 pixels).
    * When you zoom or pan a map, your browser downloads the specific tiles needed
-   * for that view. It's like a jigsaw puzzle where each piece is downloaded separately.
+   * for that view. 
    * 
    * @param webmapId The ArcGIS webmap ID extracted from the URL (unique identifier for a saved map)
    * @param domain The ArcGIS domain (e.g., 'hochtiefinfra' from 'hochtiefinfra.maps.arcgis.com')
@@ -84,7 +82,7 @@ export class ArcGISMapService {
     if (!this.map) return; // Safety check
 
     // Add OpenStreetMap as fallback
-    // OpenStreetMap is a free, community-driven mapping service (like Wikipedia for maps)
+    // OpenStreetMap is a free, community-driven mapping service
     // It's very reliable and doesn't require any API keys or authentication
     L.tileLayer('https://{s}.tile.openstreetmap.de/tiles/osmde/{z}/{x}/{y}.png', {
       attribution: '&copy; <a href="https://www.openstreetmap.org/">OpenStreetMap</a> contributors',
@@ -110,12 +108,11 @@ export class ArcGISMapService {
 
     // Construct the webmap URL using the provided domain
     // This URL returns JSON data describing the webmap configuration
-    // Think of it as a "recipe" that tells us what layers to load and how to style them
     const webmapUrl = `https://${domain}.maps.arcgis.com/sharing/rest/content/items/${webmapId}/data?f=json`;
     
     console.log(`Fetching webmap from: ${webmapUrl}`);
     
-    // Fetch webmap definition (the "recipe" for this map)
+    // Fetch webmap definition
     fetch(webmapUrl)
       .then(response => {
         // Check if the request was successful
@@ -141,8 +138,6 @@ export class ArcGISMapService {
               
               // Handle Group Layers (like BR_Leverkusen_01)
               // GROUP LAYERS are like folders that contain multiple related layers
-              // For example, a "Utilities" group might contain separate layers for
-              // water pipes, gas lines, and electrical cables
               if (layer && layer.layerType === 'GroupLayer' && layer.layers && Array.isArray(layer.layers)) {
                 console.log(`Found Group Layer: ${layer.title} with ${layer.layers.length} sublayers`);
                 
