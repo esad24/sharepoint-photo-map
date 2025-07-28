@@ -1,7 +1,3 @@
-# webmap
-
-## Summary
-
 A photo map that displays images from SharePoint lists at their GPS locations, 
 integrated into SharePoint as a web part.
 
@@ -18,20 +14,9 @@ integrated into SharePoint as a web part.
 
 ---
 
-## Minimal Path to Awesome
-
-- Clone this repository
+## run
 - Ensure that you are at the solution folder
 - in the command-line run:
   - **npm install**
   - **gulp serve**
 
-
-
-## References
-
-- [Getting started with SharePoint Framework](https://docs.microsoft.com/en-us/sharepoint/dev/spfx/set-up-your-developer-tenant)
-- [Building for Microsoft teams](https://docs.microsoft.com/en-us/sharepoint/dev/spfx/build-for-teams-overview)
-- [Use Microsoft Graph in your solution](https://docs.microsoft.com/en-us/sharepoint/dev/spfx/web-parts/get-started/using-microsoft-graph-apis)
-- [Publish SharePoint Framework applications to the Marketplace](https://docs.microsoft.com/en-us/sharepoint/dev/spfx/publish-to-marketplace-overview)
-- [Microsoft 365 Patterns and Practices](https://aka.ms/m365pnp) - Guidance, tooling, samples and open-source controls for your Microsoft 365 development
