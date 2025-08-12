@@ -1,305 +1,300 @@
 /* ========================================================================== */
-/* ArcGISMapService.ts - Enhanced with Vector Tile Layer Support              */
+/* ArcGISMapService.ts                                                        */
 /* - Service class for handling ArcGIS map layers and operations             */
-/* - Now supports Vector Tile Layers in addition to Feature and Map Service  */
+/* - Now uses basemap from webmap JSON instead of hardcoded World Imagery    */
 /* ========================================================================== */
 
 /*
- * WHAT ARE VECTOR TILE LAYERS?
- * Vector Tile Layers are a modern approach that combines the best of both worlds:
- * - Performance: Data is pre-packaged into tiles (like Map Services)
- * - Flexibility: Contains actual vector data that can be styled dynamically (like Feature Layers)
- * - Efficiency: Only loads the data needed for the current view
+ * WHAT IS ARCGIS?
+ * ArcGIS is a mapping platform by Esri that allows organizations to create, manage, 
+ * and share interactive maps and spatial data. 
  * 
- * Vector tiles are becoming the standard for modern web mapping applications.
+ * KEY CONCEPTS:
+ * - Webmap: A saved map configuration that includes layers, styling, and settings
+ * - Layer: A collection of geographic features (like roads, buildings, or boundaries)
+ * - Feature: An individual map element (like a specific road or building)
+ * - Tile: Small square images that make up the map background 
+ * - Service: A web endpoint that provides map data or functionality
  */
 
 // Import Leaflet library for map functionality
+// Leaflet is a popular open-source JavaScript library for interactive maps
 import * as L from 'leaflet';
 
+import * as esri from 'esri-leaflet';
+import * as esriVector from 'esri-leaflet-vector';
+
 // Service class that encapsulates all ArcGIS-specific map functionality
+// This class acts as a bridge between ArcGIS data and the Leaflet map display
 export class ArcGISMapService {
-  private map: L.Map;
+  private map: L.Map; // Reference to the Leaflet map instance
 
   constructor(map: L.Map) {
-    this.map = map;
+    this.map = map; // Store map reference for use in methods
   }
 
-  public addArcGISTileLayer(webmapId: string, domain: string): void {
+  /**
+   * Load ArcGIS webmap with proper basemap and operational layers
+   * 
+   * CHANGED APPROACH:
+   * Instead of adding hardcoded World Imagery first, we now:
+   * 1. Fetch the webmap JSON data first
+   * 2. Add the basemap defined in the JSON
+   * 3. Then add operational layers on top
+   * 
+   * @param webmapId The ArcGIS webmap ID extracted from the URL (unique identifier for a saved map)
+   * @param domain The ArcGIS domain (e.g., 'hochtiefinfra' from 'hochtiefinfra.maps.arcgis.com')
+   */
+  public loadArcGISWebmap(webmapId: string, domain: string): void {
+    // Safety check - ensure all required parameters exist
     if (!this.map || !webmapId || !domain) return;
 
-    const arcgisTileUrl = 'https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}';
+    // Construct the webmap URL using the provided domain
+    // This URL returns JSON data describing the webmap configuration
+    const webmapUrl = `https://${domain}.maps.arcgis.com/sharing/rest/content/items/${webmapId}/data?f=json`;
+    
+    console.log(`Fetching webmap from: ${webmapUrl}`);
+    
+    // Fetch webmap definition
+    fetch(webmapUrl)
+      .then(response => {
+        // Check if the request was successful
+        if (!response.ok) {
+          throw new Error(`HTTP error! status: ${response.status}`);
+        }
+        return response.json(); // Parse JSON response
+      })
+      .then(webmapData => {
+        // Validate that we received a valid object
+        if (webmapData && typeof webmapData === 'object') {
+          console.log('Webmap data:', webmapData);
+          
+          // STEP 1: Add basemap layers first (these go on the bottom)
+          this.addBasemapLayers(webmapData);
+          
+          // STEP 2: Add operational layers on top of the basemap
+          this.addOperationalLayers(webmapData);
+        }
+      })
+      .catch(error => {
+        // Handle errors gracefully - don't crash the entire application
+        console.warn('Could not load webmap data:', error);
+        console.warn(`Please check if the domain '${domain}' and webmap ID '${webmapId}' are correct.`);
+        // Fallback to OpenStreetMap if webmap loading fails
+        this.addFallbackTileLayer();
+      });
+  }
 
-    try {
-      L.tileLayer(arcgisTileUrl, {
-        maxZoom: 18,
-        id: 'arcgis-tiles'
-      }).addTo(this.map);
+  /**
+   * Add basemap layers from webmap JSON data
+   * 
+   * BASEMAP PRIORITY:
+   * Basemaps provide the background imagery or reference layers and should be added first.
+   * They typically include satellite imagery, street maps, or topographic maps.
+   */
+  private addBasemapLayers(webmapData: any): void {
+    if (!webmapData.baseMap) {
+      console.log('No basemap found in webmap data, using fallback');
+      this.addFallbackTileLayer();
+      return;
+    }
 
-      this.addArcGISVectorLayer(webmapId, domain);
-    } catch (error) {
-      console.error('Failed to add ArcGIS tile layer:', error);
+    const baseMap = webmapData.baseMap;
+    console.log('Found basemap:', baseMap.title || 'Unnamed basemap');
+
+    // Handle baseMapLayers array
+    if (baseMap.baseMapLayers && Array.isArray(baseMap.baseMapLayers)) {
+      let basemapAdded = false;
+      
+      baseMap.baseMapLayers.forEach((layer: any, index: number) => {
+        console.log(`Processing basemap layer ${index + 1}:`, layer.title || 'Unnamed', layer.layerType);
+        
+        if (layer && ( layer.url || layer.styleUrl)) {
+          // Handle different types of basemap layers
+          if (layer.layerType === 'ArcGISTiledMapServiceLayer') {
+            this.addArcGISTiledLayer(layer);
+            basemapAdded = true;
+          } 
+          else if (layer.layerType === 'VectorTileLayer') {
+            try {
+              console.log(`Adding vector tile layer: ${layer.title || 'Unnamed'} from ${layer.styleUrl}`);
+              this.addVectorTileLayer(layer);
+              basemapAdded = true;
+            }
+            catch (error) {
+              console.error('Failed to add vector tile layer:', error);
+
+            }
+
+
+          } else {
+            // Try to add as a generic map service layer
+            this.addArcGISMapServiceLayer(layer);
+            basemapAdded = true;
+          }
+        }
+      });
+
+      // If no basemap layers were successfully added, use fallback
+      if (!basemapAdded) {
+        console.log('No valid basemap layers found, using fallback');
+        this.addFallbackTileLayer();
+      }
+    } else {
+      // No basemap layers array found
+      console.log('No baseMapLayers array found, using fallback');
       this.addFallbackTileLayer();
     }
   }
 
+  /**
+   * Add operational layers from webmap JSON data
+   * 
+   * OPERATIONAL LAYERS:
+   * These contain the actual data/content you want to display on top of the basemap
+   * (like property boundaries, infrastructure, or business locations)
+   */
+  private addOperationalLayers(webmapData: any): void {
+    // Process operational layers from the webmap
+    if (webmapData.operationalLayers && Array.isArray(webmapData.operationalLayers)) {
+      // Loop through each layer defined in the webmap
+      webmapData.operationalLayers.forEach((layer: any) => {
+        console.log('Processing operational layer:', layer.title, layer.layerType);
+        
+        // Handle Group Layers (like BR_Leverkusen_01)
+        if (layer && layer.layerType === 'GroupLayer' && layer.layers && Array.isArray(layer.layers)) {
+          console.log(`Found Group Layer: ${layer.title} with ${layer.layers.length} sublayers`);
+          
+          // Process each sublayer within the group
+          layer.layers.forEach((sublayer: any) => {
+            console.log('Processing sublayer:', sublayer.title, sublayer.layerType, sublayer.url);
+            
+            if (sublayer && sublayer.layerType === 'ArcGISFeatureLayer' && sublayer.url) {
+              this.addArcGISFeatureLayer(sublayer);
+            }
+          });
+        }
+        // Handle direct ArcGIS Feature Layers
+        else if (layer && layer.layerType === 'ArcGISFeatureLayer' && layer.url) {
+          this.addArcGISFeatureLayer(layer);
+        }
+        // Handle direct ArcGIS Map Service Layers
+        else if (layer && layer.layerType === 'ArcGISMapServiceLayer' && layer.url) {
+          this.addArcGISMapServiceLayer(layer);
+        }
+      });
+    }
+  }
+
+  /**
+   * Add ArcGIS Tiled Map Service Layer (common basemap type)
+   * 
+   * TILED MAP SERVICES:
+   * These are pre-rendered tile caches that provide fast loading basemaps
+   * Common examples: World Imagery, World Street Map, World Topographic Map
+   */
+  private addArcGISTiledLayer(layerConfig: any): void {
+    if (!this.map || !layerConfig || !layerConfig.url) return;
+
+    console.log(`Adding tiled basemap layer: ${layerConfig.title || 'Unnamed'} from ${layerConfig.url}`);
+
+    try {
+      // Construct tile URL pattern
+      // Some services use /tile/{z}/{y}/{x}, others might use different patterns
+      let tileUrl = layerConfig.url;
+      
+      // Ensure the URL ends with the proper tile pattern
+      if (!tileUrl.includes('/tile/{z}')) {
+        // Remove trailing slash if present
+        tileUrl = tileUrl.replace(/\/$/, '');
+        // Add tile pattern
+        tileUrl = `${tileUrl}/tile/{z}/{y}/{x}`;
+      }
+
+      const tileLayer = L.tileLayer(tileUrl, {
+        maxZoom: 18,
+        opacity: layerConfig.opacity !== undefined ? layerConfig.opacity : 1,
+        attribution: layerConfig.title || 'ArcGIS Basemap'
+      });
+
+      tileLayer.addTo(this.map);
+      console.log(`✓ Successfully added tiled basemap: ${layerConfig.title || 'Unnamed'}`);
+      
+    } catch (error) {
+      console.error('Failed to add tiled basemap layer:', error);
+      // Don't add fallback here - let the parent method handle it
+    }
+  }
+
+/**
+ * Add ArcGIS Vector Tile Layer
+ * 
+ * VECTOR TILE LAYERS:
+ * These are modern basemaps that use vector data instead of raster tiles
+ * They provide crisp rendering at any zoom level and support dynamic styling
+ */
+private addVectorTileLayer(layerConfig: any): void {
+  if (!this.map || !layerConfig) {
+    console.warn('No map or layer configuration provided for vector tile layer.');
+    return;
+  }
+
+  // Vector tile layers can have either styleUrl or url
+  const styleUrl = layerConfig.styleUrl || layerConfig.url;
+  
+  if (!styleUrl) {
+    console.warn('Vector tile layer has no styleUrl or url:', layerConfig.title || 'Unnamed');
+    return;
+  }
+
+  console.log(`Adding vector tile layer: ${layerConfig.title || 'Unnamed'} from ${styleUrl}`);
+
+  try {
+    // Use esri-leaflet-vector to add the vector tile layer
+    const vectorTileLayer = esriVector.vectorTileLayer(styleUrl, {
+      opacity: layerConfig.opacity !== undefined ? layerConfig.opacity : 1,
+      pane: 'tilePane'
+    });
+
+    vectorTileLayer.addTo(this.map);
+    console.log(`✓ Successfully added vector tile layer: ${layerConfig.title || 'Unnamed'}`);
+    
+  } catch (error) {
+    console.error('Failed to add vector tile layer:', error);
+    
+    // Fallback to trying it as a regular tile layer
+    try {
+      // If vector tiles fail, try as a regular tiled layer
+      const tiledLayer = esri.tiledMapLayer({
+        url: styleUrl.replace('/resources/styles/root.json', ''),
+        opacity: layerConfig.opacity !== undefined ? layerConfig.opacity : 1
+      });
+      
+      tiledLayer.addTo(this.map);
+      console.log(`✓ Added as tiled layer instead: ${layerConfig.title || 'Unnamed'}`);
+    } catch (fallbackError) {
+      console.error('Failed to add as tiled layer:', fallbackError);
+    }
+  }
+}
+
+
+  /**
+   * Fallback tile layer in case basemap loading fails
+   */
   private addFallbackTileLayer(): void {
     if (!this.map) return;
+
+    console.log('Adding fallback OpenStreetMap layer');
 
     L.tileLayer('https://{s}.tile.openstreetmap.de/tiles/osmde/{z}/{x}/{y}.png', {
       attribution: '&copy; <a href="https://www.openstreetmap.org/">OpenStreetMap</a> contributors',
     }).addTo(this.map);
   }
 
-  private addArcGISVectorLayer(webmapId: string, domain: string): void {
-    if (!this.map || !webmapId || !domain) return;
-
-    const webmapUrl = `https://${domain}.maps.arcgis.com/sharing/rest/content/items/${webmapId}/data?f=json`;
-    
-    console.log(`Fetching webmap from: ${webmapUrl}`);
-    
-    fetch(webmapUrl)
-      .then(response => {
-        if (!response.ok) {
-          throw new Error(`HTTP error! status: ${response.status}`);
-        }
-        return response.json();
-      })
-      .then(webmapData => {
-        if (webmapData && typeof webmapData === 'object') {
-          console.log('Webmap data:', webmapData);
-          
-          if (webmapData.operationalLayers && Array.isArray(webmapData.operationalLayers)) {
-            webmapData.operationalLayers.forEach((layer: any) => {
-              console.log('Processing layer:', layer.title, layer.layerType);
-              
-              // Handle Group Layers
-              if (layer && layer.layerType === 'GroupLayer' && layer.layers && Array.isArray(layer.layers)) {
-                console.log(`Found Group Layer: ${layer.title} with ${layer.layers.length} sublayers`);
-                
-                layer.layers.forEach((sublayer: any) => {
-                  console.log('Processing sublayer:', sublayer.title, sublayer.layerType, sublayer.url);
-                  
-                  // Handle different layer types
-                  this.processLayerByType(sublayer);
-                });
-              }
-              // Handle direct layers
-              else {
-                this.processLayerByType(layer);
-              }
-            });
-          }
-          
-          // Handle baseMap layers
-          if (webmapData.baseMap && webmapData.baseMap.baseMapLayers && Array.isArray(webmapData.baseMap.baseMapLayers)) {
-            webmapData.baseMap.baseMapLayers.forEach((layer: any) => {
-              this.processLayerByType(layer);
-            });
-          }
-        }
-      })
-      .catch(error => {
-        console.warn('Could not load webmap data:', error);
-        console.warn(`Please check if the domain '${domain}' and webmap ID '${webmapId}' are correct.`);
-      });
-  }
-
   /**
-   * Process layer based on its type
-   * This centralizes the layer type detection and routing logic
+   * Convert ESRI color array to CSS color string
    */
-  private processLayerByType(layer: any): void {
-    if (!layer || !layer.url) return;
-
-    switch (layer.layerType) {
-      case 'ArcGISFeatureLayer':
-        this.addArcGISFeatureLayer(layer);
-        break;
-      
-      case 'ArcGISMapServiceLayer':
-        this.addArcGISMapServiceLayer(layer);
-        break;
-      
-      case 'VectorTileLayer':
-      case 'ArcGISVectorTileLayer':
-        this.addArcGISVectorTileLayer(layer);
-        break;
-      
-      default:
-        // Try to determine layer type from URL if not explicitly specified
-        this.addLayerByUrlPattern(layer);
-        break;
-    }
-  }
-
-  /**
-   * Fallback method to determine layer type from URL patterns
-   * Sometimes the layerType field is missing or incorrect
-   */
-  private addLayerByUrlPattern(layer: any): void {
-    if (!layer.url) return;
-
-    const url = layer.url.toLowerCase();
-    
-    if (url.includes('featureserver')) {
-      console.log(`Detected FeatureServer from URL: ${layer.title}`);
-      this.addArcGISFeatureLayer(layer);
-    } else if (url.includes('mapserver') && !url.includes('vectortileserver')) {
-      console.log(`Detected MapServer from URL: ${layer.title}`);
-      this.addArcGISMapServiceLayer(layer);
-    } else if (url.includes('vectortileserver')) {
-      console.log(`Detected VectorTileServer from URL: ${layer.title}`);
-      this.addArcGISVectorTileLayer(layer);
-    } else {
-      console.warn(`Unknown layer type for: ${layer.title} (${layer.url})`);
-      // Default to trying as a tile layer
-      this.addGenericTileLayer(layer);
-    }
-  }
-
-  /**
-   * Add ArcGIS Vector Tile Layer
-   * 
-   * WHAT ARE VECTOR TILES?
-   * Vector tiles contain vector data (points, lines, polygons) but packaged into
-   * tiles for efficient delivery. Unlike raster tiles (images), vector tiles:
-   * - Can be styled dynamically on the client
-   * - Allow for smooth zooming (no pixelation)
-   * - Support interaction and data queries
-   * - Have smaller file sizes for sparse data
-   * 
-   * VECTOR TILE FORMATS:
-   * - Mapbox Vector Tiles (MVT) - industry standard
-   * - ArcGIS Vector Tiles - Esri's format (similar to MVT)
-   */
-  private addArcGISVectorTileLayer(layerConfig: any): void {
-    if (!this.map || !layerConfig || !layerConfig.url) return;
-
-    console.log(`Adding vector tile layer: ${layerConfig.title} from ${layerConfig.url}`);
-
-    // Check if we have Leaflet plugins for vector tiles
-    // Note: You'll need to include additional libraries for full vector tile support
-    if (typeof (L as any).vectorGrid !== 'undefined') {
-      // Use Leaflet.VectorGrid if available (recommended plugin)
-      this.addVectorTileLayerWithVectorGrid(layerConfig);
-    } else {
-      // Fallback: Try to use as regular tile layer
-      console.warn('VectorGrid plugin not found. Falling back to raster tiles.');
-      this.addVectorTileLayerAsTiles(layerConfig);
-    }
-  }
-
-  /**
-   * Add vector tile layer using Leaflet.VectorGrid plugin
-   * This provides full vector tile functionality
-   */
-  private addVectorTileLayerWithVectorGrid(layerConfig: any): void {
-    try {
-      // Construct vector tile URL template
-      // Vector tiles use {z}/{y}/{x} pattern like regular tiles
-      const vectorTileUrl = `${layerConfig.url}tile/{z}/{y}/{x}.pbf`;
-      
-      // Create vector tile layer with styling
-      const vectorTileLayer = (L as any).vectorGrid.protobuf(vectorTileUrl, {
-        // Default styling for all features
-        vectorTileLayerStyles: {
-          // Style all layers in the vector tile
-          [layerConfig.title || 'default']: {
-            weight: 2,
-            color: '#3388ff',
-            opacity: 0.8,
-            fillColor: '#3388ff',
-            fillOpacity: 0.4
-          }
-        },
-        // Interaction settings
-        interactive: layerConfig.interactive !== false,
-        // Performance settings
-        rendererFactory: (L as any).svg.tile,
-        maxZoom: 18,
-        attribution: 'Vector Tiles by Esri'
-      });
-
-      // Add click handler if interactive
-      if (layerConfig.interactive !== false) {
-        vectorTileLayer.on('click', (e: any) => {
-          console.log('Vector tile feature clicked:', e.layer.properties);
-        });
-      }
-
-      vectorTileLayer.addTo(this.map);
-      console.log(`✓ Added vector tile layer: ${layerConfig.title}`);
-      
-    } catch (error) {
-      console.error('Failed to add vector tile layer:', error);
-      // Fallback to raster tiles
-      this.addVectorTileLayerAsTiles(layerConfig);
-    }
-  }
-
-  /**
-   * Fallback: Add vector tile layer as raster tiles
-   * This loses vector functionality but ensures something displays
-   */
-  private addVectorTileLayerAsTiles(layerConfig: any): void {
-    try {
-      // Many vector tile services also provide raster tile versions
-      let tileUrl = layerConfig.url;
-      
-      // Convert vector tile URL to raster tile URL if needed
-      if (tileUrl.includes('VectorTileServer')) {
-        // Try to find a corresponding MapServer
-        tileUrl = tileUrl.replace('VectorTileServer', 'MapServer');
-      }
-      
-      // Add tile pattern if not present
-      if (!tileUrl.includes('{z}')) {
-        tileUrl = `${tileUrl}/tile/{z}/{y}/{x}`;
-      }
-
-      const tileLayer = L.tileLayer(tileUrl, {
-        opacity: layerConfig.opacity || 1,
-        maxZoom: 18,
-        attribution: 'ArcGIS Vector Tiles (Raster Fallback)'
-      });
-
-      tileLayer.addTo(this.map);
-      console.log(`✓ Added vector tile layer as raster tiles: ${layerConfig.title}`);
-      
-    } catch (error) {
-      console.error('Failed to add vector tile layer as raster tiles:', error);
-    }
-  }
-
-  /**
-   * Generic tile layer for unknown types
-   */
-  private addGenericTileLayer(layerConfig: any): void {
-    try {
-      let tileUrl = layerConfig.url;
-      
-      // Add tile pattern if not present
-      if (!tileUrl.includes('{z}')) {
-        tileUrl = `${tileUrl}/tile/{z}/{y}/{x}`;
-      }
-
-      const tileLayer = L.tileLayer(tileUrl, {
-        opacity: layerConfig.opacity || 1,
-        maxZoom: 18,
-        attribution: 'ArcGIS Layer'
-      });
-
-      tileLayer.addTo(this.map);
-      console.log(`✓ Added generic tile layer: ${layerConfig.title}`);
-      
-    } catch (error) {
-      console.error('Failed to add generic tile layer:', error);
-    }
-  }
-
-  // ... (rest of your existing methods remain the same)
-  
   private esriColorToCSS(esriColor: number[]): string {
     if (!esriColor || esriColor.length < 3) return '#3388ff';
     
@@ -311,6 +306,9 @@ export class ArcGISMapService {
     return `rgb(${r}, ${g}, ${b})`;
   }
 
+  /**
+   * Get layer styling information from ArcGIS service
+   */
   private async getLayerDrawingInfo(serviceUrl: string): Promise<any> {
     try {
       const url = String(serviceUrl);
@@ -333,6 +331,9 @@ export class ArcGISMapService {
     }
   }
 
+  /**
+   * Create style function for GeoJSON layer based on ArcGIS renderer
+   */
   private createStyleFunction(drawingInfo: any): (feature: any) => any {
     return (feature: any) => {
       const defaultStyle = {
@@ -373,6 +374,9 @@ export class ArcGISMapService {
     };
   }
 
+  /**
+   * Convert ESRI symbol to Leaflet style
+   */
   private convertEsriSymbolToLeafletStyle(symbol: any): any {
     const style: any = {};
     
@@ -416,7 +420,10 @@ export class ArcGISMapService {
     return style;
   }
 
-  private async addArcGISFeatureLayer(layerConfig: any): Promise<void> {
+  /**
+   * Add an ArcGIS Feature Layer with proper styling (Optimized for performance)
+   */
+   private async addArcGISFeatureLayer(layerConfig: any): Promise<void> {
     if (!this.map || !layerConfig || !layerConfig.url) return;
 
     const featureServiceUrl = layerConfig.url;
@@ -495,10 +502,13 @@ export class ArcGISMapService {
         }
     } 
     catch (error) {
-        console.error(`Failed to load feature layer ${layerConfig.title || 'Unknown'}:`, error);
+            console.error(`Failed to load feature layer ${layerConfig.title || 'Unknown'}:`, error);
     }
   }
 
+  /**
+   * Add an ArcGIS Map Service Layer
+   */
   private addArcGISMapServiceLayer(layerConfig: any): void {
     if (!this.map || !layerConfig) return;
 

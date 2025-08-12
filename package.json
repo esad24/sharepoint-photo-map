@@ -23,6 +23,7 @@
     "dompurify": "^3.2.6",
     "esri-leaflet": "^3.0.17",
     "esri-leaflet-renderers": "^3.0.1",
+    "esri-leaflet-vector": "^4.3.0",
     "esri-leaflet-webmap": "^0.4.0",
     "exif-js": "^2.3.0",
     "jsdom": "^26.1.0",

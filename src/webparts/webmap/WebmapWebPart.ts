@@ -192,7 +192,7 @@ export default class WebmapWebPart extends BaseClientSideWebPart<IWebmapWebPartP
         
         if (webmapId && domain) {
           this.arcgisMap = new ArcGISMapService(this.map);
-          this.arcgisMap.addArcGISTileLayer(webmapId, domain);
+          this.arcgisMap.loadArcGISWebmap(webmapId, domain);
         } else {
           console.error('Could not extract webmap ID or domain from ArcGIS URL');
           this.showToast('Invalid ArcGIS map configuration', 'error');
