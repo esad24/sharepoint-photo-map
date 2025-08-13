@@ -10,9 +10,9 @@ import { WebPartContext } from '@microsoft/sp-webpart-base';
 // EXIF-js library for reading GPS data from image metadata
 import * as EXIF from 'exif-js';
 // Security utilities for safely handling user input and URLs
-import { escODataIdentifier, sanitizeUrl } from '../utils/security';
+import { escODataIdentifier, sanitizeUrl } from '../utils/Security';
 // Import interfaces from the main web part file
-import { IWebmapListItem, IWebmapWebPartProps } from '../WebmapWebPart';
+import { IWebmapListItem, IWebmapWebPartProps } from '../types/IWebmapTypes';
 
 /**
  * Interface for GPS coordinates

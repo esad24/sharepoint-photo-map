@@ -1,0 +1,243 @@
+/* ========================================================================== */
+/* services/FeatureLayerService.ts                                            */
+/* - Service for handling ArcGIS feature layer operations                     */
+/* ========================================================================== */
+
+import * as L from 'leaflet';
+import { StyleService } from './StyleService';
+import { LayerConfig, DrawingInfo } from '../types/ArcGISTypes';
+
+export class FeatureLayerService {
+  private map: L.Map;
+  private styleService: StyleService;
+
+  constructor(map: L.Map) {
+    this.map = map;
+    this.styleService = new StyleService();
+  }
+
+  /**
+   * Add an ArcGIS Feature Layer with proper styling (Optimized for performance)
+   * 
+   * ┌─────────────────────────────────────────────────────────────────────────┐
+   * │ WHAT IS A FEATURE LAYER?                                                │
+   * │                                                                         │
+   * │ A feature layer contains individual geographic features (vector data):  │
+   * │ • Each road segment, building outline, or property boundary is a        │
+   * │   separate "feature"                                                    │
+   * │ • Features have both geometry (shape/location) and attributes          │
+   * │   (properties/data)                                                     │
+   * │ • Example: A building feature might have geometry (rectangle outline)  │
+   * │   and attributes (address, owner, year built, etc.)                    │
+   * │                                                                         │
+   * │ PERFORMANCE CONSIDERATIONS:                                             │
+   * │ Feature layers can contain thousands of individual features. Loading   │
+   * │ and rendering all of them can be slow, so this method includes several │
+   * │ optimizations.                                                          │
+   * └─────────────────────────────────────────────────────────────────────────┘
+   */
+  public async addArcGISFeatureLayer(layerConfig: LayerConfig): Promise<void> {
+    // Safety checks - make sure we have everything we need
+    if (!this.map || !layerConfig || !layerConfig.url) return;
+
+    const featureServiceUrl = layerConfig.url;
+    console.log(`Loading feature layer: ${layerConfig.title} from ${featureServiceUrl}`);
+    
+    try {
+        // First, get the layer info to understand the data structure
+        const layerInfo = await this.getFeatureLayerInfo(featureServiceUrl);
+        if (!layerInfo) return;
+
+        // Get the maximum record count from layer info
+        const maxRecordCount = layerInfo.maxRecordCount || 1000;
+      
+        // Get drawing info for styling
+        const drawingInfo = layerInfo.drawingInfo || await this.getLayerDrawingInfo(featureServiceUrl);
+        
+        // Query all features - handle pagination if needed
+        const allFeatures = await this.queryAllFeatures(featureServiceUrl, maxRecordCount);
+        
+        if (allFeatures.length > 0) {
+            // Create and add the complete GeoJSON layer
+            this.createAndAddGeoJSONLayer(allFeatures, layerConfig, drawingInfo);
+        }
+    } 
+    catch (error) {
+            // Log errors but don't crash the entire map
+            // This ensures that if one layer fails, other layers can still load
+            console.error(`Failed to load feature layer ${layerConfig.title || 'Unknown'}:`, error);
+    }
+  }
+
+  /**
+   * Get layer styling information from ArcGIS service
+   * 
+   * ┌─────────────────────────────────────────────────────────────────────────┐
+   * │ WHAT IS DRAWING INFO?                                                   │
+   * │                                                                         │
+   * │ Drawing info contains the "styling rules" for a layer - it tells us:   │
+   * │ • What color should roads be?                                          │
+   * │ • How thick should boundary lines be?                                  │
+   * │ • What symbols should represent different types of buildings?          │
+   * │                                                                         │
+   * │ This method fetches these styling rules from the ArcGIS server.        │
+   * └─────────────────────────────────────────────────────────────────────────┘
+   */
+  private async getLayerDrawingInfo(serviceUrl: string): Promise<DrawingInfo | null> {
+    try {
+      // Ensure we're getting the correct layer info URL
+      const url = String(serviceUrl);
+      // Add JSON format parameter to the URL (?f=json tells ArcGIS to return JSON data)
+      const layerInfoUrl = url.indexOf('?') !== -1 ? `${url}&f=json` : `${url}?f=json`;
+      console.log('Fetching layer info from:', layerInfoUrl);
+      
+      // Fetch layer metadata (information about the layer)
+      const response = await fetch(layerInfoUrl);
+      if (!response.ok) {
+        console.warn(`Failed to fetch layer info: ${response.status}`);
+        return null;
+      }
+      
+      // Parse JSON response
+      const layerInfo = await response.json();
+      console.log('Layer info:', layerInfo);
+      
+      // Return drawing info if available, otherwise null
+      return layerInfo.drawingInfo || null;
+    } catch (error) {
+      console.error('Failed to get layer drawing info:', error);
+      return null;
+    }
+  }
+
+  /**
+   * Get feature layer information from ArcGIS service
+   */
+  private async getFeatureLayerInfo(featureServiceUrl: string): Promise<any> {
+    const layerInfoUrl = `${featureServiceUrl}?f=json`;
+    const infoResponse = await fetch(layerInfoUrl);
+    return await infoResponse.json();
+  }
+
+  /**
+   * Query all features with pagination support
+   * 
+   * ┌─────────────────────────────────────────────────────────────────────────┐
+   * │ PAGINATION EXPLAINED:                                                   │
+   * │                                                                         │
+   * │ If a layer has 5,000 features but the server only allows 1,000 per     │
+   * │ request, we need to make 5 separate requests:                          │
+   * │ • Request 1: features 0-999                                            │
+   * │ • Request 2: features 1000-1999                                        │
+   * │ • Request 3: features 2000-2999                                        │
+   * │ • etc.                                                                 │
+   * └─────────────────────────────────────────────────────────────────────────┘
+   */
+  private async queryAllFeatures(featureServiceUrl: string, maxRecordCount: number): Promise<any[]> {
+    let allFeatures: any[] = [];         // Array to store all fetched features across multiple pages
+    let resultOffset = 0;                // Starting position for the current request (initially 0)
+    let hasMore = true;                  // Boolean flag to control the pagination loop
+
+    while (hasMore) {
+        // Create query parameters for the current request
+        const queryParams = new URLSearchParams({
+            'where': '1=1',                  // SQL-like query: "1=1" means "select all features" (always true condition)
+            'outFields': 'Layer,RefName,Entity', // Limit returned fields to only what's needed for styling (performance optimization)
+            'f': 'geojson',                  // Response format: GeoJSON (standardized geographic data format)
+            'outSR': '4326',                 // Output spatial reference: WGS 84 (standard latitude/longitude coordinate system)
+            'returnGeometry': 'true',        // Include the shape/location data of features (not just attributes)
+            'resultOffset': resultOffset.toString(),  // Tell the server where to start returning records from
+            'resultRecordCount': maxRecordCount.toString(), // Maximum number of records to return in this request
+            'geometryPrecision': '6'         // Limit coordinate decimal places (reduces file size and improves performance)
+        });
+
+        // Construct the full query URL with all parameters
+        const queryUrl = `${featureServiceUrl}/query?${queryParams.toString()}`;
+
+        // Send the HTTP GET request to the ArcGIS Feature Service
+        const response = await fetch(queryUrl);
+        if (!response.ok) {
+            // If the request fails, throw an error with the HTTP status code
+            throw new Error(`HTTP error! status: ${response.status}`);
+        }
+
+        // Parse the response as JSON (GeoJSON format)
+        const geojsonData = await response.json();
+
+        // Check if the response has features and add them to our collection
+        if (geojsonData && geojsonData.features && geojsonData.features.length > 0) {
+            // Add current batch of features to the master list
+            allFeatures = allFeatures.concat(geojsonData.features);
+
+            // Update the offset for the next request (move to the next "page")
+            resultOffset += geojsonData.features.length;
+
+            // If we received a full batch (max count), assume there may be more features to load
+            // If we got fewer than the maximum, we've probably reached the end
+            hasMore = geojsonData.features.length === maxRecordCount;
+        } else {
+            // If no features returned, we've reached the end
+            hasMore = false;
+        }
+    }
+
+    console.log(`Total features fetched: ${allFeatures.length}`);
+    return allFeatures;
+  }
+
+  /**
+   * Create and add GeoJSON layer to the map with proper styling
+   */
+  private createAndAddGeoJSONLayer(allFeatures: any[], layerConfig: LayerConfig, drawingInfo: DrawingInfo | null): void {
+    // Create the complete GeoJSON object
+    // GeoJSON is a standard format for representing geographic features
+    // It wraps all features in a "FeatureCollection" structure
+    const completeGeoJSON = {
+        type: 'FeatureCollection' as const,
+        features: allFeatures
+    } as any;
+    
+    // Create style function based on drawing info
+    const styleFunction = this.styleService.createStyleFunction(drawingInfo);
+    
+    
+    // Create a GeoJSON layer optimized for performance
+    const geoJsonLayer = L.geoJSON(completeGeoJSON, {
+        // Style function for lines and polygons
+        // This function is called for each feature to determine its appearance
+        style: (feature) => {
+            const style = styleFunction(feature);
+            // Ensure polygon visibility
+            // Special handling for polygon layers to make sure they're visible
+            if (layerConfig.title && layerConfig.title.includes('Polys')) {
+                style.fillOpacity = style.fillOpacity || 0.6; // Make sure polygons have some transparency
+                style.weight = style.weight || 1; // Keep border lines thin for performance
+            }
+            return style;
+        },
+        // Function to create markers for point features
+        // Instead of default markers (which can be slow), use simple circles
+        pointToLayer: (feature, latlng) => {
+            const style = styleFunction(feature);
+            // Use circle markers instead of default markers for better performance
+            return L.circleMarker(latlng, {
+                ...style,
+                radius: style.radius || 5  // Provide a default radius if undefined
+            });
+        },
+        
+        // Disable all interactivity for better performance
+        // PERFORMANCE OPTIMIZATION:
+        // Interactive features (hover effects, click events) require more processing
+        // For layers with thousands of features, this can make the map slow
+        // If you need interactivity, you can enable it, but expect slower performance
+        interactive: false,
+        bubblingMouseEvents: false
+    });
+
+    // Add the layer to the map
+    geoJsonLayer.addTo(this.map!);
+    
+    console.log(`✓ Successfully added feature layer: ${layerConfig.title} with ${allFeatures.length} features`);
+  }
+}
