@@ -25,18 +25,14 @@
 import * as L from 'leaflet';
 
 // Import modularized services
-import { FeatureLayerService } from './services/FeatureLayer';
-import { MapServiceLayerService } from './services/MapServiceLayer';
+import { FeatureLayerService } from './services/layers/FeatureLayer';
+import { MapServiceLayerService } from './services/layers/MapServiceLayer';
 import { WebmapData, LayerConfig } from './types/ArcGISTypes';
 
-// ═══════════════════════════════════════════════════════════════════════════════
-// MAIN SERVICE CLASS
-// ═══════════════════════════════════════════════════════════════════════════════
 
-/**
- * Service class that encapsulates all ArcGIS-specific map functionality
- * This class acts as a bridge between ArcGIS data and the Leaflet map display
- */
+const ARCGIS_TILE_URL = 'https://services.arcgisonline.com/ArcGIS/rest/services/World_Topo_Map/MapServer/tile/{z}/{y}/{x}';
+const OPEN_STREET_MAP_TILE_URL = 'https://{s}.tile.openstreetmap.de/tiles/osmde/{z}/{x}/{y}.png'; 
+
 export class ArcGISMapService {
   private map: L.Map; // Reference to the Leaflet map instance
   private featureLayerService: FeatureLayerService;
@@ -48,19 +44,15 @@ export class ArcGISMapService {
     this.mapServiceLayerService = new MapServiceLayerService(map);
   }
 
-  // ─────────────────────────────────────────────────────────────────────────────
-  // PUBLIC METHODS - Main entry points for map functionality
-  // ─────────────────────────────────────────────────────────────────────────────
-
   /**
    * Add ArcGIS tile layer to the map
    * 
    * ┌─────────────────────────────────────────────────────────────────────────┐
    * │ WHAT ARE TILES?                                                         │
    * │                                                                         │
-   * │ Maps are made up of small square images called "tiles" (usually        │
-   * │ 256x256 pixels). When you zoom or pan a map, your browser downloads    │
-   * │ the specific tiles needed for that view.                               │
+   * │ Maps are made up of small square images called "tiles" (usually         │
+   * │ 256x256 pixels). When you zoom or pan a map, your browser downloads     │
+   * │ the specific tiles needed for that view.                                │
    * └─────────────────────────────────────────────────────────────────────────┘
    * 
    * @param webmapId - The ArcGIS webmap ID extracted from the URL (unique identifier for a saved map)
@@ -70,18 +62,13 @@ export class ArcGISMapService {
     // Safety check - ensure all required parameters exist
     if (!this.map || !webmapId || !domain) return;
 
-    // ArcGIS Online tile service URL pattern
-    // This uses the standard ArcGIS world topographic basemap 
-    // {z} = zoom level (higher numbers = more zoomed in)
-    // {y} = tile row (north-south position)  
-    // {x} = tile column (east-west position)
-    // Leaflet automatically replaces these placeholders with actual values
-    const arcgisTileUrl = 'https://services.arcgisonline.com/ArcGIS/rest/services/World_Topo_Map/MapServer/tile/{z}/{y}/{x}';
+    // standard ArcGIS world topographic basemap 
+    
 
     try {
       // Add the tile layer to the map
       // This creates the base satellite imagery that other layers will be drawn on top of
-      L.tileLayer(arcgisTileUrl, {
+      L.tileLayer(ARCGIS_TILE_URL, {
         maxZoom: 19,        // Maximum zoom level supported by this tile service
         id: 'arcgis-tiles'  // Identifier for this layer (useful for debugging)
       }).addTo(this.map);
@@ -96,27 +83,14 @@ export class ArcGISMapService {
     }
   }
 
-  // ─────────────────────────────────────────────────────────────────────────────
-  // PRIVATE METHODS - Internal functionality and utilities
-  // ─────────────────────────────────────────────────────────────────────────────
-
   /**
    * Fallback tile layer in case ArcGIS fails
-   * 
-   * ┌─────────────────────────────────────────────────────────────────────────┐
-   * │ REDUNDANCY AND RELIABILITY:                                             │
-   * │                                                                         │
-   * │ Sometimes external services fail or are temporarily unavailable.       │
-   * │ This method ensures users always see a map, even if ArcGIS is down.    │
-   * └─────────────────────────────────────────────────────────────────────────┘
    */
   private addFallbackTileLayer(): void {
     if (!this.map) return; // Safety check
 
     // Add OpenStreetMap as fallback
-    // OpenStreetMap is a free, community-driven mapping service
-    // It's very reliable and doesn't require any API keys or authentication
-    L.tileLayer('https://{s}.tile.openstreetmap.de/tiles/osmde/{z}/{x}/{y}.png', {
+    L.tileLayer(OPEN_STREET_MAP_TILE_URL, {
       attribution: '&copy; <a href="https://www.openstreetmap.org/">OpenStreetMap</a> contributors',
     }).addTo(this.map);
   }
@@ -127,13 +101,13 @@ export class ArcGISMapService {
    * ┌─────────────────────────────────────────────────────────────────────────┐
    * │ WHAT IS A VECTOR LAYER?                                                 │
    * │                                                                         │
-   * │ Unlike tiles (which are images), vector layers contain actual          │
+   * │ Unlike tiles (which are images), vector layers contain actual           │
    * │ geometric data:                                                         │
-   * │ • Points   (like building locations)                                   │
-   * │ • Lines    (like roads or pipelines)                                   │
-   * │ • Polygons (like property boundaries or zones)                         │
+   * │ • Points   (like building locations)                                    │
+   * │ • Lines    (like roads or pipelines)                                    │
+   * │ • Polygons (like property boundaries or zones)                          │
    * │                                                                         │
-   * │ This data can be styled, queried, and interacted with programmatically.│
+   * │ This data can be styled, queried, and interacted with programmatically. │
    * └─────────────────────────────────────────────────────────────────────────┘
    * 
    * @param webmapId - The ArcGIS webmap ID
@@ -181,12 +155,12 @@ export class ArcGISMapService {
    * Process operational layers from webmap data
    * 
    * ┌─────────────────────────────────────────────────────────────────────────┐
-   * │ OPERATIONAL LAYERS vs BASEMAPS:                                        │
+   * │ OPERATIONAL LAYERS vs BASEMAPS:                                         │
    * │                                                                         │
    * │ • Basemap           - Background imagery (satellite photos, street maps)│
-   * │ • Operational layers - The actual data/content you want to display     │
-   * │                       (like property boundaries, infrastructure, or    │
-   * │                       business locations)                              │
+   * │ • Operational layers - The actual data/content you want to display      │
+   * │                       (like property boundaries, infrastructure, or     │
+   * │                       business locations)                               │
    * └─────────────────────────────────────────────────────────────────────────┘
    */
   private processOperationalLayers(webmapData: WebmapData): void {
@@ -215,10 +189,6 @@ export class ArcGISMapService {
 
   /**
    * Process group layers and their sublayers
-   * 
-   * ┌─────────────────────────────────────────────────────────────────────────┐
-   * │ GROUP LAYERS are like folders that contain multiple related layers      │
-   * └─────────────────────────────────────────────────────────────────────────┘
    */
   private processGroupLayer(layer: any): void {
     console.log(`Found Group Layer: ${layer.title} with ${layer.layers.length} sublayers`);
@@ -240,11 +210,6 @@ export class ArcGISMapService {
 
   /**
    * Process basemap layers from webmap data
-   * 
-   * ┌─────────────────────────────────────────────────────────────────────────┐
-   * │ Basemaps provide the background imagery or reference layers             │
-   * │ (like satellite imagery, street maps, or topographic maps)             │
-   * └─────────────────────────────────────────────────────────────────────────┘
    */
   private processBasemapLayers(webmapData: WebmapData): void {
     if (!webmapData.baseMap || !webmapData.baseMap.baseMapLayers || !Array.isArray(webmapData.baseMap.baseMapLayers)) {

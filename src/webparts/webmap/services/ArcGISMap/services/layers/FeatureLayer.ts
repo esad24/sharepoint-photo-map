@@ -4,8 +4,8 @@
 /* ========================================================================== */
 
 import * as L from 'leaflet';
-import { StyleService } from './StyleService';
-import { LayerConfig, DrawingInfo } from '../types/ArcGISTypes';
+import { StyleService } from '../styling/StyleService';
+import { LayerConfig, DrawingInfo } from '../../types/ArcGISTypes';
 
 export class FeatureLayerService {
   private map: L.Map;
@@ -25,14 +25,14 @@ export class FeatureLayerService {
    * │ A feature layer contains individual geographic features (vector data):  │
    * │ • Each road segment, building outline, or property boundary is a        │
    * │   separate "feature"                                                    │
-   * │ • Features have both geometry (shape/location) and attributes          │
+   * │ • Features have both geometry (shape/location) and attributes           │
    * │   (properties/data)                                                     │
-   * │ • Example: A building feature might have geometry (rectangle outline)  │
-   * │   and attributes (address, owner, year built, etc.)                    │
+   * │ • Example: A building feature might have geometry (rectangle outline)   │
+   * │   and attributes (address, owner, year built, etc.)                     │
    * │                                                                         │
    * │ PERFORMANCE CONSIDERATIONS:                                             │
-   * │ Feature layers can contain thousands of individual features. Loading   │
-   * │ and rendering all of them can be slow, so this method includes several │
+   * │ Feature layers can contain thousands of individual features. Loading    │
+   * │ and rendering all of them can be slow, so this method includes several  │
    * │ optimizations.                                                          │
    * └─────────────────────────────────────────────────────────────────────────┘
    */
@@ -71,17 +71,6 @@ export class FeatureLayerService {
 
   /**
    * Get layer styling information from ArcGIS service
-   * 
-   * ┌─────────────────────────────────────────────────────────────────────────┐
-   * │ WHAT IS DRAWING INFO?                                                   │
-   * │                                                                         │
-   * │ Drawing info contains the "styling rules" for a layer - it tells us:   │
-   * │ • What color should roads be?                                          │
-   * │ • How thick should boundary lines be?                                  │
-   * │ • What symbols should represent different types of buildings?          │
-   * │                                                                         │
-   * │ This method fetches these styling rules from the ArcGIS server.        │
-   * └─────────────────────────────────────────────────────────────────────────┘
    */
   private async getLayerDrawingInfo(serviceUrl: string): Promise<DrawingInfo | null> {
     try {
@@ -121,17 +110,6 @@ export class FeatureLayerService {
 
   /**
    * Query all features with pagination support
-   * 
-   * ┌─────────────────────────────────────────────────────────────────────────┐
-   * │ PAGINATION EXPLAINED:                                                   │
-   * │                                                                         │
-   * │ If a layer has 5,000 features but the server only allows 1,000 per     │
-   * │ request, we need to make 5 separate requests:                          │
-   * │ • Request 1: features 0-999                                            │
-   * │ • Request 2: features 1000-1999                                        │
-   * │ • Request 3: features 2000-2999                                        │
-   * │ • etc.                                                                 │
-   * └─────────────────────────────────────────────────────────────────────────┘
    */
   private async queryAllFeatures(featureServiceUrl: string, maxRecordCount: number): Promise<any[]> {
     let allFeatures: any[] = [];         // Array to store all fetched features across multiple pages
@@ -227,10 +205,6 @@ export class FeatureLayerService {
         },
         
         // Disable all interactivity for better performance
-        // PERFORMANCE OPTIMIZATION:
-        // Interactive features (hover effects, click events) require more processing
-        // For layers with thousands of features, this can make the map slow
-        // If you need interactivity, you can enable it, but expect slower performance
         interactive: false,
         bubblingMouseEvents: false
     });
@@ -238,6 +212,6 @@ export class FeatureLayerService {
     // Add the layer to the map
     geoJsonLayer.addTo(this.map!);
     
-    console.log(`✓ Successfully added feature layer: ${layerConfig.title} with ${allFeatures.length} features`);
+    console.log(`Successfully added feature layer: ${layerConfig.title} with ${allFeatures.length} features`);
   }
 }

@@ -11,6 +11,10 @@ import { ArcGISMapService } from '../services/ArcGISMap/ArcGISMapMain';
 import { validateArcGISUrl } from '../utils/Security';
 import { addWatermark } from '../assets/ViconWatermark';
 
+const HOCHTIEF_LAT = 51.4239; // Latitude for Hochtief location
+const HOCHTIEF_LON = 6.9985; // Longitude for Hochtief location
+const OPEN_STREET_MAP_TILE_URL = 'https://{s}.tile.openstreetmap.de/tiles/osmde/{z}/{x}/{y}.png'; // OpenStreetMap tile URL
+
 export class MapManager {
   private map: L.Map | undefined;
   private arcgisMap: ArcGISMapService | undefined;
@@ -37,7 +41,7 @@ export class MapManager {
     // Initialize a new map on the 'map' div, setting an initial view (coordinates and zoom level).
     // [51.4239, 6.9985] are the latitude/longitude coordinates (Hochtief location)
     // 10 is the zoom level (higher = more zoomed in)
-    this.map = L.map(this.mapId).setView([51.4239, 6.9985], 10); // Default view over Hochtief location
+    this.map = L.map(this.mapId).setView([HOCHTIEF_LAT, HOCHTIEF_LON], 15); // Default view over Hochtief location
 
     /* 3. Add base layer based on map type */
     if (properties.mapType === 'arcgis' && properties.arcgisMapUrl) {
@@ -63,13 +67,13 @@ export class MapManager {
     // Add OpenStreetMap tiles to the map
     // {s} is replaced by a, b, or c for load balancing across servers
     // {z}/{x}/{y} are replaced by zoom level and tile coordinates
-    L.tileLayer('https://{s}.tile.openstreetmap.de/tiles/osmde/{z}/{x}/{y}.png', {
+    L.tileLayer(OPEN_STREET_MAP_TILE_URL, {
       attribution: '&copy; <a href="https://www.openstreetmap.org/">OpenStreetMap</a> contributors', // Legal attribution required by OSM
     }).addTo(this.map);
   }
 
   private addArcGISLayer(arcgisMapUrl: string): void {
-    // SECURITY: Validate the ArcGIS URL before using it
+    //  Validate the ArcGIS URL before using it
     const validatedUrl = validateArcGISUrl(arcgisMapUrl);
     
     if (validatedUrl) {

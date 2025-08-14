@@ -4,7 +4,7 @@
 /* ========================================================================== */
 
 import { SymbolConverter } from './SymbolConverter';
-import { DrawingInfo, FeatureStyle } from '../types/ArcGISTypes';
+import { DrawingInfo, FeatureStyle } from '../../types/ArcGISTypes';
 
 export class StyleService {
   private symbolConverter: SymbolConverter;
@@ -15,18 +15,6 @@ export class StyleService {
 
   /**
    * Create style function for GeoJSON layer based on ArcGIS renderer
-   * 
-   * ┌─────────────────────────────────────────────────────────────────────────┐
-   * │ WHAT IS A RENDERER?                                                     │
-   * │                                                                         │
-   * │ A renderer is a set of rules that determines how features should look: │
-   * │ • "All highways should be thick red lines"                            │
-   * │ • "Residential areas should be light green polygons"                  │
-   * │ • "Schools should be blue circle markers"                             │
-   * │                                                                         │
-   * │ This method converts ArcGIS renderer rules into Leaflet styling        │
-   * │ functions.                                                             │
-   * └─────────────────────────────────────────────────────────────────────────┘
    */
   public createStyleFunction(drawingInfo: DrawingInfo | null): (feature: any) => FeatureStyle {
     // Return a function that takes a feature and returns its style
@@ -64,13 +52,6 @@ export class StyleService {
 
   /**
    * Handle unique value renderer styling
-   * 
-   * ┌─────────────────────────────────────────────────────────────────────────┐
-   * │ UNIQUE VALUE RENDERER example:                                          │
-   * │ • If feature.type = "highway"     → use thick red line                 │
-   * │ • If feature.type = "local_road"  → use thin gray line                 │
-   * │ • If feature.type = "bike_path"   → use dashed green line              │
-   * └─────────────────────────────────────────────────────────────────────────┘
    */
   private handleUniqueValueRenderer(renderer: any, feature: any, defaultStyle: FeatureStyle): FeatureStyle {
     // Get the value of the field used for rendering (e.g., "highway", "local_road")

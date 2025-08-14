@@ -20,7 +20,7 @@ import { BaseClientSideWebPart } from '@microsoft/sp-webpart-base'; // The base 
 import * as L from 'leaflet';               // The core Leaflet library.
 
 // Import interfaces and types
-import { IWebmapWebPartProps,  } from './types/IWebmapTypes';
+import { IWebmapWebPartProps } from './types/IWebmapTypes';
 
 // Import managers and services
 import { MapManager } from './components/MapManager';
@@ -46,7 +46,6 @@ export default class WebmapWebPart extends BaseClientSideWebPart<IWebmapWebPartP
   private clusterManager: ClusterManager | undefined;
   private propertyPaneManager: PropertyPaneManager | undefined;
   private dataService: DataService | undefined;        // Holds the data service instance - handles fetching data from SharePoint
-  //private dataTimer: number | undefined;                   // Holds the ID of the setInterval timer for data refreshes (currently commented out)
 
   // Generate a unique ID for the map container to avoid conflicts if multiple web parts are on the same page
   private mapId: string = `map-${Math.random().toString(36).substr(2, 9)}`;
@@ -96,12 +95,6 @@ export default class WebmapWebPart extends BaseClientSideWebPart<IWebmapWebPartP
       this.clusterManager.dispose();
       this.clusterManager = undefined;
     }
-    // If a data refresh timer is running, clear it.
-    // Currently commented out but would refresh data every 30 seconds
-    // if (this.dataTimer) {
-    //   window.clearInterval(this.dataTimer);
-    //   this.dataTimer = undefined;
-    // }
 
     /* 2. Create fresh map and cluster managers */
     this.mapManager = new MapManager(this.mapId);

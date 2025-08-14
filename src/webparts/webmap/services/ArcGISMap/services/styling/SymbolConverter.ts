@@ -3,8 +3,8 @@
 /* - Service for converting ESRI symbols to Leaflet styles                    */
 /* ========================================================================== */
 
-import { esriColorToCSS } from '../utils/ColorConverter';
-import { FeatureStyle } from '../types/ArcGISTypes';
+import { esriColorToCSS } from './ColorConverter';
+import { FeatureStyle } from '../../types/ArcGISTypes';
 
 export class SymbolConverter {
   /**
@@ -13,12 +13,12 @@ export class SymbolConverter {
    * ┌─────────────────────────────────────────────────────────────────────────┐
    * │ SYMBOL CONVERSION:                                                      │
    * │                                                                         │
-   * │ ESRI and Leaflet use different formats for describing how features     │
-   * │ should look. This is like translating between two different languages  │
-   * │ that describe the same thing.                                          │
+   * │ ESRI and Leaflet use different formats for describing how features      │
+   * │ should look. This is like translating between two different languages   │
+   * │ that describe the same thing.                                           │
    * │                                                                         │
-   * │ ESRI might say:   "esriSLS with color [255,0,0] and width 3"          │
-   * │ Leaflet wants:    "{ color: 'rgb(255,0,0)', weight: 3 }"              │
+   * │ ESRI might say:   "esriSLS with color [255,0,0] and width 3"            │
+   * │ Leaflet wants:    "{ color: 'rgb(255,0,0)', weight: 3 }"                │
    * └─────────────────────────────────────────────────────────────────────────┘
    */
   public convertEsriSymbolToLeafletStyle(symbol: any): FeatureStyle {

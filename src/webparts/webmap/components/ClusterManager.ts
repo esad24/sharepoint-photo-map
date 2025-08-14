@@ -10,6 +10,8 @@ import 'leaflet.markercluster/dist/MarkerCluster.Default.css';
 import { IClusterClickEvent, IWebmapListItem } from '../types/IWebmapTypes';
 import { sanitizeUrl, escAttr } from '../utils/Security';
 import styles from '../WebmapWebPart.module.scss';
+import { createClusterIconHtml } from './ClusterIcon'; // Import the new CSS file
+
 
 export class ClusterManager {
   private markerCluster: L.MarkerClusterGroup | undefined;
@@ -33,30 +35,9 @@ export class ClusterManager {
         // This makes the cluster show a preview of what's inside
         const first: L.Marker = cluster.getAllChildMarkers()[0]; // Use the specific L.Marker type instead of 'any'.
         const img = sanitizeUrl(first?.options.data?.img as string); // Safely get and sanitize the image URL
-
         const count  = cluster.getChildCount(); // How many markers are in this cluster.
-        const digits = String(count).length;     // Number of digits in the count (1, 2, 3, etc.).
-        const badgeH = 22; // Height of the count badge in pixels.
-        // Dynamically calculate the width of the badge to fit the count number.
-        // Single digit = 22px wide, each additional digit adds 10px
-        const badgeW = digits === 1 ? badgeH : badgeH + (digits - 1) * 10;
 
-        // The HTML for the custom cluster icon.
-        // Note the use of `escAttr` for security when inserting the image URL.
-        const html = `
-          <div style="position:relative;width:60px;height:60px;display:inline-block;">
-            <div style="width:60px;height:60px;border-radius:10px;overflow:hidden;">
-              <img src="${escAttr(img)}" style="width:100%;height:100%;object-fit:cover;" />
-            </div>
-            <div style="
-              position:absolute;top:-8px;right:-8px;width:${badgeW}px;height:${badgeH}px;
-              background:#007AFF;color:#fff;font:700 12px/1 'Segoe UI',sans-serif;
-              padding:0 4px;border-radius:9999px;display:flex;align-items:center;
-              justify-content:center;box-shadow:0 0 2px rgba(0,0,0,.25);">
-              ${count}
-            </div>
-          </div>
-        `;
+        const html = createClusterIconHtml(img, count);
 
         // Return a Leaflet DivIcon with our custom HTML
         // className: '' prevents Leaflet from adding default styles
@@ -110,7 +91,8 @@ export class ClusterManager {
 
       // Create previous button
       const prevBtn = L.DomUtil.create('button', '', nav);
-      prevBtn.innerHTML = '◀'; // Left arrow character
+      prevBtn.innerHTML = '';
+      prevBtn.className = styles.galleryNavPrev;
       prevBtn.onclick = () => {
         // Move to previous image, wrapping around to end if at beginning
         current = (current - 1 + imgList.length) % imgList.length; // Cycle backwards.
@@ -120,7 +102,8 @@ export class ClusterManager {
 
       // Create next button
       const nextBtn = L.DomUtil.create('button', '', nav);
-      nextBtn.innerHTML = '▶'; // Right arrow character
+      nextBtn.innerHTML = ''; // Right arrow character
+      nextBtn.className = styles.galleryNavNext;
       nextBtn.onclick = () => {
         // Move to next image, wrapping around to beginning if at end
         current = (current + 1) % imgList.length; // Cycle forwards.
