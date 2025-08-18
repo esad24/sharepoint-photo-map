@@ -6,6 +6,7 @@
 import * as L from 'leaflet';
 import { StyleService } from '../styling/StyleService';
 import { LayerConfig, DrawingInfo } from '../../types/ArcGISTypes';
+import  styles  from '../../../../WebmapWebPart.module.scss';
 
 export class FeatureLayerService {
   private map: L.Map;
@@ -59,7 +60,10 @@ export class FeatureLayerService {
         
         if (allFeatures.length > 0) {
             // Create and add the complete GeoJSON layer
-            this.createAndAddGeoJSONLayer(allFeatures, layerConfig, drawingInfo);
+            const geoJsonLayer = this.createAndAddGeoJSONLayer(allFeatures, layerConfig, drawingInfo);
+
+            // Automatically zoom to show all features
+            this.fitMapToFeatures(geoJsonLayer);
         }
     } 
     catch (error) {
@@ -120,7 +124,7 @@ export class FeatureLayerService {
         // Create query parameters for the current request
         const queryParams = new URLSearchParams({
             'where': '1=1',                  // SQL-like query: "1=1" means "select all features" (always true condition)
-            'outFields': 'Layer,RefName,Entity', // Limit returned fields to only what's needed for styling (performance optimization)
+            'outFields': '*', // Limit returned fields to only what's needed for styling (performance optimization)
             'f': 'geojson',                  // Response format: GeoJSON (standardized geographic data format)
             'outSR': '4326',                 // Output spatial reference: WGS 84 (standard latitude/longitude coordinate system)
             'returnGeometry': 'true',        // Include the shape/location data of features (not just attributes)
@@ -166,7 +170,7 @@ export class FeatureLayerService {
   /**
    * Create and add GeoJSON layer to the map with proper styling
    */
-  private createAndAddGeoJSONLayer(allFeatures: any[], layerConfig: LayerConfig, drawingInfo: DrawingInfo | null): void {
+  private createAndAddGeoJSONLayer(allFeatures: any[], layerConfig: LayerConfig, drawingInfo: DrawingInfo | null): L.GeoJSON {
     // Create the complete GeoJSON object
     // GeoJSON is a standard format for representing geographic features
     // It wraps all features in a "FeatureCollection" structure
@@ -203,6 +207,19 @@ export class FeatureLayerService {
                 radius: style.radius || 5  // Provide a default radius if undefined
             });
         },
+        // Add text labels for each feature
+        onEachFeature: (feature, layer) => {
+          const textValue = feature.properties?.Text;
+          if (textValue && textValue.trim()) {
+              // Create a simple tooltip that shows on hover
+              layer.bindTooltip(textValue, {
+                  permanent: true,
+                  direction: 'auto',
+                  className: styles.textLabel
+              });
+          }
+        },
+
         
         // Disable all interactivity for better performance
         interactive: false,
@@ -213,5 +230,33 @@ export class FeatureLayerService {
     geoJsonLayer.addTo(this.map!);
     
     console.log(`Successfully added feature layer: ${layerConfig.title} with ${allFeatures.length} features`);
+
+    return geoJsonLayer;
+  }
+  private fitMapToFeatures(geoJsonLayer: L.GeoJSON): void {
+    try {
+      // Get the bounds (bounding box) of all features in the layer
+      // getBounds() returns a LatLngBounds object that represents the smallest
+      // rectangle that contains all features in the layer
+      const bounds = geoJsonLayer.getBounds();
+      
+      // Check if bounds are valid (not empty)
+      // isValid() returns true if the bounds contain at least one point
+      if (bounds && bounds.isValid()) {
+        // Fit the map view to show all features with some padding
+        this.map.fitBounds(bounds, {
+          padding: [20, 20],     // Add 20 pixels of padding around the features
+          maxZoom: 16            // Don't zoom in too close (max zoom level 16)
+                                 // This prevents over-zooming when features are very close together
+        });
+        
+        console.log('Map view adjusted to show all features');
+      } else {
+        console.warn('Unable to fit bounds: layer bounds are invalid');
+      }
+    } catch (error) {
+      // If anything goes wrong with bounds calculation, log the error but don't crash
+      console.error('Error fitting map to features:', error);
+    }
   }
 }

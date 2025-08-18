@@ -141,7 +141,7 @@ export class ArcGISMapService {
           this.processOperationalLayers(webmapData);
           
           // Also check for baseMap layers
-          //this.processBasemapLayers(webmapData);
+          this.processBasemapLayers(webmapData);
         }
       })
       .catch(error => {

@@ -153,3 +153,13 @@
     opacity: 0;
   }
 }
+
+
+.textLabel {
+  background: none;       /* remove background */
+  border: none;           /* remove border */
+  box-shadow: none;       /* remove shadow */
+  color: black;           /* text color */
+  font-weight: normal;    /* optional */
+  padding: 0;             /* remove padding */
+}
