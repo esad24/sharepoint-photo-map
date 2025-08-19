@@ -28,6 +28,8 @@ import * as L from 'leaflet';
 import { FeatureLayerService } from './services/layers/FeatureLayer';
 import { MapServiceLayerService } from './services/layers/MapServiceLayer';
 import { WebmapData, LayerConfig } from './types/ArcGISTypes';
+import { MapViewService } from '../MapViewService';
+
 
 
 const ARCGIS_TILE_URL = 'https://services.arcgisonline.com/ArcGIS/rest/services/World_Topo_Map/MapServer/tile/{z}/{y}/{x}';
@@ -37,11 +39,19 @@ export class ArcGISMapService {
   private map: L.Map; // Reference to the Leaflet map instance
   private featureLayerService: FeatureLayerService;
   private mapServiceLayerService: MapServiceLayerService;
+  private mapViewService: MapViewService; // Add this
+
 
   constructor(map: L.Map) {
     this.map = map; // Store map reference for use in methods
     this.featureLayerService = new FeatureLayerService(map);
     this.mapServiceLayerService = new MapServiceLayerService(map);
+  }
+
+  public setMapViewService(mapViewService: MapViewService): void {
+    this.mapViewService = mapViewService;
+    // Update the FeatureLayerService with the MapViewService
+    this.featureLayerService = new FeatureLayerService(this.map, mapViewService);
   }
 
   /**

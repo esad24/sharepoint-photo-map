@@ -11,6 +11,8 @@ import { ArcGISMapService } from '../services/ArcGISMap/ArcGISMapMain';
 import { validateArcGISUrl } from '../utils/Security';
 import { addWatermark } from '../assets/ViconWatermark';
 
+import { MapViewService } from '../services/MapViewService';
+
 const HOCHTIEF_LAT = 51.4239; // Latitude for Hochtief location
 const HOCHTIEF_LON = 6.9985; // Longitude for Hochtief location
 const OPEN_STREET_MAP_TILE_URL = 'https://{s}.tile.openstreetmap.de/tiles/osmde/{z}/{x}/{y}.png'; // OpenStreetMap tile URL
@@ -91,6 +93,13 @@ export class MapManager {
     } else {
       console.error('Invalid ArcGIS map URL - must be HTTPS and from maps.arcgis.com');
       this.addOpenStreetMapLayer();
+    }
+  }
+
+  // Add a method to set MapViewService on the ArcGIS service after creation
+  public setMapViewService(mapViewService: MapViewService): void {
+    if (this.arcgisMap) {
+      this.arcgisMap.setMapViewService(mapViewService);
     }
   }
 

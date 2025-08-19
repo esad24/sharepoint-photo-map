@@ -14,6 +14,10 @@ import { escODataIdentifier, sanitizeUrl } from '../utils/Security';
 // Import interfaces from the main web part file
 import { IWebmapListItem, IWebmapWebPartProps } from '../types/IWebmapTypes';
 
+import { MapViewService } from './MapViewService';
+
+import * as L from 'leaflet';
+
 /**
  * Interface for GPS coordinates
  * Simple structure to hold latitude and longitude values
@@ -43,14 +47,19 @@ export interface IDataFetchResult {
   errors: string[];     // Array of error messages to display to user
 }
 
+const bounds: L.LatLng[] = [];
 /**
  * Service class for handling all data fetching operations
  */
 export class DataService {
   private context: WebPartContext; // SharePoint context for making API calls
+  private mapViewService: MapViewService | undefined;
 
-  constructor(context: WebPartContext) {
+
+  constructor(context: WebPartContext, mapViewService?: MapViewService) {
     this.context = context; // Store context for later use
+    this.mapViewService = mapViewService;
+
   }
 
   /**
@@ -61,6 +70,7 @@ export class DataService {
     // Currently only supports document libraries, but could be extended
     // for other data sources (lists, external APIs, etc.)
     return this.fetchDocumentLibraryData(properties);
+
   }
 
   /**
@@ -196,6 +206,7 @@ export class DataService {
       result.errors.push('Failed to load images from document library');
     }
 
+    this.getBounds(result.items); // Collect all coordinates for map bounds
     return result;
   }
 
@@ -283,5 +294,20 @@ export class DataService {
     const ext = fileName.toLowerCase().substring(fileName.lastIndexOf('.'));
     // Check if extension is in our list
     return imageExtensions.indexOf(ext) !== -1;
+  }
+
+  /**
+   * Collect all coordinates and call MapViewService to set bounds
+   */
+  private getBounds(items: IMapItem[]): void {
+    const bounds: L.LatLng[] = [];
+    for (const item of items) {
+      bounds.push(L.latLng(item.lat, item.lon));
+    }
+    
+    // Pass bounds to MapViewService
+    if (this.mapViewService) {
+      this.mapViewService.setImageBounds(bounds);
+    }
   }
 }

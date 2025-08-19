@@ -7,14 +7,18 @@ import * as L from 'leaflet';
 import { StyleService } from '../styling/StyleService';
 import { LayerConfig, DrawingInfo } from '../../types/ArcGISTypes';
 import  styles  from '../../../../WebmapWebPart.module.scss';
+import { MapViewService } from '../../../MapViewService';
 
 export class FeatureLayerService {
   private map: L.Map;
   private styleService: StyleService;
+  private mapViewService: MapViewService | undefined;
 
-  constructor(map: L.Map) {
+
+  constructor(map: L.Map, mapViewService?: MapViewService) {
     this.map = map;
     this.styleService = new StyleService();
+    this.mapViewService = mapViewService;
   }
 
   /**
@@ -63,7 +67,7 @@ export class FeatureLayerService {
             const geoJsonLayer = this.createAndAddGeoJSONLayer(allFeatures, layerConfig, drawingInfo);
 
             // Automatically zoom to show all features
-            this.fitMapToFeatures(geoJsonLayer);
+            this.getBounds(geoJsonLayer);
         }
     } 
     catch (error) {
@@ -233,29 +237,22 @@ export class FeatureLayerService {
 
     return geoJsonLayer;
   }
-  private fitMapToFeatures(geoJsonLayer: L.GeoJSON): void {
+
+  private getBounds(geoJsonLayer: L.GeoJSON): void {
     try {
-      // Get the bounds (bounding box) of all features in the layer
-      // getBounds() returns a LatLngBounds object that represents the smallest
-      // rectangle that contains all features in the layer
       const bounds = geoJsonLayer.getBounds();
       
-      // Check if bounds are valid (not empty)
-      // isValid() returns true if the bounds contain at least one point
-      if (bounds && bounds.isValid()) {
-        // Fit the map view to show all features with some padding
-        this.map.fitBounds(bounds, {
-          padding: [20, 20],     // Add 20 pixels of padding around the features
-          maxZoom: 16            // Don't zoom in too close (max zoom level 16)
-                                 // This prevents over-zooming when features are very close together
-        });
-        
-        console.log('Map view adjusted to show all features');
-      } else {
-        console.warn('Unable to fit bounds: layer bounds are invalid');
+      // Extract corner coordinates for MapViewService
+      if (bounds.isValid() && this.mapViewService) {
+        const boundsArray = [
+          bounds.getSouthWest(),
+          bounds.getNorthEast(),
+          bounds.getNorthWest(),
+          bounds.getSouthEast()
+        ];
+        this.mapViewService.setFeatureBounds(boundsArray);
       }
     } catch (error) {
-      // If anything goes wrong with bounds calculation, log the error but don't crash
       console.error('Error fitting map to features:', error);
     }
   }

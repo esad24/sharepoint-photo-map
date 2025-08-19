@@ -29,6 +29,8 @@ import { PropertyPaneManager } from './components/PropertyPaneManager';
 import { DataService, IMapItem } from './services/DataService';
 import { ToastManager } from './utils/ToastManager';
 import { validateArcGISUrl } from './utils/Security';
+import { MapViewService } from './services/MapViewService';
+
 
 // Imports the web part's specific styles defined in a scss module.
 import styles from './WebmapWebPart.module.scss';
@@ -46,6 +48,7 @@ export default class WebmapWebPart extends BaseClientSideWebPart<IWebmapWebPartP
   private clusterManager: ClusterManager | undefined;
   private propertyPaneManager: PropertyPaneManager | undefined;
   private dataService: DataService | undefined;        // Holds the data service instance - handles fetching data from SharePoint
+  private mapViewService: MapViewService | undefined; // Manages map view and bounds for image markers and feature layers
 
   // Generate a unique ID for the map container to avoid conflicts if multiple web parts are on the same page
   private mapId: string = `map-${Math.random().toString(36).substr(2, 9)}`;
@@ -57,10 +60,10 @@ export default class WebmapWebPart extends BaseClientSideWebPart<IWebmapWebPartP
    * The main render method called by the SPFx framework to display the web part.
    */
   public render(): void {
-    // Initialize managers and services if not already done
-    if (!this.dataService) {
-      this.dataService = new DataService(this.context);
-    }
+    // // Initialize managers and services if not already done
+    // if (!this.dataService) {
+    //   this.dataService = new DataService(this.context);
+    // }
     if (!this.propertyPaneManager) {
       this.propertyPaneManager = new PropertyPaneManager(this.context, this.properties);
     }
@@ -98,6 +101,7 @@ export default class WebmapWebPart extends BaseClientSideWebPart<IWebmapWebPartP
 
     /* 2. Create fresh map and cluster managers */
     this.mapManager = new MapManager(this.mapId);
+
     const map = this.mapManager.initializeMap(this.properties);
     
     if (!map) {
@@ -105,8 +109,16 @@ export default class WebmapWebPart extends BaseClientSideWebPart<IWebmapWebPartP
       return;
     }
 
+    this.mapViewService = new MapViewService(map);
+    this.mapManager.setMapViewService(this.mapViewService); // Pass MapViewService to MapManager
+
+
+    // Pass MapViewService to other services
+    this.dataService = new DataService(this.context, this.mapViewService);
+
     /* 3. Initialize cluster manager */
     this.clusterManager = new ClusterManager(map);
+
 
     /* 4. First data load */
     this.loadMapData(); // Load the data immediately when map is created.
@@ -132,29 +144,10 @@ export default class WebmapWebPart extends BaseClientSideWebPart<IWebmapWebPartP
     // This ensures we don't have duplicate markers if data is refreshed
     this.clusterManager.clearMarkers();
 
-    // Create an array to hold all valid coordinates
-    // We'll use this to automatically zoom the map to show all markers
-    const allLatLngs: L.LatLng[] = [];
-
-    // Process the fetched items
     result.items.forEach((item: IMapItem) => {
-      // Add the valid coordinates to our array for bounds calculation
-      allLatLngs.push(L.latLng(item.lat, item.lon));
-
       // Add marker to cluster
       this.clusterManager!.addMarker(item.lat, item.lon, item.data, item.img);
     });
-
-    // After processing all items, check if we have any coordinates
-    const map = this.mapManager.getMap();
-    if (allLatLngs.length > 0 && map) {
-      // Create a bounding box around all points
-      // This calculates the rectangle that contains all markers
-      const bounds = L.latLngBounds(allLatLngs);
-      // Tell the map to fit itself to these bounds, with a little padding -> map displays all images and is postioned in the middle
-      // pad(0.1) adds 10% padding around the bounds for better visibility
-      map.fitBounds(bounds.pad(0.1));
-    }
 
     // Show any errors that occurred during fetching
     // This helps users understand if something went wrong
@@ -252,8 +245,7 @@ export default class WebmapWebPart extends BaseClientSideWebPart<IWebmapWebPartP
     // Clean up all managers
     this.mapManager?.dispose();
     this.clusterManager?.dispose();
-    // Stop the data refresh timer if it exists
-    //if (this.dataTimer) window.clearInterval(this.dataTimer);
+    this.mapViewService = undefined;
   }
 
   /* ------------------------------------------------------------- */
