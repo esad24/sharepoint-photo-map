@@ -14,7 +14,7 @@ import * as L from 'leaflet';
 const HOCHTIEF_DEFAULT_VIEW = {
   lat: 51.4239,    // Hochtief headquarters latitude
   lon: 6.9985,     // Hochtief headquarters longitude
-  zoom: 13         // Default zoom level
+  zoom: 15         // Default zoom level
 };
 
 /**
