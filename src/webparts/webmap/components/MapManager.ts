@@ -36,8 +36,6 @@ export class MapManager {
    */
   public initializeMap(properties: IWebmapWebPartProps): L.Map {
     /* 1. Dispose previous instance (avoid "Map container is already initialized") */
-    // If a map instance already exists, remove it to prevent errors on re-render.
-    // This is important because Leaflet throws an error if you try to create a map on a container that already has one
     if (this.map) {
       this.map.remove(); // Clean up all map resources and event listeners
       this.map = undefined; // Clear the reference
@@ -45,8 +43,6 @@ export class MapManager {
 
     /* 2. Create fresh map */
     // Initialize a new map on the 'map' div, setting an initial view (coordinates and zoom level).
-    // [51.4239, 6.9985] are the latitude/longitude coordinates (Hochtief location)
-    // 10 is the zoom level (higher = more zoomed in)
     this.map = L.map(this.mapId).setView([HOCHTIEF_DEFAULT_VIEW.lat, HOCHTIEF_DEFAULT_VIEW.lon], HOCHTIEF_DEFAULT_VIEW.zoom); // Default view over Hochtief location
 
 
