@@ -49,8 +49,9 @@ export class MapManager {
 
 
     /* 3. Add base layer based on map type */
-    if (properties.mapType === 'arcgis' && properties.arcgisMapUrl) {
-      this.addArcGISLayer(properties.arcgisMapUrl);
+    if (properties.mapType === 'project' && properties.arcgisMapUrl) {
+      const mapView = properties.mapView || 'openstreetmap'; // Default to OpenStreetMap if not set
+      this.addArcGISLayer(properties.arcgisMapUrl, mapView); // Add ArcGIS layer if map type is 'project'
     } else {
       this.addOpenStreetMapLayer();
     }
@@ -71,7 +72,7 @@ export class MapManager {
     }).addTo(this.map);
   }
 
-  private addArcGISLayer(arcgisMapUrl: string): void {
+  private addArcGISLayer(arcgisMapUrl: string, mapView: string): void {
     //  Validate the ArcGIS URL before using it
     const validatedUrl = validateArcGISUrl(arcgisMapUrl);
     
@@ -82,7 +83,7 @@ export class MapManager {
       
       if (webmapId && domain && this.map) {
         this.arcgisMap = new ArcGISMapService(this.map);
-        this.arcgisMap.addArcGISTileLayer(webmapId, domain);
+        this.arcgisMap.addArcGISTileLayer(webmapId, domain, mapView);
       } else {
         console.error('Could not extract webmap ID or domain from ArcGIS URL');
         this.addOpenStreetMapLayer();

@@ -44,10 +44,10 @@ import {
             PropertyPaneDropdown('mapType', {
               label: 'Map Type',
               options: [
-                { key: 'openstreetmap', text: 'OpenStreetMap (Default)' },
-                { key: 'arcgis', text: 'ArcGIS Web Map' }
+                { key: 'general', text: 'General Map - OpenStreetMap' },
+                { key: 'project', text: 'Project Map - ArcGIS Web Map' }
               ],
-              selectedKey: this.properties.mapType || 'openstreetmap' // Default to OSM if not set
+              selectedKey: this.properties.mapType || 'general' // Default to OSM if not set
             })
           ]
         }
@@ -55,13 +55,21 @@ import {
   
       // If ArcGIS is selected, show URL field
       // This demonstrates conditional property pane fields
-      if (this.properties.mapType === 'arcgis') {
+      if (this.properties.mapType === 'project') {
         groups[0].groupFields.push(
           PropertyPaneTextField('arcgisMapUrl', {
             label: 'ArcGIS Web Map URL',
             description: 'Enter the ArcGIS web map URL (e.g., https://domain.maps.arcgis.com/apps/mapviewer/index.html?webmap=xxxxx)',
             placeholder: 'https://domain.maps.arcgis.com/apps/mapviewer/index.html?webmap=xxxxx',
             value: this.properties.arcgisMapUrl
+          }),
+          PropertyPaneDropdown('mapView', {
+            label: 'Map View',
+            options: [
+              { key: 'openstreetmap', text: 'OpenStreetMap' },
+              { key: 'satellite', text: 'Satellite' }
+            ],
+            selectedKey: this.properties.mapView || 'openstreetmap' // Default to OpenStreetMap
           })
         );
       }

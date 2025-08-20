@@ -32,10 +32,9 @@ import { MapViewService } from '../MapViewService';
 
 
 
-//const ARCGIS_TILE_URL = 'https://services.arcgisonline.com/ArcGIS/rest/services/World_Topo_Map/MapServer/tile/{z}/{y}/{x}';
-const ARCGIS_TILE_URL = 'https://tile.openstreetmap.org/{z}/{x}/{y}.png	'; 
 
-
+// Basemap tile URLs
+const IMAGERY_TILE_URL = 'https://services.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}';
 const OPEN_STREET_MAP_TILE_URL = 'https://tile.openstreetmap.org/{z}/{x}/{y}.png'; 
 
 export class ArcGISMapService {
@@ -71,41 +70,33 @@ export class ArcGISMapService {
    * @param webmapId - The ArcGIS webmap ID extracted from the URL (unique identifier for a saved map)
    * @param domain   - The ArcGIS domain (e.g., 'hochtiefinfra' from 'hochtiefinfra.maps.arcgis.com')
    */
-  public addArcGISTileLayer(webmapId: string, domain: string): void {
+  public addArcGISTileLayer(webmapId: string, domain: string, mapView: string): void {
     // Safety check - ensure all required parameters exist
-    if (!this.map || !webmapId || !domain) return;
-
-    // standard ArcGIS world topographic basemap 
-    
+    if (!this.map || !webmapId || !domain || !mapView) return;
 
     try {
-      // Add the tile layer to the map
-      // This creates the base satellite imagery that other layers will be drawn on top of
-      L.tileLayer(ARCGIS_TILE_URL, {
-        maxZoom: 19,        // Maximum zoom level supported by this tile service
-        id: 'arcgis-tiles'  // Identifier for this layer (useful for debugging)
-      }).addTo(this.map);
+      // add ArcGIS basemap tiles
+      if( mapView === 'satellite') {
+        L.tileLayer(IMAGERY_TILE_URL, {
+          attribution: '&copy; <a href="https://www.esri.com/">Esri</a>, Maxar, Earthstar Geographics, and the GIS User Community',
+          maxZoom: 19,        // Maximum zoom level supported by this tile service
+          id: 'imagery-tile'  // Identifier for this layer (useful for debugging)
+        }).addTo(this.map);
+      }
 
-      // Add vector tile layer with proper styling
-      // This adds the actual webmap content (roads, buildings, etc.) on top of the base imagery
-      this.addArcGISVectorLayer(webmapId, domain);
+      else {
+        L.tileLayer(OPEN_STREET_MAP_TILE_URL, {
+          attribution: '&copy; <a href="https://www.openstreetmap.org/">OpenStreetMap</a> contributors', // Legal attribution required by OSM
+          maxZoom: 19,        // Maximum zoom level supported by this tile service
+          id: 'osm-tile'      // Identifier for this layer (useful for debugging)
+        }).addTo(this.map);
+      }
     } catch (error) {
-      // If adding ArcGIS tiles fails, fall back to OpenStreetMap
       console.error('Failed to add ArcGIS tile layer:', error);
-      this.addFallbackTileLayer();
     }
-  }
-
-  /**
-   * Fallback tile layer in case ArcGIS fails
-   */
-  private addFallbackTileLayer(): void {
-    if (!this.map) return; // Safety check
-
-    // Add OpenStreetMap as fallback
-    L.tileLayer(OPEN_STREET_MAP_TILE_URL, {
-      attribution: '&copy; <a href="https://www.openstreetmap.org/">OpenStreetMap</a> contributors',
-    }).addTo(this.map);
+    // Add vector tile layer with proper styling
+    // This adds the actual webmap content (roads, buildings, etc.) on top of the base imagery
+    this.addArcGISVectorLayer(webmapId, domain);
   }
 
   /**
@@ -149,12 +140,8 @@ export class ArcGISMapService {
         // Validate that we received a valid object
         if (webmapData && typeof webmapData === 'object') {
           console.log('Webmap data:', webmapData);
-          
           // Process operational layers from the webmap
           this.processOperationalLayers(webmapData);
-          
-          // Also check for baseMap layers
-          this.processBasemapLayers(webmapData);
         }
       })
       .catch(error => {
@@ -166,15 +153,6 @@ export class ArcGISMapService {
 
   /**
    * Process operational layers from webmap data
-   * 
-   * ┌─────────────────────────────────────────────────────────────────────────┐
-   * │ OPERATIONAL LAYERS vs BASEMAPS:                                         │
-   * │                                                                         │
-   * │ • Basemap           - Background imagery (satellite photos, street maps)│
-   * │ • Operational layers - The actual data/content you want to display      │
-   * │                       (like property boundaries, infrastructure, or     │
-   * │                       business locations)                               │
-   * └─────────────────────────────────────────────────────────────────────────┘
    */
   private processOperationalLayers(webmapData: WebmapData): void {
     if (!webmapData.operationalLayers || !Array.isArray(webmapData.operationalLayers)) {
@@ -217,21 +195,6 @@ export class ArcGISMapService {
         // This ensures all layers are loaded regardless of their default visibility
         // (Users can turn layers on/off later if needed)
         this.featureLayerService.addArcGISFeatureLayer(sublayer);
-      }
-    });
-  }
-
-  /**
-   * Process basemap layers from webmap data
-   */
-  private processBasemapLayers(webmapData: WebmapData): void {
-    if (!webmapData.baseMap || !webmapData.baseMap.baseMapLayers || !Array.isArray(webmapData.baseMap.baseMapLayers)) {
-      return;
-    }
-
-    webmapData.baseMap.baseMapLayers.forEach((layer: any) => {
-      if (layer && layer.url) {
-        this.mapServiceLayerService.addArcGISMapServiceLayer(layer);
       }
     });
   }

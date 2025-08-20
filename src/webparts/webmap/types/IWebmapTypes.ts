@@ -12,8 +12,11 @@ export interface ISPField { TypeAsString: string; InternalName: string; Title: s
 export interface IClusterClickEvent extends L.LeafletEvent { layer: L.MarkerCluster; latlng: L.LatLng; } // Custom event type for cluster clicks
 
 // Map type options
-export type MapType = 'openstreetmap' | 'arcgis'; // Only two allowed values for map type
+export type MapType = 'general' | 'project'; // Only two allowed values for map type
 
+export type MapView = 'openstreetmap' | 'satellite'
+
+export type LocationMethod = 'exif' | 'manual'; // Method for getting GPS coordinates
 /**
  * This is a TypeScript feature called "module augmentation".
  * We are extending the original 'leaflet' module to add a custom 'data' property
@@ -43,11 +46,12 @@ export interface IWebmapListItem {
  */
 export interface IWebmapWebPartProps {
   libraryName: string; // for document library - the name of the SharePoint document library to read images from
-  locationMethod: 'exif' | 'manual'; // method for getting GPS coordinates - either extract from image EXIF data or use manual fields
+  locationMethod: LocationMethod; // method for getting GPS coordinates - either extract from image EXIF data or use manual fields
   latField: string; // The internal name of the column containing the latitude (only used if locationMethod is 'manual')
   lonField: string; // The internal name of the column containing the longitude (only used if locationMethod is 'manual')
   mapType: MapType; // The type of map to use - either 'openstreetmap' or 'arcgis'
   arcgisMapUrl: string; // The ArcGIS web map URL (only used if mapType is 'arcgis')
+  mapView: MapView;
 }
 
 // Cache types for property pane

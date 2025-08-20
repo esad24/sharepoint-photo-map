@@ -32,6 +32,7 @@ import { validateArcGISUrl } from './utils/Security';
 import { MapViewService } from './services/MapViewService';
 
 
+
 // Imports the web part's specific styles defined in a scss module.
 import styles from './WebmapWebPart.module.scss';
 
@@ -192,7 +193,7 @@ export default class WebmapWebPart extends BaseClientSideWebPart<IWebmapWebPartP
     if (path === 'mapType') {
       // Clear ArcGIS URL if switching away from ArcGIS
       // This prevents confusion if user switches back later
-      if (newValue !== 'arcgis') {
+      if (newValue !== 'project') {
         this.properties.arcgisMapUrl = '';
       }
       this.context.propertyPane.refresh(); // Refresh to show/hide ArcGIS URL field
@@ -229,7 +230,7 @@ export default class WebmapWebPart extends BaseClientSideWebPart<IWebmapWebPartP
     /* Re-render map whenever any data-source field changes */
     // If any of the core data properties have changed, trigger a full re-render of the web part.
     // This ensures the map updates immediately when settings change
-    if (['libraryName', 'locationMethod', 'latField', 'lonField', 'mapType', 'arcgisMapUrl'].indexOf(path) !== -1) {
+    if (['libraryName', 'locationMethod', 'latField', 'lonField', 'mapType', 'arcgisMapUrl', 'mapType'].indexOf(path) !== -1) {
       this.render(); // Full re-render to apply new settings
     }
   }
