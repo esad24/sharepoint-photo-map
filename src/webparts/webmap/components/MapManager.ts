@@ -13,13 +13,15 @@ import { addWatermark } from '../assets/ViconWatermark';
 
 import { MapViewService } from '../services/MapViewService';
 
+import { extractArcGISDomain, extractWebmapId } from '../services/ArcGISMap/services/ArcGISUrlService';
+
 const HOCHTIEF_DEFAULT_VIEW = {
   lat: 51.4239,    // Hochtief headquarters latitude
   lon: 6.9985,     // Hochtief headquarters longitude
   zoom: 15         // Default zoom level
 };
 
-const OPEN_STREET_MAP_TILE_URL = 'https://{s}.tile.openstreetmap.de/tiles/osmde/{z}/{x}/{y}.png'; // OpenStreetMap tile URL
+const OPEN_STREET_MAP_TILE_URL = 'https://tile.openstreetmap.org/{z}/{x}/{y}.png	'; // OpenStreetMap tile URL
 
 export class MapManager {
   private map: L.Map | undefined;
@@ -59,17 +61,11 @@ export class MapManager {
     return this.map;
   }
 
-  /**
-   * Add OpenStreetMap tile layer
-   * OpenStreetMap is a free, community-driven mapping service
-   * It's very reliable and doesn't require any API keys or authentication
-   */
+  
+  // Add OpenStreetMap tile layer
   private addOpenStreetMapLayer(): void {
     if (!this.map) return; // Safety check - exit if map doesn't exist
-    
-    // Add OpenStreetMap tiles to the map
-    // {s} is replaced by a, b, or c for load balancing across servers
-    // {z}/{x}/{y} are replaced by zoom level and tile coordinates
+
     L.tileLayer(OPEN_STREET_MAP_TILE_URL, {
       attribution: '&copy; <a href="https://www.openstreetmap.org/">OpenStreetMap</a> contributors', // Legal attribution required by OSM
     }).addTo(this.map);
@@ -81,8 +77,8 @@ export class MapManager {
     
     if (validatedUrl) {
       // Use your existing extraction methods (they're fine)
-      const webmapId = this.extractWebmapId(validatedUrl);
-      const domain = this.extractArcGISDomain(validatedUrl);
+      const webmapId = extractWebmapId(validatedUrl);
+      const domain = extractArcGISDomain(validatedUrl);
       
       if (webmapId && domain && this.map) {
         this.arcgisMap = new ArcGISMapService(this.map);
@@ -102,51 +98,6 @@ export class MapManager {
     if (this.arcgisMap) {
       this.arcgisMap.setMapViewService(mapViewService);
     }
-  }
-
-  /**
-   * Extract webmap ID from ArcGIS URL
-   */
-  private extractWebmapId(url: string): string | null {
-    if (!url) return null; // Return null if no URL provided
-    
-    // Pattern: https://{domain}.maps.arcgis.com/apps/mapviewer/index.html?webmap={webmap_id}
-    // This regex pattern matches the standard ArcGIS web map URL format
-    const urlPattern = /https?:\/\/[^\/]+\.maps\.arcgis\.com\/apps\/mapviewer\/index\.html\?webmap=([a-zA-Z0-9]+)/;
-    const match = url.match(urlPattern);
-    
-    if (match && match[1]) {
-      return match[1]; // Return the captured webmap ID
-    }
-    
-    // Also check for webmap ID in other common ArcGIS URL formats
-    // Sometimes the URL might be formatted differently
-    const webmapPattern = /webmap=([a-zA-Z0-9]+)/;
-    const webmapMatch = url.match(webmapPattern);
-    
-    if (webmapMatch && webmapMatch[1]) {
-      return webmapMatch[1]; // Return the captured webmap ID
-    }
-    
-    return null; // No valid webmap ID found
-  }
-
-  /**
-   * Extract domain from ArcGIS URL
-   */
-  private extractArcGISDomain(url: string): string | null {
-    if (!url) return null; // Return null if no URL provided
-    
-    // Pattern to extract the domain part (e.g., "hochtiefinfra" from "hochtiefinfra.maps.arcgis.com")
-    // This captures the subdomain before .maps.arcgis.com
-    const domainPattern = /https?:\/\/([^\/]+)\.maps\.arcgis\.com/;
-    const match = url.match(domainPattern);
-    
-    if (match && match[1]) {
-      return match[1]; // Return the captured domain
-    }
-    
-    return null; // No valid domain found
   }
 
   public getMap(): L.Map | undefined {

@@ -1,23 +1,23 @@
 
 require("./WebmapWebPart.module.css");
 const styles = {
-  webmap: 'webmap_26a271fe',
-  teams: 'teams_26a271fe',
-  welcome: 'welcome_26a271fe',
-  welcomeImage: 'welcomeImage_26a271fe',
-  mapContainer: 'mapContainer_26a271fe',
-  popupImg: 'popupImg_26a271fe',
-  galleryContainer: 'galleryContainer_26a271fe',
-  photoGalleryPopup: 'photoGalleryPopup_26a271fe',
-  galleryNav: 'galleryNav_26a271fe',
-  galleryNavPrev: 'galleryNavPrev_26a271fe',
-  galleryNavNext: 'galleryNavNext_26a271fe',
-  links: 'links_26a271fe',
-  toast: 'toast_26a271fe',
-  slideUp: 'slideUp_26a271fe',
-  toastError: 'toastError_26a271fe',
-  textLabel: 'textLabel_26a271fe',
-  slideDown: 'slideDown_26a271fe'
+  webmap: 'webmap_67f2c4c9',
+  teams: 'teams_67f2c4c9',
+  welcome: 'welcome_67f2c4c9',
+  welcomeImage: 'welcomeImage_67f2c4c9',
+  mapContainer: 'mapContainer_67f2c4c9',
+  popupImg: 'popupImg_67f2c4c9',
+  galleryContainer: 'galleryContainer_67f2c4c9',
+  photoGalleryPopup: 'photoGalleryPopup_67f2c4c9',
+  galleryNav: 'galleryNav_67f2c4c9',
+  galleryNavPrev: 'galleryNavPrev_67f2c4c9',
+  galleryNavNext: 'galleryNavNext_67f2c4c9',
+  links: 'links_67f2c4c9',
+  toast: 'toast_67f2c4c9',
+  slideUp: 'slideUp_67f2c4c9',
+  toastError: 'toastError_67f2c4c9',
+  textLabel: 'textLabel_67f2c4c9',
+  slideDown: 'slideDown_67f2c4c9'
 };
 
 export default styles;

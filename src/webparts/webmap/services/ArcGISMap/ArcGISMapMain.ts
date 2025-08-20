@@ -33,10 +33,10 @@ import { MapViewService } from '../MapViewService';
 
 
 //const ARCGIS_TILE_URL = 'https://services.arcgisonline.com/ArcGIS/rest/services/World_Topo_Map/MapServer/tile/{z}/{y}/{x}';
-const ARCGIS_TILE_URL = 'https://{s}.tile.openstreetmap.de/tiles/osmde/{z}/{x}/{y}.png'; 
+const ARCGIS_TILE_URL = 'https://tile.openstreetmap.org/{z}/{x}/{y}.png	'; 
 
 
-const OPEN_STREET_MAP_TILE_URL = 'https://{s}.tile.openstreetmap.de/tiles/osmde/{z}/{x}/{y}.png'; 
+const OPEN_STREET_MAP_TILE_URL = 'https://tile.openstreetmap.org/{z}/{x}/{y}.png'; 
 
 export class ArcGISMapService {
   private map: L.Map; // Reference to the Leaflet map instance
@@ -154,7 +154,7 @@ export class ArcGISMapService {
           this.processOperationalLayers(webmapData);
           
           // Also check for baseMap layers
-          //this.processBasemapLayers(webmapData);
+          this.processBasemapLayers(webmapData);
         }
       })
       .catch(error => {

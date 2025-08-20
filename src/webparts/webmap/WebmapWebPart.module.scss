@@ -159,7 +159,12 @@
   background: none;       /* remove background */
   border: none;           /* remove border */
   box-shadow: none;       /* remove shadow */
-  color: black;           /* text color */
+  color: white;           /* text color */
+  text-shadow: 
+    -1px -1px 0 black,
+     1px -1px 0 black,
+    -1px  1px 0 black,
+     1px  1px 0 black;  /* creates a fake border */
   font-weight: normal;    /* optional */
   padding: 0;             /* remove padding */
 }

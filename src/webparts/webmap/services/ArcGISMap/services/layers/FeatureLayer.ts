@@ -4,6 +4,8 @@
 /* ========================================================================== */
 
 import * as L from 'leaflet';
+import 'leaflet.markercluster';
+
 import { StyleService } from '../styling/StyleService';
 import { LayerConfig, DrawingInfo } from '../../types/ArcGISTypes';
 import  styles  from '../../../../WebmapWebPart.module.scss';
@@ -186,6 +188,25 @@ export class FeatureLayerService {
     // Create style function based on drawing info
     const styleFunction = this.styleService.createStyleFunction(drawingInfo);
     
+    // CREATE MARKER CLUSTER GROUP FOR TEXT LABELS
+    const textClusterGroup = (L as any).markerClusterGroup({
+      maxClusterRadius: 25,  // Distance to cluster (pixels)
+      disableClusteringAtZoom: 19,  // Stop clustering at high zoom
+      spiderfyOnMaxZoom: false,
+      showCoverageOnHover: false,
+      zoomToBoundsOnClick: false,
+      iconCreateFunction: function(cluster: any) {
+          // Get the first marker's text from the cluster
+          const firstMarker = cluster.getAllChildMarkers()[0];
+          const textContent = firstMarker.options.icon.options.html;
+          
+          return L.divIcon({
+              html: textContent,
+              className: styles.textLabel,
+              iconSize: [100, 20]
+          });
+      }
+    });
     
     // Create a GeoJSON layer optimized for performance
     const geoJsonLayer = L.geoJSON(completeGeoJSON, {
@@ -215,15 +236,30 @@ export class FeatureLayerService {
         onEachFeature: (feature, layer) => {
           const textValue = feature.properties?.Text;
           if (textValue && textValue.trim()) {
-              // Create a simple tooltip that shows on hover
-              layer.bindTooltip(textValue, {
-                  permanent: true,
-                  direction: 'auto',
-                  className: styles.textLabel
+              // GET POSITION FROM FEATURE GEOMETRY DIRECTLY
+              let position: L.LatLng;
+              
+              if (feature.geometry.type === 'Point') {
+                  const coords = feature.geometry.coordinates;
+                  position = L.latLng(coords[1], coords[0]);
+              } else {
+                  // For polygons/lines, use the centroid from the layer
+                  position = (layer as any).getBounds().getCenter();
+              }
+              
+              // CREATE TEXT MARKER FOR CLUSTERING
+              const textMarker = L.marker(position, {
+                  icon: L.divIcon({
+                      html: textValue,
+                      className: styles.textLabel,
+                      iconSize: [100, 20]
+                  })
               });
+              
+              // ADD TO CLUSTER GROUP INSTEAD OF TOOLTIP
+              textClusterGroup.addLayer(textMarker);
           }
-        },
-
+      },
         
         // Disable all interactivity for better performance
         interactive: false,
@@ -232,6 +268,8 @@ export class FeatureLayerService {
 
     // Add the layer to the map
     geoJsonLayer.addTo(this.map!);
+    textClusterGroup.addTo(this.map!);  // ADD CLUSTER GROUP TO MAP
+
     
     console.log(`Successfully added feature layer: ${layerConfig.title} with ${allFeatures.length} features`);
 
