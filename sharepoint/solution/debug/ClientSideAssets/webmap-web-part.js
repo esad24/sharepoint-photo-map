@@ -1,4 +1,4 @@
-(()=>{ var __RUSHSTACK_CURRENT_SCRIPT__ = document.currentScript; define("55b7bc1d-e7a3-4bfd-b392-1fcb62ad93ca_0.0.1", ["@microsoft/sp-core-library","@microsoft/sp-property-pane","@microsoft/sp-webpart-base","@microsoft/sp-http","leaflet"], (__WEBPACK_EXTERNAL_MODULE__676__, __WEBPACK_EXTERNAL_MODULE__877__, __WEBPACK_EXTERNAL_MODULE__642__, __WEBPACK_EXTERNAL_MODULE__909__, __WEBPACK_EXTERNAL_MODULE__973__) => { return /******/ (() => { // webpackBootstrap
+(()=>{ var __RUSHSTACK_CURRENT_SCRIPT__ = document.currentScript; define("55b7bc1d-e7a3-4bfd-b392-1fcb62ad93ca_0.0.1", ["@microsoft/sp-core-library","@microsoft/sp-webpart-base","leaflet","@microsoft/sp-property-pane","@microsoft/sp-http"], (__WEBPACK_EXTERNAL_MODULE__676__, __WEBPACK_EXTERNAL_MODULE__642__, __WEBPACK_EXTERNAL_MODULE__973__, __WEBPACK_EXTERNAL_MODULE__877__, __WEBPACK_EXTERNAL_MODULE__909__) => { return /******/ (() => { // webpackBootstrap
 /******/ 	var __webpack_modules__ = ({
 
 /***/ 493:
@@ -16,27 +16,30 @@ __webpack_require__.r(__webpack_exports__);
 // Imports
 
 
-_node_modules_microsoft_sp_css_loader_node_modules_microsoft_load_themed_styles_lib_es6_index_js__WEBPACK_IMPORTED_MODULE_0__.loadStyles(".webmap_c13c3186{color:\"[theme:bodyText, default: #323130]\";color:var(--bodyText);overflow:hidden;padding:1em}.webmap_c13c3186.teams_c13c3186{font-family:Segoe UI,-apple-system,BlinkMacSystemFont,Roboto,Helvetica Neue,sans-serif}.welcome_c13c3186{text-align:center}.welcomeImage_c13c3186{max-width:420px;width:100%}.mapContainer_c13c3186{border-radius:20px;box-shadow:0 0 10px rgba(0,0,0,.2);height:600px;width:100%}.popupImg_c13c3186{border-radius:10px;max-height:300px;max-width:300px}.galleryContainer_c13c3186{align-items:center;display:flex;flex-direction:column;text-align:center;width:300px}.photoGalleryPopup_c13c3186 .leaflet-popup-content,.photoGalleryPopup_c13c3186 .leaflet-popup-content-wrapper{margin:0!important;padding:0!important}.leaflet-popup-content-wrapper{border-radius:12px;box-shadow:0 8px 24px rgba(0,0,0,.3)}.leaflet-popup-content-wrapper,.leaflet-popup-tip{backdrop-filter:blur(12px);-webkit-backdrop-filter:blur(12px);background:hsla(0,0%,100%,.15);border:1px solid hsla(0,0%,100%,.3)}.galleryNav_c13c3186{display:flex;gap:10px;justify-content:center;margin-top:8px}.links_c13c3186 a{color:\"[theme:link, default:#03787c]\";color:var(--link);text-decoration:none}.links_c13c3186 a:hover{color:\"[theme:linkHovered, default: #014446]\";color:var(--linkHovered);text-decoration:underline}.toast_c13c3186{animation:slideUp_c13c3186 .3s ease-out;background-color:#1976d2;border-radius:4px;bottom:20px;box-shadow:0 2px 5px rgba(0,0,0,.2);color:#fff;font-family:Segoe UI,sans-serif;left:50%;padding:16px 24px;position:fixed;transform:translateX(-50%);z-index:9999}.toastError_c13c3186{background-color:#d32f2f}@keyframes slideUp_c13c3186{0%{opacity:0;transform:translateX(-50%) translateY(100%)}to{opacity:1;transform:translateX(-50%) translateY(0)}}@keyframes slideDown_c13c3186{0%{opacity:1;transform:translateX(-50%) translateY(0)}to{opacity:0;transform:translateX(-50%) translateY(100%)}}\n/*# sourceMappingURL=data:application/json;base64,eyJ2ZXJzaW9uIjozLCJzb3VyY2VzIjpbImZpbGU6Ly8vQzovVXNlcnMvQkdMVXNlcjAxL0RvY3VtZW50cy9QeXRob24lMjBTY3JpcHRzL3NoYXJlcG9pbnQtcGhvdG8tbWFwL3NyYy93ZWJwYXJ0cy93ZWJtYXAvV2VibWFwV2ViUGFydC5tb2R1bGUuc2NzcyJdLCJuYW1lcyI6W10sIm1hcHBpbmdzIjoiQUFFQSxpQkFHRSwwQ0FBQSxDQUNBLHFCQUFBLENBSEEsZUFBQSxDQUNBLFdBRUEsQ0FDQSxnQ0FDRSxzRkFBQSxDQUlKLGtCQUNFLGlCQUFBLENBR0YsdUJBRUUsZUFBQSxDQURBLFVBQ0EsQ0FHRix1QkFHRSxrQkFBQSxDQUNBLGtDQUFBLENBSEEsWUFBQSxDQUNBLFVBRUEsQ0FTRixtQkFHRSxrQkFBQSxDQURBLGdCQUFBLENBREEsZUFFQSxDQUtGLDJCQUlFLGtCQUFBLENBRkEsWUFBQSxDQUNBLHFCQUFBLENBRUEsaUJBQUEsQ0FKQSxXQUlBLENBT0UsOEdBRUUsa0JBQUEsQ0FDQSxtQkFBQSxDQU1OLCtCQUlFLGtCQUFBLENBRUEsb0NBQUEsQ0FHRixrREFQRSwwQkFBQSxDQUNBLGtDQUFBLENBRkEsOEJBQUEsQ0FJQSxtQ0FRQSxDQU1GLHFCQUVFLFlBQUEsQ0FFQSxRQUFBLENBREEsc0JBQUEsQ0FGQSxjQUdBLENBS0Esa0JBRUUscUNBQUEsQ0FDQSxpQkFBQSxDQUZBLG9CQUVBLENBRUEsd0JBRUUsNkNBQUEsQ0FDQSx3QkFBQSxDQUZBLHlCQUVBLENBTU4sZ0JBWUUsdUNBQUEsQ0FQQSx3QkFBQSxDQUdBLGlCQUFBLENBTkEsV0FBQSxDQU9BLG1DQUFBLENBSEEsVUFBQSxDQUtBLCtCQUFBLENBUkEsUUFBQSxDQUlBLGlCQUFBLENBTkEsY0FBQSxDQUdBLDBCQUFBLENBTUEsWUFFQSxDQUdGLHFCQUNFLHdCQUFBLENBR0YsNEJBQ0UsR0FFRSxTQUFBLENBREEsMkNBQ0EsQ0FFRixHQUVFLFNBQUEsQ0FEQSx3Q0FDQSxDQUFBLENBSUosOEJBQ0UsR0FFRSxTQUFBLENBREEsd0NBQ0EsQ0FFRixHQUVFLFNBQUEsQ0FEQSwyQ0FDQSxDQUFBIiwiZmlsZSI6IldlYm1hcFdlYlBhcnQubW9kdWxlLmNzcyJ9 */", true);
+_node_modules_microsoft_sp_css_loader_node_modules_microsoft_load_themed_styles_lib_es6_index_js__WEBPACK_IMPORTED_MODULE_0__.loadStyles(".webmap_67f2c4c9{color:\"[theme:bodyText, default: #323130]\";color:var(--bodyText);overflow:hidden;padding:1em}.webmap_67f2c4c9.teams_67f2c4c9{font-family:Segoe UI,-apple-system,BlinkMacSystemFont,Roboto,Helvetica Neue,sans-serif}.welcome_67f2c4c9{text-align:center}.welcomeImage_67f2c4c9{max-width:420px;width:100%}.mapContainer_67f2c4c9{border-radius:20px;box-shadow:0 0 10px rgba(0,0,0,.2);height:600px;width:100%}.popupImg_67f2c4c9{border-radius:10px;max-height:300px;max-width:300px}.galleryContainer_67f2c4c9{align-items:center;display:flex;flex-direction:column;text-align:center;width:300px}.photoGalleryPopup_67f2c4c9 .leaflet-popup-content,.photoGalleryPopup_67f2c4c9 .leaflet-popup-content-wrapper{margin:0!important;padding:0!important}.leaflet-popup-content-wrapper{border-radius:12px;box-shadow:0 8px 24px rgba(0,0,0,.3)}.leaflet-popup-content-wrapper,.leaflet-popup-tip{backdrop-filter:blur(12px);-webkit-backdrop-filter:blur(12px);background:hsla(0,0%,100%,.15);border:1px solid hsla(0,0%,100%,.3)}.galleryNav_67f2c4c9{display:flex;gap:10px;justify-content:center;margin-top:8px}.galleryNavPrev_67f2c4c9:before{transform:rotate(135deg)}.galleryNavNext_67f2c4c9:before,.galleryNavPrev_67f2c4c9:before{border:solid #000;border-width:0 2px 2px 0;content:\"\";display:inline-block;padding:3px}.galleryNavNext_67f2c4c9:before{transform:rotate(-45deg)}.links_67f2c4c9 a{color:\"[theme:link, default:#03787c]\";color:var(--link);text-decoration:none}.links_67f2c4c9 a:hover{color:\"[theme:linkHovered, default: #014446]\";color:var(--linkHovered);text-decoration:underline}.toast_67f2c4c9{animation:slideUp_67f2c4c9 .3s ease-out;background-color:#1976d2;border-radius:4px;bottom:20px;box-shadow:0 2px 5px rgba(0,0,0,.2);color:#fff;font-family:Segoe UI,sans-serif;left:50%;padding:16px 24px;position:fixed;transform:translateX(-50%);z-index:9999}.toastError_67f2c4c9{background-color:#d32f2f}@keyframes slideUp_67f2c4c9{0%{opacity:0;transform:translateX(-50%) translateY(100%)}to{opacity:1;transform:translateX(-50%) translateY(0)}}@keyframes slideDown_67f2c4c9{0%{opacity:1;transform:translateX(-50%) translateY(0)}to{opacity:0;transform:translateX(-50%) translateY(100%)}}.textLabel_67f2c4c9{background:0 0;border:none;box-shadow:none;color:#fff;font-weight:400;padding:0;text-shadow:-1px -1px 0 #000,1px -1px 0 #000,-1px 1px 0 #000,1px 1px 0 #000}\n/*# sourceMappingURL=data:application/json;base64,eyJ2ZXJzaW9uIjozLCJzb3VyY2VzIjpbImZpbGU6Ly8vQzovVXNlcnMvQkdMVXNlcjAxL0RvY3VtZW50cy9Gb3RvTWFwL3NoYXJlcG9pbnQtcGhvdG8tbWFwL3NyYy93ZWJwYXJ0cy93ZWJtYXAvV2VibWFwV2ViUGFydC5tb2R1bGUuc2NzcyJdLCJuYW1lcyI6W10sIm1hcHBpbmdzIjoiQUFFQSxpQkFHRSwwQ0FBQSxDQUNBLHFCQUFBLENBSEEsZUFBQSxDQUNBLFdBRUEsQ0FDQSxnQ0FDRSxzRkFBQSxDQUlKLGtCQUNFLGlCQUFBLENBR0YsdUJBRUUsZUFBQSxDQURBLFVBQ0EsQ0FHRix1QkFHRSxrQkFBQSxDQUNBLGtDQUFBLENBSEEsWUFBQSxDQUNBLFVBRUEsQ0FJRixtQkFHRSxrQkFBQSxDQURBLGdCQUFBLENBREEsZUFFQSxDQUlGLDJCQUlFLGtCQUFBLENBRkEsWUFBQSxDQUNBLHFCQUFBLENBRUEsaUJBQUEsQ0FKQSxXQUlBLENBTUUsOEdBRUUsa0JBQUEsQ0FDQSxtQkFBQSxDQU1OLCtCQUlFLGtCQUFBLENBRUEsb0NBQUEsQ0FHRixrREFQRSwwQkFBQSxDQUNBLGtDQUFBLENBRkEsOEJBQUEsQ0FJQSxtQ0FRQSxDQUtGLHFCQUVFLFlBQUEsQ0FFQSxRQUFBLENBREEsc0JBQUEsQ0FGQSxjQUdBLENBR0YsZ0NBTUUsd0JBQUEsQ0FHRixnRUFORSxpQkFBQSxDQUFBLHdCQUFBLENBRkEsVUFBQSxDQUdBLG9CQUFBLENBQ0EsV0FVQSxDQU5GLGdDQU1FLHdCQUFBLENBS0Esa0JBRUUscUNBQUEsQ0FDQSxpQkFBQSxDQUZBLG9CQUVBLENBRUEsd0JBRUUsNkNBQUEsQ0FDQSx3QkFBQSxDQUZBLHlCQUVBLENBTU4sZ0JBWUUsdUNBQUEsQ0FQQSx3QkFBQSxDQUdBLGlCQUFBLENBTkEsV0FBQSxDQU9BLG1DQUFBLENBSEEsVUFBQSxDQUtBLCtCQUFBLENBUkEsUUFBQSxDQUlBLGlCQUFBLENBTkEsY0FBQSxDQUdBLDBCQUFBLENBTUEsWUFFQSxDQUdGLHFCQUNFLHdCQUFBLENBR0YsNEJBQ0UsR0FFRSxTQUFBLENBREEsMkNBQ0EsQ0FFRixHQUVFLFNBQUEsQ0FEQSx3Q0FDQSxDQUFBLENBSUosOEJBQ0UsR0FFRSxTQUFBLENBREEsd0NBQ0EsQ0FFRixHQUVFLFNBQUEsQ0FEQSwyQ0FDQSxDQUFBLENBS0osb0JBQ0UsY0FBQSxDQUNBLFdBQUEsQ0FDQSxlQUFBLENBQ0EsVUFBQSxDQU1BLGVBQUEsQ0FDQSxTQUFBLENBTkEsMkVBTUEiLCJmaWxlIjoiV2VibWFwV2ViUGFydC5tb2R1bGUuY3NzIn0= */", true);
 
 // Exports
 /* harmony default export */ const __WEBPACK_DEFAULT_EXPORT__ = ({
-  webmap_c13c3186: "webmap_c13c3186",
-  teams_c13c3186: "teams_c13c3186",
-  welcome_c13c3186: "welcome_c13c3186",
-  welcomeImage_c13c3186: "welcomeImage_c13c3186",
-  mapContainer_c13c3186: "mapContainer_c13c3186",
-  popupImg_c13c3186: "popupImg_c13c3186",
-  galleryContainer_c13c3186: "galleryContainer_c13c3186",
-  photoGalleryPopup_c13c3186: "photoGalleryPopup_c13c3186",
+  webmap_67f2c4c9: "webmap_67f2c4c9",
+  teams_67f2c4c9: "teams_67f2c4c9",
+  welcome_67f2c4c9: "welcome_67f2c4c9",
+  welcomeImage_67f2c4c9: "welcomeImage_67f2c4c9",
+  mapContainer_67f2c4c9: "mapContainer_67f2c4c9",
+  popupImg_67f2c4c9: "popupImg_67f2c4c9",
+  galleryContainer_67f2c4c9: "galleryContainer_67f2c4c9",
+  photoGalleryPopup_67f2c4c9: "photoGalleryPopup_67f2c4c9",
   "leaflet-popup-content": "leaflet-popup-content",
   "leaflet-popup-content-wrapper": "leaflet-popup-content-wrapper",
   "leaflet-popup-tip": "leaflet-popup-tip",
-  galleryNav_c13c3186: "galleryNav_c13c3186",
-  links_c13c3186: "links_c13c3186",
-  toast_c13c3186: "toast_c13c3186",
-  slideUp_c13c3186: "slideUp_c13c3186",
-  toastError_c13c3186: "toastError_c13c3186",
-  slideDown_c13c3186: "slideDown_c13c3186"
+  galleryNav_67f2c4c9: "galleryNav_67f2c4c9",
+  galleryNavPrev_67f2c4c9: "galleryNavPrev_67f2c4c9",
+  galleryNavNext_67f2c4c9: "galleryNavNext_67f2c4c9",
+  links_67f2c4c9: "links_67f2c4c9",
+  toast_67f2c4c9: "toast_67f2c4c9",
+  slideUp_67f2c4c9: "slideUp_67f2c4c9",
+  toastError_67f2c4c9: "toastError_67f2c4c9",
+  textLabel_67f2c4c9: "textLabel_67f2c4c9",
+  slideDown_67f2c4c9: "slideDown_67f2c4c9"
 });
 
 
@@ -117,30 +120,33 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony export */   "default": () => (__WEBPACK_DEFAULT_EXPORT__)
 /* harmony export */ });
 __webpack_require__(/*! ./WebmapWebPart.module.css */ 493);
-var styles = {
-    webmap: 'webmap_c13c3186',
-    teams: 'teams_c13c3186',
-    welcome: 'welcome_c13c3186',
-    welcomeImage: 'welcomeImage_c13c3186',
-    mapContainer: 'mapContainer_c13c3186',
-    popupImg: 'popupImg_c13c3186',
-    galleryContainer: 'galleryContainer_c13c3186',
-    photoGalleryPopup: 'photoGalleryPopup_c13c3186',
-    galleryNav: 'galleryNav_c13c3186',
-    links: 'links_c13c3186',
-    toast: 'toast_c13c3186',
-    slideUp: 'slideUp_c13c3186',
-    toastError: 'toastError_c13c3186',
-    slideDown: 'slideDown_c13c3186'
+const styles = {
+    webmap: 'webmap_67f2c4c9',
+    teams: 'teams_67f2c4c9',
+    welcome: 'welcome_67f2c4c9',
+    welcomeImage: 'welcomeImage_67f2c4c9',
+    mapContainer: 'mapContainer_67f2c4c9',
+    popupImg: 'popupImg_67f2c4c9',
+    galleryContainer: 'galleryContainer_67f2c4c9',
+    photoGalleryPopup: 'photoGalleryPopup_67f2c4c9',
+    galleryNav: 'galleryNav_67f2c4c9',
+    galleryNavPrev: 'galleryNavPrev_67f2c4c9',
+    galleryNavNext: 'galleryNavNext_67f2c4c9',
+    links: 'links_67f2c4c9',
+    toast: 'toast_67f2c4c9',
+    slideUp: 'slideUp_67f2c4c9',
+    toastError: 'toastError_67f2c4c9',
+    textLabel: 'textLabel_67f2c4c9',
+    slideDown: 'slideDown_67f2c4c9'
 };
 /* harmony default export */ const __WEBPACK_DEFAULT_EXPORT__ = (styles);
 
 
 /***/ }),
 
-/***/ 479:
+/***/ 607:
 /*!******************************************************!*\
-  !*** ./lib/webparts/webmap/assets/viconWatermark.js ***!
+  !*** ./lib/webparts/webmap/assets/ViconWatermark.js ***!
   \******************************************************/
 /***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
 
@@ -159,20 +165,27 @@ function addWatermark(map) {
     if (!map)
         return;
     // Create a custom Leaflet control for the watermark
-    var WatermarkControl = leaflet__WEBPACK_IMPORTED_MODULE_0__.Control.extend({
+    const WatermarkControl = leaflet__WEBPACK_IMPORTED_MODULE_0__.Control.extend({
         options: {
             position: 'bottomleft' // Position at bottom left corner
         },
         onAdd: function (map) {
             // Create the watermark container
-            var container = leaflet__WEBPACK_IMPORTED_MODULE_0__.DomUtil.create('div', 'leaflet-control-watermark');
+            const container = leaflet__WEBPACK_IMPORTED_MODULE_0__.DomUtil.create('div', 'leaflet-control-watermark');
             // Style the container
-            container.style.cssText = "\n        background: rgba(255, 255, 255, 0.7);\n        padding: 8px 12px;\n        border-radius: 5px;\n        box-shadow: 0 1px 5px rgba(0,0,0,0.2);\n        font-family: 'Segoe UI', Arial, sans-serif;\n        line-height: 1.2;\n      ";
+            container.style.cssText = `
+        background: rgba(255, 255, 255, 0.7);
+        padding: 8px 12px;
+        border-radius: 5px;
+        box-shadow: 0 1px 5px rgba(0,0,0,0.2);
+        font-family: 'Segoe UI', Arial, sans-serif;
+        line-height: 1.2;
+      `;
             // Add the title
-            var title = leaflet__WEBPACK_IMPORTED_MODULE_0__.DomUtil.create('div', '', container);
+            const title = leaflet__WEBPACK_IMPORTED_MODULE_0__.DomUtil.create('div', '', container);
             title.innerHTML = '<strong style="font-size: 14px; color: #333;">Powered by ViCon</strong>';
             // Add the subtitle
-            var subtitle = leaflet__WEBPACK_IMPORTED_MODULE_0__.DomUtil.create('div', '', container);
+            const subtitle = leaflet__WEBPACK_IMPORTED_MODULE_0__.DomUtil.create('div', '', container);
             subtitle.innerHTML = '<span style="font-size: 12px; color: #666;">Build digitally first.</span>';
             // Prevent map interactions on the watermark
             leaflet__WEBPACK_IMPORTED_MODULE_0__.DomEvent.disableClickPropagation(container);
@@ -187,10 +200,550 @@ function addWatermark(map) {
 
 /***/ }),
 
-/***/ 314:
-/*!***************************************************!*\
-  !*** ./lib/webparts/webmap/services/ArcgisMap.js ***!
-  \***************************************************/
+/***/ 940:
+/*!*******************************************************!*\
+  !*** ./lib/webparts/webmap/components/ClusterIcon.js ***!
+  \*******************************************************/
+/***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony export */ __webpack_require__.d(__webpack_exports__, {
+/* harmony export */   createClusterIconHtml: () => (/* binding */ createClusterIconHtml)
+/* harmony export */ });
+/* harmony import */ var _utils_Security__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ../utils/Security */ 415);
+/* ========================================================================== */
+/* ClusterIcon.ts                                                             */
+/* - Generates HTML for cluster icons with image and count badge              */
+/* ========================================================================== */
+
+const createClusterIconHtml = (imageUrl, count) => {
+    const digits = String(count).length;
+    const badgeH = 22;
+    const badgeW = digits === 1 ? 22 : 22 + (digits - 1) * 10;
+    return `
+    <div style="position:relative;width:60px;height:60px;display:inline-block;">
+      <div style="width:60px;height:60px;border-radius:10px;overflow:hidden;">
+        <img src="${(0,_utils_Security__WEBPACK_IMPORTED_MODULE_0__.escAttr)(imageUrl)}" style="width:100%;height:100%;object-fit:cover;" />
+      </div>
+      <div style="
+        position:absolute;top:-8px;right:-8px;width:${badgeW}px;height:${badgeH}px;
+        background:#007AFF;color:#fff;font:700 12px/1 'Segoe UI',sans-serif;
+        padding:0 4px;border-radius:9999px;display:flex;align-items:center;
+        justify-content:center;box-shadow:0 0 2px rgba(0,0,0,.25);">
+        ${count}
+      </div>
+  </div>
+  `;
+};
+
+
+/***/ }),
+
+/***/ 482:
+/*!**********************************************************!*\
+  !*** ./lib/webparts/webmap/components/ClusterManager.js ***!
+  \**********************************************************/
+/***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony export */ __webpack_require__.d(__webpack_exports__, {
+/* harmony export */   ClusterManager: () => (/* binding */ ClusterManager)
+/* harmony export */ });
+/* harmony import */ var leaflet__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! leaflet */ 973);
+/* harmony import */ var leaflet__WEBPACK_IMPORTED_MODULE_0___default = /*#__PURE__*/__webpack_require__.n(leaflet__WEBPACK_IMPORTED_MODULE_0__);
+/* harmony import */ var leaflet_markercluster__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! leaflet.markercluster */ 528);
+/* harmony import */ var leaflet_markercluster__WEBPACK_IMPORTED_MODULE_1___default = /*#__PURE__*/__webpack_require__.n(leaflet_markercluster__WEBPACK_IMPORTED_MODULE_1__);
+/* harmony import */ var leaflet_markercluster_dist_MarkerCluster_css__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! leaflet.markercluster/dist/MarkerCluster.css */ 897);
+/* harmony import */ var leaflet_markercluster_dist_MarkerCluster_Default_css__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! leaflet.markercluster/dist/MarkerCluster.Default.css */ 152);
+/* harmony import */ var _utils_Security__WEBPACK_IMPORTED_MODULE_5__ = __webpack_require__(/*! ../utils/Security */ 415);
+/* harmony import */ var _WebmapWebPart_module_scss__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(/*! ../WebmapWebPart.module.scss */ 641);
+/* harmony import */ var _ClusterIcon__WEBPACK_IMPORTED_MODULE_6__ = __webpack_require__(/*! ./ClusterIcon */ 940);
+/* ========================================================================== */
+/* ClusterManager.ts                                                          */
+/* - Manages marker clustering and popup interactions                         */
+/* ========================================================================== */
+
+
+
+
+
+
+ // Import the new CSS file
+class ClusterManager {
+    constructor(map) {
+        this.map = map;
+        this.initializeClusterLayer();
+    }
+    /**
+     * Initialize the marker cluster group.
+     * This groups nearby markers together to avoid cluttering the map
+     */
+    initializeClusterLayer() {
+        this.markerCluster = leaflet__WEBPACK_IMPORTED_MODULE_0__.markerClusterGroup({
+            // `iconCreateFunction` is a customization that defines how a cluster icon looks.
+            // This function is called for each cluster to create its visual representation
+            iconCreateFunction: (cluster) => {
+                var _a;
+                // Get the first marker in the cluster to use its image for the cluster icon.
+                // This makes the cluster show a preview of what's inside
+                const first = cluster.getAllChildMarkers()[0]; // Use the specific L.Marker type instead of 'any'.
+                const img = (0,_utils_Security__WEBPACK_IMPORTED_MODULE_5__.sanitizeUrl)((_a = first === null || first === void 0 ? void 0 : first.options.data) === null || _a === void 0 ? void 0 : _a.img); // Safely get and sanitize the image URL
+                const count = cluster.getChildCount(); // How many markers are in this cluster.
+                const html = (0,_ClusterIcon__WEBPACK_IMPORTED_MODULE_6__.createClusterIconHtml)(img, count);
+                // Return a Leaflet DivIcon with our custom HTML
+                // className: '' prevents Leaflet from adding default styles
+                // iconSize: [60, 60] tells Leaflet the size of our icon
+                return leaflet__WEBPACK_IMPORTED_MODULE_0__.divIcon({ html, className: '', iconSize: [60, 60] });
+            },
+            zoomToBoundsOnClick: false, // Disable the default behavior of zooming in when a cluster is clicked.
+            showCoverageOnHover: false // Don't show the coverage area of the cluster on hover (blue outline).
+        });
+        // Add the newly created cluster layer to the map.
+        this.map.addLayer(this.markerCluster);
+        // Set up gallery popup on cluster click
+        this.setupClusterClickHandler();
+    }
+    /**
+     * Gallery popup on cluster click
+     * Since zoomToBoundsOnClick is false, we can define our own click behavior.
+     * This creates a photo gallery popup when clicking on a cluster
+     */
+    setupClusterClickHandler() {
+        if (!this.markerCluster)
+            return;
+        this.markerCluster.on('clusterclick', (e) => {
+            const markers = e.layer.getAllChildMarkers(); // Get all individual markers within the clicked cluster
+            if (!markers.length)
+                return; // Exit if no markers (shouldn't happen but good to check)
+            // Create a simple image gallery from all the images within the cluster.
+            const imgList = markers.map(m => { var _a; return (0,_utils_Security__WEBPACK_IMPORTED_MODULE_5__.sanitizeUrl)((_a = m.options.data) === null || _a === void 0 ? void 0 : _a.img); }); // Extract and sanitize all image URLs
+            let current = 0; // Index of the currently displayed image in the gallery.
+            // Programmatically create the HTML elements for the gallery popup using Leaflet's DOM utilities.
+            const container = leaflet__WEBPACK_IMPORTED_MODULE_0__.DomUtil.create('div', _WebmapWebPart_module_scss__WEBPACK_IMPORTED_MODULE_4__["default"].galleryContainer); // Main container with gallery styles
+            // Create a wrapper link for the image
+            // This allows users to click the image to open it full-size in a new tab
+            const imgLink = leaflet__WEBPACK_IMPORTED_MODULE_0__.DomUtil.create('a', '', container);
+            imgLink.href = imgList[0]; // Set initial href to first image
+            imgLink.target = '_blank'; // Open in new tab
+            imgLink.rel = 'noopener noreferrer'; // Security best practice for external links
+            imgLink.style.cursor = 'pointer'; // Show pointer cursor on hover
+            // Create the actual image element inside the link
+            const imgEl = leaflet__WEBPACK_IMPORTED_MODULE_0__.DomUtil.create('img', _WebmapWebPart_module_scss__WEBPACK_IMPORTED_MODULE_4__["default"].popupImg, imgLink);
+            imgEl.src = imgList[0]; // Set initial image to first in list
+            // Create navigation container for prev/next buttons
+            const nav = leaflet__WEBPACK_IMPORTED_MODULE_0__.DomUtil.create('div', _WebmapWebPart_module_scss__WEBPACK_IMPORTED_MODULE_4__["default"].galleryNav, container);
+            // Create previous button
+            const prevBtn = leaflet__WEBPACK_IMPORTED_MODULE_0__.DomUtil.create('button', '', nav);
+            prevBtn.innerHTML = '';
+            prevBtn.className = _WebmapWebPart_module_scss__WEBPACK_IMPORTED_MODULE_4__["default"].galleryNavPrev;
+            prevBtn.onclick = () => {
+                // Move to previous image, wrapping around to end if at beginning
+                current = (current - 1 + imgList.length) % imgList.length; // Cycle backwards.
+                imgEl.src = imgList[current]; // Update displayed image
+                imgLink.href = imgList[current]; // Update the link href
+            };
+            // Create next button
+            const nextBtn = leaflet__WEBPACK_IMPORTED_MODULE_0__.DomUtil.create('button', '', nav);
+            nextBtn.innerHTML = ''; // Right arrow character
+            nextBtn.className = _WebmapWebPart_module_scss__WEBPACK_IMPORTED_MODULE_4__["default"].galleryNavNext;
+            nextBtn.onclick = () => {
+                // Move to next image, wrapping around to beginning if at end
+                current = (current + 1) % imgList.length; // Cycle forwards.
+                imgEl.src = imgList[current]; // Update displayed image
+                imgLink.href = imgList[current]; // Update the link href
+            };
+            // Create and open the Leaflet popup at the cluster's location, containing the gallery.
+            leaflet__WEBPACK_IMPORTED_MODULE_0__.popup({
+                className: 'photoGalleryPopup', // CSS class for styling
+                maxWidth: 300 // Maximum width in pixels
+            })
+                .setLatLng(e.latlng) // Position at cluster location
+                .setContent(container) // Set our gallery container as content
+                .openOn(this.map); // Open on the map (! tells TypeScript map is defined)
+        });
+    }
+    /**
+     * Clear all markers from the cluster layer
+     */
+    clearMarkers() {
+        var _a;
+        (_a = this.markerCluster) === null || _a === void 0 ? void 0 : _a.clearLayers();
+    }
+    /**
+     * Add a marker to the cluster layer
+     */
+    addMarker(lat, lon, item, imgUrl) {
+        // Create a custom icon for the individual marker (not a cluster).
+        // This shows the actual image as a small thumbnail on the map
+        const icon = leaflet__WEBPACK_IMPORTED_MODULE_0__.divIcon({
+            html: `<img src="${imgUrl}" style="width:40px;height:40px;border-radius:5px;" />`,
+            className: '', // Empty className prevents Leaflet default styles
+            iconSize: [40, 40] // Size of the icon in pixels
+        });
+        // Create the Leaflet marker with coordinates, the custom icon, and our enriched data payload.
+        const marker = leaflet__WEBPACK_IMPORTED_MODULE_0__.marker([lat, lon], {
+            icon, // Our custom image icon
+            data: item // Attach the full SharePoint item data for later use
+        });
+        // Bind a simple popup to the individual marker, showing its image.
+        // This appears when clicking on a single (non-clustered) marker
+        marker.bindPopup(`
+      <div>
+        <a href="${imgUrl}" target="_blank" rel="noopener noreferrer" style="cursor: pointer;">
+          <img src="${imgUrl}" class="${_WebmapWebPart_module_scss__WEBPACK_IMPORTED_MODULE_4__["default"].popupImg}" />
+        </a>
+      </div>
+    `);
+        // Add the final marker to the cluster layer.
+        // The cluster layer will automatically group it with nearby markers
+        this.markerCluster.addLayer(marker);
+        return marker;
+    }
+    getClusterGroup() {
+        return this.markerCluster;
+    }
+    dispose() {
+        var _a;
+        (_a = this.markerCluster) === null || _a === void 0 ? void 0 : _a.clearLayers();
+        this.markerCluster = undefined;
+    }
+}
+
+
+/***/ }),
+
+/***/ 230:
+/*!******************************************************!*\
+  !*** ./lib/webparts/webmap/components/MapManager.js ***!
+  \******************************************************/
+/***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony export */ __webpack_require__.d(__webpack_exports__, {
+/* harmony export */   MapManager: () => (/* binding */ MapManager)
+/* harmony export */ });
+/* harmony import */ var leaflet__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! leaflet */ 973);
+/* harmony import */ var leaflet__WEBPACK_IMPORTED_MODULE_0___default = /*#__PURE__*/__webpack_require__.n(leaflet__WEBPACK_IMPORTED_MODULE_0__);
+/* harmony import */ var leaflet_dist_leaflet_css__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! leaflet/dist/leaflet.css */ 796);
+/* harmony import */ var _services_ArcGISMap_ArcGISMapMain__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ../services/ArcGISMap/ArcGISMapMain */ 185);
+/* harmony import */ var _utils_Security__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(/*! ../utils/Security */ 415);
+/* harmony import */ var _assets_ViconWatermark__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! ../assets/ViconWatermark */ 607);
+/* harmony import */ var _services_ArcGISMap_services_ArcGISUrlService__WEBPACK_IMPORTED_MODULE_5__ = __webpack_require__(/*! ../services/ArcGISMap/services/ArcGISUrlService */ 57);
+/* ========================================================================== */
+/* MapManager.ts                                                              */
+/* - Handles Leaflet map initialization and management                        */
+/* - Manages map layers and base tiles                                        */
+/* ========================================================================== */
+
+
+
+
+
+
+const HOCHTIEF_DEFAULT_VIEW = {
+    lat: 51.4239, // Hochtief headquarters latitude
+    lon: 6.9985, // Hochtief headquarters longitude
+    zoom: 15 // Default zoom level
+};
+const OPEN_STREET_MAP_TILE_URL = 'https://tile.openstreetmap.org/{z}/{x}/{y}.png	'; // OpenStreetMap tile URL
+class MapManager {
+    constructor(mapId) {
+        this.mapId = mapId;
+    }
+    /**
+     * Initializes or refreshes the Leaflet map instance. This method handles
+     * cleanup of old instances and setup of the map, layers, and events.
+     */
+    initializeMap(properties) {
+        /* 1. Dispose previous instance (avoid "Map container is already initialized") */
+        if (this.map) {
+            this.map.remove(); // Clean up all map resources and event listeners
+            this.map = undefined; // Clear the reference
+        }
+        /* 2. Create fresh map */
+        // Initialize a new map on the 'map' div, setting an initial view (coordinates and zoom level).
+        this.map = leaflet__WEBPACK_IMPORTED_MODULE_0__.map(this.mapId).setView([HOCHTIEF_DEFAULT_VIEW.lat, HOCHTIEF_DEFAULT_VIEW.lon], HOCHTIEF_DEFAULT_VIEW.zoom); // Default view over Hochtief location
+        /* 3. Add base layer based on map type */
+        if (properties.mapType === 'project' && properties.arcgisMapUrl) {
+            const mapView = properties.mapView || 'openstreetmap'; // Default to OpenStreetMap if not set
+            this.addArcGISLayer(properties.arcgisMapUrl, mapView); // Add ArcGIS layer if map type is 'project'
+        }
+        else {
+            this.addOpenStreetMapLayer();
+        }
+        /* 4. Add watermark */
+        (0,_assets_ViconWatermark__WEBPACK_IMPORTED_MODULE_3__.addWatermark)(this.map); // Add the ViCon watermark to the map
+        return this.map;
+    }
+    // Add OpenStreetMap tile layer
+    addOpenStreetMapLayer() {
+        if (!this.map)
+            return; // Safety check - exit if map doesn't exist
+        leaflet__WEBPACK_IMPORTED_MODULE_0__.tileLayer(OPEN_STREET_MAP_TILE_URL, {
+            attribution: '&copy; <a href="https://www.openstreetmap.org/">OpenStreetMap</a> contributors', // Legal attribution required by OSM
+        }).addTo(this.map);
+    }
+    addArcGISLayer(arcgisMapUrl, mapView) {
+        //  Validate the ArcGIS URL before using it
+        const validatedUrl = (0,_utils_Security__WEBPACK_IMPORTED_MODULE_4__.validateArcGISUrl)(arcgisMapUrl);
+        if (validatedUrl) {
+            // Use your existing extraction methods (they're fine)
+            const webmapId = (0,_services_ArcGISMap_services_ArcGISUrlService__WEBPACK_IMPORTED_MODULE_5__.extractWebmapId)(validatedUrl);
+            const domain = (0,_services_ArcGISMap_services_ArcGISUrlService__WEBPACK_IMPORTED_MODULE_5__.extractArcGISDomain)(validatedUrl);
+            if (webmapId && domain && this.map) {
+                this.arcgisMap = new _services_ArcGISMap_ArcGISMapMain__WEBPACK_IMPORTED_MODULE_2__.ArcGISMapService(this.map);
+                this.arcgisMap.addArcGISTileLayer(webmapId, domain, mapView);
+            }
+            else {
+                console.error('Could not extract webmap ID or domain from ArcGIS URL');
+                this.addOpenStreetMapLayer();
+            }
+        }
+        else {
+            console.error('Invalid ArcGIS map URL - must be HTTPS and from maps.arcgis.com');
+            this.addOpenStreetMapLayer();
+        }
+    }
+    // Add a method to set MapViewService on the ArcGIS service after creation
+    setMapViewService(mapViewService) {
+        if (this.arcgisMap) {
+            this.arcgisMap.setMapViewService(mapViewService);
+        }
+    }
+    getMap() {
+        return this.map;
+    }
+    dispose() {
+        var _a;
+        // Completely remove the map instance and its event listeners.
+        // The ?. operator safely calls remove() only if map exists
+        (_a = this.map) === null || _a === void 0 ? void 0 : _a.remove();
+        this.map = undefined;
+        this.arcgisMap = undefined;
+    }
+}
+
+
+/***/ }),
+
+/***/ 105:
+/*!***************************************************************!*\
+  !*** ./lib/webparts/webmap/components/PropertyPaneManager.js ***!
+  \***************************************************************/
+/***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony export */ __webpack_require__.d(__webpack_exports__, {
+/* harmony export */   PropertyPaneManager: () => (/* binding */ PropertyPaneManager)
+/* harmony export */ });
+/* harmony import */ var _microsoft_sp_property_pane__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! @microsoft/sp-property-pane */ 877);
+/* harmony import */ var _microsoft_sp_property_pane__WEBPACK_IMPORTED_MODULE_0___default = /*#__PURE__*/__webpack_require__.n(_microsoft_sp_property_pane__WEBPACK_IMPORTED_MODULE_0__);
+/* harmony import */ var _microsoft_sp_http__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! @microsoft/sp-http */ 909);
+/* harmony import */ var _microsoft_sp_http__WEBPACK_IMPORTED_MODULE_1___default = /*#__PURE__*/__webpack_require__.n(_microsoft_sp_http__WEBPACK_IMPORTED_MODULE_1__);
+/* harmony import */ var _utils_Security__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ../utils/Security */ 415);
+/* ========================================================================== */
+/* PropertyPaneManager.ts                                                     */
+/* - Manages property pane configuration and dynamic field loading            */
+/* ========================================================================== */
+
+
+
+class PropertyPaneManager {
+    constructor(context, properties) {
+        this.context = context;
+        this.properties = properties;
+        this.cache = {
+            libraries: [],
+            fields: [],
+            siteForLibraries: null,
+            libraryForFields: null
+        };
+    }
+    /**
+     * Defines the configuration for the web part's property pane (the settings panel).
+     */
+    getConfiguration() {
+        // Start with the base groups
+        // Groups organize related settings together
+        const groups = [
+            {
+                groupName: 'Map Configuration',
+                groupFields: [
+                    (0,_microsoft_sp_property_pane__WEBPACK_IMPORTED_MODULE_0__.PropertyPaneDropdown)('mapType', {
+                        label: 'Map Type',
+                        options: [
+                            { key: 'general', text: 'General Map - OpenStreetMap' },
+                            { key: 'project', text: 'Project Map - ArcGIS Web Map' }
+                        ],
+                        selectedKey: this.properties.mapType || 'general' // Default to OSM if not set
+                    })
+                ]
+            }
+        ];
+        // If ArcGIS is selected, show URL field
+        // This demonstrates conditional property pane fields
+        if (this.properties.mapType === 'project') {
+            groups[0].groupFields.push((0,_microsoft_sp_property_pane__WEBPACK_IMPORTED_MODULE_0__.PropertyPaneTextField)('arcgisMapUrl', {
+                label: 'ArcGIS Web Map URL',
+                description: 'Enter the ArcGIS web map URL (e.g., https://domain.maps.arcgis.com/apps/mapviewer/index.html?webmap=xxxxx)',
+                placeholder: 'https://domain.maps.arcgis.com/apps/mapviewer/index.html?webmap=xxxxx',
+                value: this.properties.arcgisMapUrl
+            }), (0,_microsoft_sp_property_pane__WEBPACK_IMPORTED_MODULE_0__.PropertyPaneDropdown)('mapView', {
+                label: 'Map View',
+                options: [
+                    { key: 'openstreetmap', text: 'OpenStreetMap' },
+                    { key: 'satellite', text: 'Satellite' }
+                ],
+                selectedKey: this.properties.mapView || 'openstreetmap' // Default to OpenStreetMap
+            }));
+        }
+        // Data source configuration group
+        groups.push({
+            groupName: 'Data Source Configuration',
+            groupFields: [
+                (0,_microsoft_sp_property_pane__WEBPACK_IMPORTED_MODULE_0__.PropertyPaneDropdown)('libraryName', {
+                    label: 'Document Library',
+                    options: this.cache.libraries, // Dynamically loaded list of libraries
+                    disabled: !this.cache.libraries.length // Disable if no libraries loaded yet
+                }),
+                (0,_microsoft_sp_property_pane__WEBPACK_IMPORTED_MODULE_0__.PropertyPaneDropdown)('locationMethod', {
+                    label: 'Location Method',
+                    options: [
+                        { key: 'exif', text: 'Extract from Image EXIF Data' },
+                        { key: 'manual', text: 'Select latitude and longitude fields' }
+                    ],
+                    selectedKey: this.properties.locationMethod || 'exif' // Default to EXIF
+                })
+            ]
+        });
+        // If manual method is selected, show field selectors
+        // Another example of conditional fields based on user selection
+        if (this.properties.locationMethod === 'manual') {
+            groups.push({
+                groupName: 'Coordinate Fields',
+                groupFields: [
+                    (0,_microsoft_sp_property_pane__WEBPACK_IMPORTED_MODULE_0__.PropertyPaneDropdown)('latField', {
+                        label: 'Latitude Field',
+                        options: this.cache.fields, // Dynamically loaded list of fields from selected library
+                        disabled: !this.cache.fields.length // Disable if no fields loaded yet
+                    }),
+                    (0,_microsoft_sp_property_pane__WEBPACK_IMPORTED_MODULE_0__.PropertyPaneDropdown)('lonField', {
+                        label: 'Longitude Field',
+                        options: this.cache.fields, // Same list of fields
+                        disabled: !this.cache.fields.length
+                    })
+                ]
+            });
+        }
+        return {
+            pages: [
+                {
+                    header: { description: '' }, // No header description
+                    groups: groups // All our configured groups
+                }
+            ]
+        };
+    }
+    /**
+     * Load available SharePoint document libraries
+     */
+    async loadLibraries() {
+        const site = this.context.pageContext.web.absoluteUrl; // Get current site URL
+        // Check if we need to fetch libraries (i.e., if the site context has changed).
+        // This caching prevents unnecessary API calls
+        if (site !== this.cache.siteForLibraries) {
+            // Clear all cached options and selections.
+            // This ensures we start fresh when the site changes
+            this.cache.libraries = [];
+            this.cache.fields = [];
+            this.properties.libraryName = '';
+            this.properties.latField = '';
+            this.properties.lonField = '';
+            this.cache.siteForLibraries = site; // Update the cache key.
+            try {
+                // Fetch all non-hidden document libraries from the current site.
+                // BaseTemplate 101 = Document Library in SharePoint
+                const librariesUrl = `${site}/_api/web/lists?$filter=Hidden eq false and BaseTemplate eq 101`;
+                const response = await this.context.spHttpClient.get(librariesUrl, _microsoft_sp_http__WEBPACK_IMPORTED_MODULE_1__.SPHttpClient.configurations.v1);
+                const json = await response.json();
+                // Map the API response to the format required by PropertyPaneDropdown.
+                // Use the specific ISPList interface instead of 'any'.
+                this.cache.libraries = json.value.map((l) => ({
+                    key: l.Title, // Use title as both key and display text
+                    text: l.Title
+                }));
+                // Refresh the property pane to show the newly loaded libraries.
+                this.context.propertyPane.refresh();
+            }
+            catch (err) {
+                console.error('Webmap → library enumeration failed:', err);
+            }
+        }
+    }
+    /**
+     * Load fields for the selected library
+     */
+    async loadFields(libraryName) {
+        // Only load fields if we're using manual method
+        // EXIF method doesn't need field selection
+        if (this.properties.locationMethod !== 'manual')
+            return;
+        if (libraryName !== this.cache.libraryForFields) {
+            // Clear old field options and selections.
+            this.cache.fields = [];
+            this.properties.latField = '';
+            this.properties.lonField = '';
+            this.cache.libraryForFields = libraryName; // Update the cache key.
+            try {
+                const site = this.context.pageContext.web.absoluteUrl;
+                // Fetch all non-hidden, non-readonly fields for the newly selected library.
+                // escODataIdentifier ensures special characters in library name are properly encoded
+                const fieldsUrl = `${site}/_api/web/lists/getByTitle('${(0,_utils_Security__WEBPACK_IMPORTED_MODULE_2__.escODataIdentifier)(libraryName)}')/fields` +
+                    `?$filter=Hidden eq false and ReadOnlyField eq false`;
+                const response = await this.context.spHttpClient.get(fieldsUrl, _microsoft_sp_http__WEBPACK_IMPORTED_MODULE_1__.SPHttpClient.configurations.v1);
+                const json = await response.json();
+                // Only show field types that are likely to contain the required data.
+                // Text fields might contain coordinates as strings
+                // Number fields would contain numeric lat/lon values
+                // URL fields might contain location data in some custom implementations
+                const okTypes = ['Text', 'Number', 'URL'];
+                // FIX: Use the specific ISPField interface instead of 'any'.
+                this.cache.fields = json.value
+                    .filter((f) => okTypes.indexOf(f.TypeAsString) !== -1) // Filter to allowed types
+                    .map((f) => ({
+                    key: f.InternalName, // Use the internal name for API calls.
+                    text: f.Title // Show the user-friendly display name.
+                }));
+                // Refresh the property pane to show the new field options.
+                this.context.propertyPane.refresh();
+            }
+            catch (err) {
+                console.error('Webmap → field enumeration failed:', err);
+            }
+        }
+    }
+    getCache() {
+        return this.cache;
+    }
+    clearFieldCache() {
+        this.cache.fields = [];
+        this.cache.libraryForFields = null;
+        this.properties.latField = '';
+        this.properties.lonField = '';
+    }
+}
+
+
+/***/ }),
+
+/***/ 185:
+/*!*****************************************************************!*\
+  !*** ./lib/webparts/webmap/services/ArcGISMap/ArcGISMapMain.js ***!
+  \*****************************************************************/
 /***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
 
 "use strict";
@@ -200,302 +753,675 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony export */ });
 /* harmony import */ var leaflet__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! leaflet */ 973);
 /* harmony import */ var leaflet__WEBPACK_IMPORTED_MODULE_0___default = /*#__PURE__*/__webpack_require__.n(leaflet__WEBPACK_IMPORTED_MODULE_0__);
+/* harmony import */ var _services_layers_FeatureLayer__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ./services/layers/FeatureLayer */ 510);
+/* harmony import */ var _services_layers_MapServiceLayer__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ./services/layers/MapServiceLayer */ 347);
 /* ========================================================================== */
 /* ArcGISMapService.ts                                                        */
 /* - Service class for handling ArcGIS map layers and operations             */
-/* - Now accepts webmap ID as parameter instead of hardcoding                 */
+/* - Now accepts webmap ID as parameter instead of hardcoding                */
 /* ========================================================================== */
-var __awaiter = (undefined && undefined.__awaiter) || function (thisArg, _arguments, P, generator) {
-    function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
-    return new (P || (P = Promise))(function (resolve, reject) {
-        function fulfilled(value) { try { step(generator.next(value)); } catch (e) { reject(e); } }
-        function rejected(value) { try { step(generator["throw"](value)); } catch (e) { reject(e); } }
-        function step(result) { result.done ? resolve(result.value) : adopt(result.value).then(fulfilled, rejected); }
-        step((generator = generator.apply(thisArg, _arguments || [])).next());
-    });
-};
-var __generator = (undefined && undefined.__generator) || function (thisArg, body) {
-    var _ = { label: 0, sent: function() { if (t[0] & 1) throw t[1]; return t[1]; }, trys: [], ops: [] }, f, y, t, g;
-    return g = { next: verb(0), "throw": verb(1), "return": verb(2) }, typeof Symbol === "function" && (g[Symbol.iterator] = function() { return this; }), g;
-    function verb(n) { return function (v) { return step([n, v]); }; }
-    function step(op) {
-        if (f) throw new TypeError("Generator is already executing.");
-        while (g && (g = 0, op[0] && (_ = 0)), _) try {
-            if (f = 1, y && (t = op[0] & 2 ? y["return"] : op[0] ? y["throw"] || ((t = y["return"]) && t.call(y), 0) : y.next) && !(t = t.call(y, op[1])).done) return t;
-            if (y = 0, t) op = [op[0] & 2, t.value];
-            switch (op[0]) {
-                case 0: case 1: t = op; break;
-                case 4: _.label++; return { value: op[1], done: false };
-                case 5: _.label++; y = op[1]; op = [0]; continue;
-                case 7: op = _.ops.pop(); _.trys.pop(); continue;
-                default:
-                    if (!(t = _.trys, t = t.length > 0 && t[t.length - 1]) && (op[0] === 6 || op[0] === 2)) { _ = 0; continue; }
-                    if (op[0] === 3 && (!t || (op[1] > t[0] && op[1] < t[3]))) { _.label = op[1]; break; }
-                    if (op[0] === 6 && _.label < t[1]) { _.label = t[1]; t = op; break; }
-                    if (t && _.label < t[2]) { _.label = t[2]; _.ops.push(op); break; }
-                    if (t[2]) _.ops.pop();
-                    _.trys.pop(); continue;
-            }
-            op = body.call(thisArg, _);
-        } catch (e) { op = [6, e]; y = 0; } finally { f = t = 0; }
-        if (op[0] & 5) throw op[1]; return { value: op[0] ? op[1] : void 0, done: true };
-    }
-};
 /*
+ * ═══════════════════════════════════════════════════════════════════════════
  * WHAT IS ARCGIS?
- * ArcGIS is a mapping platform by Esri that allows organizations to create, manage,
- * and share interactive maps and spatial data.
+ * ═══════════════════════════════════════════════════════════════════════════
+ * ArcGIS is a mapping platform by Esri that allows organizations to create,
+ * manage, and share interactive maps and spatial data.
  *
  * KEY CONCEPTS:
- * - Webmap: A saved map configuration that includes layers, styling, and settings
- * - Layer: A collection of geographic features (like roads, buildings, or boundaries)
- * - Feature: An individual map element (like a specific road or building)
- * - Tile: Small square images that make up the map background
- * - Service: A web endpoint that provides map data or functionality
+ * ────────────────────────────────────────────────────────────────────────────
+ * • Webmap    - A saved map configuration that includes layers, styling, and settings
+ * • Layer     - A collection of geographic features (like roads, buildings, or boundaries)
+ * • Feature   - An individual map element (like a specific road or building)
+ * • Tile      - Small square images that make up the map background
+ * • Service   - A web endpoint that provides map data or functionality
  */
 // Import Leaflet library for map functionality
 // Leaflet is a popular open-source JavaScript library for interactive maps
 
-// Service class that encapsulates all ArcGIS-specific map functionality
-// This class acts as a bridge between ArcGIS data and the Leaflet map display
-var ArcGISMapService = /** @class */ (function () {
-    function ArcGISMapService(map) {
+// Import modularized services
+
+
+// Basemap tile URLs
+const IMAGERY_TILE_URL = 'https://services.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}';
+const OPEN_STREET_MAP_TILE_URL = 'https://tile.openstreetmap.org/{z}/{x}/{y}.png';
+class ArcGISMapService {
+    constructor(map) {
         this.map = map; // Store map reference for use in methods
+        this.featureLayerService = new _services_layers_FeatureLayer__WEBPACK_IMPORTED_MODULE_1__.FeatureLayerService(map);
+        this.mapServiceLayerService = new _services_layers_MapServiceLayer__WEBPACK_IMPORTED_MODULE_2__.MapServiceLayerService(map);
+    }
+    setMapViewService(mapViewService) {
+        this.mapViewService = mapViewService;
+        // Update the FeatureLayerService with the MapViewService
+        this.featureLayerService = new _services_layers_FeatureLayer__WEBPACK_IMPORTED_MODULE_1__.FeatureLayerService(this.map, mapViewService);
     }
     /**
      * Add ArcGIS tile layer to the map
      *
-     * WHAT ARE TILES?
-     * Maps are made up of small square images called "tiles" (usually 256x256 pixels).
-     * When you zoom or pan a map, your browser downloads the specific tiles needed
-     * for that view.
+     * ┌─────────────────────────────────────────────────────────────────────────┐
+     * │ WHAT ARE TILES?                                                         │
+     * │                                                                         │
+     * │ Maps are made up of small square images called "tiles" (usually         │
+     * │ 256x256 pixels). When you zoom or pan a map, your browser downloads     │
+     * │ the specific tiles needed for that view.                                │
+     * └─────────────────────────────────────────────────────────────────────────┘
      *
-     * @param webmapId The ArcGIS webmap ID extracted from the URL (unique identifier for a saved map)
-     * @param domain The ArcGIS domain (e.g., 'hochtiefinfra' from 'hochtiefinfra.maps.arcgis.com')
+     * @param webmapId - The ArcGIS webmap ID extracted from the URL (unique identifier for a saved map)
+     * @param domain   - The ArcGIS domain (e.g., 'hochtiefinfra' from 'hochtiefinfra.maps.arcgis.com')
      */
-    ArcGISMapService.prototype.addArcGISTileLayer = function (webmapId, domain) {
+    addArcGISTileLayer(webmapId, domain, mapView) {
         // Safety check - ensure all required parameters exist
-        if (!this.map || !webmapId || !domain)
+        if (!this.map || !webmapId || !domain || !mapView)
             return;
-        // ArcGIS Online tile service URL pattern
-        // This uses the standard ArcGIS world imagery basemap (satellite/aerial photos)
-        // {z} = zoom level (higher numbers = more zoomed in)
-        // {y} = tile row (north-south position)  
-        // {x} = tile column (east-west position)
-        // Leaflet automatically replaces these placeholders with actual values
-        var arcgisTileUrl = 'https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}';
         try {
-            // Add the tile layer to the map
-            // This creates the base satellite imagery that other layers will be drawn on top of
-            leaflet__WEBPACK_IMPORTED_MODULE_0__.tileLayer(arcgisTileUrl, {
-                maxZoom: 18, // Maximum zoom level supported by this tile service
-                id: 'arcgis-tiles' // Identifier for this layer (useful for debugging)
-            }).addTo(this.map);
-            // Add vector tile layer with proper styling
-            // This adds the actual webmap content (roads, buildings, etc.) on top of the base imagery
-            this.addArcGISVectorLayer(webmapId, domain);
+            // add ArcGIS basemap tiles
+            if (mapView === 'satellite') {
+                leaflet__WEBPACK_IMPORTED_MODULE_0__.tileLayer(IMAGERY_TILE_URL, {
+                    attribution: '&copy; <a href="https://www.esri.com/">Esri</a>, Maxar, Earthstar Geographics, and the GIS User Community',
+                    maxZoom: 19, // Maximum zoom level supported by this tile service
+                    id: 'imagery-tile' // Identifier for this layer (useful for debugging)
+                }).addTo(this.map);
+            }
+            else {
+                leaflet__WEBPACK_IMPORTED_MODULE_0__.tileLayer(OPEN_STREET_MAP_TILE_URL, {
+                    attribution: '&copy; <a href="https://www.openstreetmap.org/">OpenStreetMap</a> contributors', // Legal attribution required by OSM
+                    maxZoom: 19, // Maximum zoom level supported by this tile service
+                    id: 'osm-tile' // Identifier for this layer (useful for debugging)
+                }).addTo(this.map);
+            }
         }
         catch (error) {
-            // If adding ArcGIS tiles fails, fall back to OpenStreetMap
             console.error('Failed to add ArcGIS tile layer:', error);
-            this.addFallbackTileLayer();
         }
-    };
-    /**
-     * Fallback tile layer in case ArcGIS fails
-     *
-     * REDUNDANCY AND RELIABILITY:
-     * Sometimes external services fail or are temporarily unavailable.
-     * This method ensures users always see a map, even if ArcGIS is down.
-     */
-    ArcGISMapService.prototype.addFallbackTileLayer = function () {
-        if (!this.map)
-            return; // Safety check
-        // Add OpenStreetMap as fallback
-        // OpenStreetMap is a free, community-driven mapping service
-        // It's very reliable and doesn't require any API keys or authentication
-        leaflet__WEBPACK_IMPORTED_MODULE_0__.tileLayer('https://{s}.tile.openstreetmap.de/tiles/osmde/{z}/{x}/{y}.png', {
-            attribution: '&copy; <a href="https://www.openstreetmap.org/">OpenStreetMap</a> contributors',
-        }).addTo(this.map);
-    };
+        // Add vector tile layer with proper styling
+        // This adds the actual webmap content (roads, buildings, etc.) on top of the base imagery
+        this.addArcGISVectorLayer(webmapId, domain);
+    }
     /**
      * Add ArcGIS vector layer (webmap content)
      *
-     * WHAT IS A VECTOR LAYER?
-     * Unlike tiles (which are images), vector layers contain actual geometric data:
-     * - Points (like building locations)
-     * - Lines (like roads or pipelines)
-     * - Polygons (like property boundaries or zones)
-     * This data can be styled, queried, and interacted with programmatically.
+     * ┌─────────────────────────────────────────────────────────────────────────┐
+     * │ WHAT IS A VECTOR LAYER?                                                 │
+     * │                                                                         │
+     * │ Unlike tiles (which are images), vector layers contain actual           │
+     * │ geometric data:                                                         │
+     * │ • Points   (like building locations)                                    │
+     * │ • Lines    (like roads or pipelines)                                    │
+     * │ • Polygons (like property boundaries or zones)                          │
+     * │                                                                         │
+     * │ This data can be styled, queried, and interacted with programmatically. │
+     * └─────────────────────────────────────────────────────────────────────────┘
      *
-     * @param webmapId The ArcGIS webmap ID
-     * @param domain The ArcGIS domain (e.g., 'hochtiefinfra')
+     * @param webmapId - The ArcGIS webmap ID
+     * @param domain   - The ArcGIS domain (e.g., 'hochtiefinfra')
      */
-    ArcGISMapService.prototype.addArcGISVectorLayer = function (webmapId, domain) {
-        var _this = this;
+    addArcGISVectorLayer(webmapId, domain) {
         // Safety check for required parameters
         if (!this.map || !webmapId || !domain)
             return;
         // Construct the webmap URL using the provided domain
         // This URL returns JSON data describing the webmap configuration
-        var webmapUrl = "https://".concat(domain, ".maps.arcgis.com/sharing/rest/content/items/").concat(webmapId, "/data?f=json");
-        console.log("Fetching webmap from: ".concat(webmapUrl));
+        const webmapUrl = `https://${domain}.maps.arcgis.com/sharing/rest/content/items/${webmapId}/data?f=json`;
+        console.log(`Fetching webmap from: ${webmapUrl}`);
         // Fetch webmap definition
         fetch(webmapUrl)
-            .then(function (response) {
+            .then(response => {
             // Check if the request was successful
             if (!response.ok) {
-                throw new Error("HTTP error! status: ".concat(response.status));
+                throw new Error(`HTTP error! status: ${response.status}`);
             }
             return response.json(); // Parse JSON response
         })
-            .then(function (webmapData) {
+            .then(webmapData => {
             // Validate that we received a valid object
             if (webmapData && typeof webmapData === 'object') {
                 console.log('Webmap data:', webmapData);
                 // Process operational layers from the webmap
-                // OPERATIONAL LAYERS vs BASEMAPS:
-                // - Basemap: Background imagery (satellite photos, street maps)
-                // - Operational layers: The actual data/content you want to display
-                //   (like property boundaries, infrastructure, or business locations)
-                if (webmapData.operationalLayers && Array.isArray(webmapData.operationalLayers)) {
-                    // Loop through each layer defined in the webmap
-                    webmapData.operationalLayers.forEach(function (layer) {
-                        console.log('Processing layer:', layer.title, layer.layerType);
-                        // Handle Group Layers (like BR_Leverkusen_01)
-                        // GROUP LAYERS are like folders that contain multiple related layers
-                        if (layer && layer.layerType === 'GroupLayer' && layer.layers && Array.isArray(layer.layers)) {
-                            console.log("Found Group Layer: ".concat(layer.title, " with ").concat(layer.layers.length, " sublayers"));
-                            // Process each sublayer within the group
-                            layer.layers.forEach(function (sublayer) {
-                                console.log('Processing sublayer:', sublayer.title, sublayer.layerType, sublayer.url);
-                                // Feature layers contain vector data (points, lines, polygons)
-                                // These are individual geographic features that can be styled and queried
-                                if (sublayer && sublayer.layerType === 'ArcGISFeatureLayer' && sublayer.url) {
-                                    // Remove the visibility check - load all layers
-                                    // This ensures all layers are loaded regardless of their default visibility
-                                    // (Users can turn layers on/off later if needed)
-                                    _this.addArcGISFeatureLayer(sublayer);
-                                }
-                            });
-                        }
-                        // Handle direct ArcGIS Feature Layers
-                        // These are individual layers that aren't grouped with others
-                        else if (layer && layer.layerType === 'ArcGISFeatureLayer' && layer.url) {
-                            _this.addArcGISFeatureLayer(layer);
-                        }
-                        // Handle direct ArcGIS Map Service Layers
-                        // MAP SERVICE LAYERS provide pre-rendered images (like tiles)
-                        // They're faster to display but less interactive than feature layers
-                        else if (layer && layer.layerType === 'ArcGISMapServiceLayer' && layer.url) {
-                            _this.addArcGISMapServiceLayer(layer);
-                        }
-                    });
-                }
-                // Also check for baseMap layers
-                // Basemaps provide the background imagery or reference layers
-                // (like satellite imagery, street maps, or topographic maps)
-                if (webmapData.baseMap && webmapData.baseMap.baseMapLayers && Array.isArray(webmapData.baseMap.baseMapLayers)) {
-                    webmapData.baseMap.baseMapLayers.forEach(function (layer) {
-                        if (layer && layer.url) {
-                            _this.addArcGISMapServiceLayer(layer);
-                        }
-                    });
-                }
+                this.processOperationalLayers(webmapData);
             }
         })
-            .catch(function (error) {
+            .catch(error => {
             // Handle errors gracefully - don't crash the entire application
             console.warn('Could not load webmap data:', error);
-            console.warn("Please check if the domain '".concat(domain, "' and webmap ID '").concat(webmapId, "' are correct."));
+            console.warn(`Please check if the domain '${domain}' and webmap ID '${webmapId}' are correct.`);
         });
-    };
+    }
     /**
-     * Convert ESRI color array to CSS color string
-     *
-     * COLOR FORMATS:
-     * - ESRI uses arrays like [255, 0, 0, 128] for red with 50% transparency
-     * - CSS uses strings like "rgba(255, 0, 0, 0.5)" for the same color
-     * - We need to convert between these formats
-     *
-     * @param esriColor Array of [Red, Green, Blue, Alpha] values (0-255 each)
-     * @returns CSS color string
+     * Process operational layers from webmap data
      */
-    ArcGISMapService.prototype.esriColorToCSS = function (esriColor) {
-        // Default to blue if color is invalid
-        if (!esriColor || esriColor.length < 3)
-            return '#3388ff';
-        // Destructure color components, default alpha to 255 (fully opaque)
-        var r = esriColor[0], g = esriColor[1], b = esriColor[2], _a = esriColor[3], a = _a === void 0 ? 255 : _a;
-        // Use rgba if transparency is specified
-        if (a < 255) {
-            return "rgba(".concat(r, ", ").concat(g, ", ").concat(b, ", ").concat(a / 255, ")"); // Convert alpha from 0-255 to 0-1 scale
+    processOperationalLayers(webmapData) {
+        if (!webmapData.operationalLayers || !Array.isArray(webmapData.operationalLayers)) {
+            return;
         }
-        // Use rgb for fully opaque colors (slightly more efficient)
-        return "rgb(".concat(r, ", ").concat(g, ", ").concat(b, ")");
-    };
+        // Loop through each layer defined in the webmap
+        webmapData.operationalLayers.forEach((layer) => {
+            console.log('Processing layer:', layer.title, layer.layerType);
+            // Handle Group Layers (like BR_Leverkusen_01)
+            if (layer && layer.layerType === 'GroupLayer' && layer.layers && Array.isArray(layer.layers)) {
+                this.processGroupLayer(layer);
+            }
+            // Handle direct ArcGIS Feature Layers
+            else if (layer && layer.layerType === 'ArcGISFeatureLayer' && layer.url) {
+                this.featureLayerService.addArcGISFeatureLayer(layer);
+            }
+            // Handle direct ArcGIS Map Service Layers
+            else if (layer && layer.layerType === 'ArcGISMapServiceLayer' && layer.url) {
+                this.mapServiceLayerService.addArcGISMapServiceLayer(layer);
+            }
+        });
+    }
+    /**
+     * Process group layers and their sublayers
+     */
+    processGroupLayer(layer) {
+        console.log(`Found Group Layer: ${layer.title} with ${layer.layers.length} sublayers`);
+        // Process each sublayer within the group
+        layer.layers.forEach((sublayer) => {
+            console.log('Processing sublayer:', sublayer.title, sublayer.layerType, sublayer.url);
+            // Feature layers contain vector data (points, lines, polygons)
+            // These are individual geographic features that can be styled and queried
+            if (sublayer && sublayer.layerType === 'ArcGISFeatureLayer' && sublayer.url) {
+                // Remove the visibility check - load all layers
+                // This ensures all layers are loaded regardless of their default visibility
+                // (Users can turn layers on/off later if needed)
+                this.featureLayerService.addArcGISFeatureLayer(sublayer);
+            }
+        });
+    }
+}
+
+
+/***/ }),
+
+/***/ 57:
+/*!*****************************************************************************!*\
+  !*** ./lib/webparts/webmap/services/ArcGISMap/services/ArcGISUrlService.js ***!
+  \*****************************************************************************/
+/***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony export */ __webpack_require__.d(__webpack_exports__, {
+/* harmony export */   extractArcGISDomain: () => (/* binding */ extractArcGISDomain),
+/* harmony export */   extractWebmapId: () => (/* binding */ extractWebmapId)
+/* harmony export */ });
+function extractWebmapId(url) {
+    if (!url)
+        return null; // Return null if no URL provided
+    // Pattern: https://{domain}.maps.arcgis.com/apps/mapviewer/index.html?webmap={webmap_id}
+    // This regex pattern matches the standard ArcGIS web map URL format
+    const urlPattern = /https?:\/\/[^\/]+\.maps\.arcgis\.com\/apps\/mapviewer\/index\.html\?webmap=([a-zA-Z0-9]+)/;
+    const match = url.match(urlPattern);
+    if (match && match[1]) {
+        return match[1]; // Return the captured webmap ID
+    }
+    // Also check for webmap ID in other common ArcGIS URL formats
+    // Sometimes the URL might be formatted differently
+    const webmapPattern = /webmap=([a-zA-Z0-9]+)/;
+    const webmapMatch = url.match(webmapPattern);
+    if (webmapMatch && webmapMatch[1]) {
+        return webmapMatch[1]; // Return the captured webmap ID
+    }
+    return null; // No valid webmap ID found
+}
+/**
+ * Extract domain from ArcGIS URL
+ */
+function extractArcGISDomain(url) {
+    if (!url)
+        return null; // Return null if no URL provided
+    // Pattern to extract the domain part (e.g., "hochtiefinfra" from "hochtiefinfra.maps.arcgis.com")
+    // This captures the subdomain before .maps.arcgis.com
+    const domainPattern = /https?:\/\/([^\/]+)\.maps\.arcgis\.com/;
+    const match = url.match(domainPattern);
+    if (match && match[1]) {
+        return match[1]; // Return the captured domain
+    }
+    return null; // No valid domain found
+}
+
+
+/***/ }),
+
+/***/ 510:
+/*!********************************************************************************!*\
+  !*** ./lib/webparts/webmap/services/ArcGISMap/services/layers/FeatureLayer.js ***!
+  \********************************************************************************/
+/***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony export */ __webpack_require__.d(__webpack_exports__, {
+/* harmony export */   FeatureLayerService: () => (/* binding */ FeatureLayerService)
+/* harmony export */ });
+/* harmony import */ var leaflet__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! leaflet */ 973);
+/* harmony import */ var leaflet__WEBPACK_IMPORTED_MODULE_0___default = /*#__PURE__*/__webpack_require__.n(leaflet__WEBPACK_IMPORTED_MODULE_0__);
+/* harmony import */ var leaflet_markercluster__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! leaflet.markercluster */ 528);
+/* harmony import */ var leaflet_markercluster__WEBPACK_IMPORTED_MODULE_1___default = /*#__PURE__*/__webpack_require__.n(leaflet_markercluster__WEBPACK_IMPORTED_MODULE_1__);
+/* harmony import */ var _styling_StyleService__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! ../styling/StyleService */ 707);
+/* harmony import */ var _WebmapWebPart_module_scss__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ../../../../WebmapWebPart.module.scss */ 641);
+/* ========================================================================== */
+/* services/FeatureLayerService.ts                                            */
+/* - Service for handling ArcGIS feature layer operations                     */
+/* ========================================================================== */
+
+
+
+
+class FeatureLayerService {
+    constructor(map, mapViewService) {
+        this.map = map;
+        this.styleService = new _styling_StyleService__WEBPACK_IMPORTED_MODULE_3__.StyleService();
+        this.mapViewService = mapViewService;
+    }
+    /**
+     * Add an ArcGIS Feature Layer with proper styling (Optimized for performance)
+     *
+     * ┌─────────────────────────────────────────────────────────────────────────┐
+     * │ WHAT IS A FEATURE LAYER?                                                │
+     * │                                                                         │
+     * │ A feature layer contains individual geographic features (vector data):  │
+     * │ • Each road segment, building outline, or property boundary is a        │
+     * │   separate "feature"                                                    │
+     * │ • Features have both geometry (shape/location) and attributes           │
+     * │   (properties/data)                                                     │
+     * │ • Example: A building feature might have geometry (rectangle outline)   │
+     * │   and attributes (address, owner, year built, etc.)                     │
+     * │                                                                         │
+     * │ PERFORMANCE CONSIDERATIONS:                                             │
+     * │ Feature layers can contain thousands of individual features. Loading    │
+     * │ and rendering all of them can be slow, so this method includes several  │
+     * │ optimizations.                                                          │
+     * └─────────────────────────────────────────────────────────────────────────┘
+     */
+    async addArcGISFeatureLayer(layerConfig) {
+        // Safety checks - make sure we have everything we need
+        if (!this.map || !layerConfig || !layerConfig.url)
+            return;
+        const featureServiceUrl = layerConfig.url;
+        console.log(`Loading feature layer: ${layerConfig.title} from ${featureServiceUrl}`);
+        try {
+            // First, get the layer info to understand the data structure
+            const layerInfo = await this.getFeatureLayerInfo(featureServiceUrl);
+            if (!layerInfo)
+                return;
+            // Get the maximum record count from layer info
+            const maxRecordCount = layerInfo.maxRecordCount || 1000;
+            // Get drawing info for styling
+            const drawingInfo = layerInfo.drawingInfo || await this.getLayerDrawingInfo(featureServiceUrl);
+            // Query all features - handle pagination if needed
+            const allFeatures = await this.queryAllFeatures(featureServiceUrl, maxRecordCount);
+            if (allFeatures.length > 0) {
+                // Create and add the complete GeoJSON layer
+                const geoJsonLayer = this.createAndAddGeoJSONLayer(allFeatures, layerConfig, drawingInfo);
+                // Automatically zoom to show all features
+                this.getBounds(geoJsonLayer);
+            }
+        }
+        catch (error) {
+            // Log errors but don't crash the entire map
+            // This ensures that if one layer fails, other layers can still load
+            console.error(`Failed to load feature layer ${layerConfig.title || 'Unknown'}:`, error);
+        }
+    }
     /**
      * Get layer styling information from ArcGIS service
-     *
-     * WHAT IS DRAWING INFO?
-     * Drawing info contains the "styling rules" for a layer - it tells us:
-     * - What color should roads be?
-     * - How thick should boundary lines be?
-     * - What symbols should represent different types of buildings?
-     *
-     * This method fetches these styling rules from the ArcGIS server.
      */
-    ArcGISMapService.prototype.getLayerDrawingInfo = function (serviceUrl) {
-        return __awaiter(this, void 0, void 0, function () {
-            var url, layerInfoUrl, response, layerInfo, error_1;
-            return __generator(this, function (_a) {
-                switch (_a.label) {
-                    case 0:
-                        _a.trys.push([0, 3, , 4]);
-                        url = String(serviceUrl);
-                        layerInfoUrl = url.indexOf('?') !== -1 ? "".concat(url, "&f=json") : "".concat(url, "?f=json");
-                        console.log('Fetching layer info from:', layerInfoUrl);
-                        return [4 /*yield*/, fetch(layerInfoUrl)];
-                    case 1:
-                        response = _a.sent();
-                        if (!response.ok) {
-                            console.warn("Failed to fetch layer info: ".concat(response.status));
-                            return [2 /*return*/, null];
-                        }
-                        return [4 /*yield*/, response.json()];
-                    case 2:
-                        layerInfo = _a.sent();
-                        console.log('Layer info:', layerInfo);
-                        // Return drawing info if available, otherwise null
-                        return [2 /*return*/, layerInfo.drawingInfo || null];
-                    case 3:
-                        error_1 = _a.sent();
-                        console.error('Failed to get layer drawing info:', error_1);
-                        return [2 /*return*/, null];
-                    case 4: return [2 /*return*/];
-                }
+    async getLayerDrawingInfo(serviceUrl) {
+        try {
+            // Ensure we're getting the correct layer info URL
+            const url = String(serviceUrl);
+            // Add JSON format parameter to the URL (?f=json tells ArcGIS to return JSON data)
+            const layerInfoUrl = url.indexOf('?') !== -1 ? `${url}&f=json` : `${url}?f=json`;
+            console.log('Fetching layer info from:', layerInfoUrl);
+            // Fetch layer metadata (information about the layer)
+            const response = await fetch(layerInfoUrl);
+            if (!response.ok) {
+                console.warn(`Failed to fetch layer info: ${response.status}`);
+                return null;
+            }
+            // Parse JSON response
+            const layerInfo = await response.json();
+            console.log('Layer info:', layerInfo);
+            // Return drawing info if available, otherwise null
+            return layerInfo.drawingInfo || null;
+        }
+        catch (error) {
+            console.error('Failed to get layer drawing info:', error);
+            return null;
+        }
+    }
+    /**
+     * Get feature layer information from ArcGIS service
+     */
+    async getFeatureLayerInfo(featureServiceUrl) {
+        const layerInfoUrl = `${featureServiceUrl}?f=json`;
+        const infoResponse = await fetch(layerInfoUrl);
+        return await infoResponse.json();
+    }
+    /**
+     * Query all features with pagination support
+     */
+    async queryAllFeatures(featureServiceUrl, maxRecordCount) {
+        let allFeatures = []; // Array to store all fetched features across multiple pages
+        let resultOffset = 0; // Starting position for the current request (initially 0)
+        let hasMore = true; // Boolean flag to control the pagination loop
+        while (hasMore) {
+            // Create query parameters for the current request
+            const queryParams = new URLSearchParams({
+                'where': '1=1', // SQL-like query: "1=1" means "select all features" (always true condition)
+                'outFields': '*', // Limit returned fields to only what's needed for styling (performance optimization)
+                'f': 'geojson', // Response format: GeoJSON (standardized geographic data format)
+                'outSR': '4326', // Output spatial reference: WGS 84 (standard latitude/longitude coordinate system)
+                'returnGeometry': 'true', // Include the shape/location data of features (not just attributes)
+                'resultOffset': resultOffset.toString(), // Tell the server where to start returning records from
+                'resultRecordCount': maxRecordCount.toString(), // Maximum number of records to return in this request
+                'geometryPrecision': '6' // Limit coordinate decimal places (reduces file size and improves performance)
             });
+            // Construct the full query URL with all parameters
+            const queryUrl = `${featureServiceUrl}/query?${queryParams.toString()}`;
+            // Send the HTTP GET request to the ArcGIS Feature Service
+            const response = await fetch(queryUrl);
+            if (!response.ok) {
+                // If the request fails, throw an error with the HTTP status code
+                throw new Error(`HTTP error! status: ${response.status}`);
+            }
+            // Parse the response as JSON (GeoJSON format)
+            const geojsonData = await response.json();
+            // Check if the response has features and add them to our collection
+            if (geojsonData && geojsonData.features && geojsonData.features.length > 0) {
+                // Add current batch of features to the master list
+                allFeatures = allFeatures.concat(geojsonData.features);
+                // Update the offset for the next request (move to the next "page")
+                resultOffset += geojsonData.features.length;
+                // If we received a full batch (max count), assume there may be more features to load
+                // If we got fewer than the maximum, we've probably reached the end
+                hasMore = geojsonData.features.length === maxRecordCount;
+            }
+            else {
+                // If no features returned, we've reached the end
+                hasMore = false;
+            }
+        }
+        console.log(`Total features fetched: ${allFeatures.length}`);
+        return allFeatures;
+    }
+    /**
+     * Create and add GeoJSON layer to the map with proper styling
+     */
+    createAndAddGeoJSONLayer(allFeatures, layerConfig, drawingInfo) {
+        // Create the complete GeoJSON object
+        // GeoJSON is a standard format for representing geographic features
+        // It wraps all features in a "FeatureCollection" structure
+        const completeGeoJSON = {
+            type: 'FeatureCollection',
+            features: allFeatures
+        };
+        // Create style function based on drawing info
+        const styleFunction = this.styleService.createStyleFunction(drawingInfo);
+        // CREATE MARKER CLUSTER GROUP FOR TEXT LABELS
+        const textClusterGroup = leaflet__WEBPACK_IMPORTED_MODULE_0__.markerClusterGroup({
+            maxClusterRadius: 25, // Distance to cluster (pixels)
+            disableClusteringAtZoom: 19, // Stop clustering at high zoom
+            spiderfyOnMaxZoom: false,
+            showCoverageOnHover: false,
+            zoomToBoundsOnClick: false,
+            iconCreateFunction: function (cluster) {
+                // Get the first marker's text from the cluster
+                const firstMarker = cluster.getAllChildMarkers()[0];
+                const textContent = firstMarker.options.icon.options.html;
+                return leaflet__WEBPACK_IMPORTED_MODULE_0__.divIcon({
+                    html: textContent,
+                    className: _WebmapWebPart_module_scss__WEBPACK_IMPORTED_MODULE_2__["default"].textLabel,
+                    iconSize: [100, 20]
+                });
+            }
         });
-    };
+        // Create a GeoJSON layer optimized for performance
+        const geoJsonLayer = leaflet__WEBPACK_IMPORTED_MODULE_0__.geoJSON(completeGeoJSON, {
+            // Style function for lines and polygons
+            // This function is called for each feature to determine its appearance
+            style: (feature) => {
+                const style = styleFunction(feature);
+                // Ensure polygon visibility
+                // Special handling for polygon layers to make sure they're visible
+                if (layerConfig.title && layerConfig.title.includes('Polys')) {
+                    style.fillOpacity = style.fillOpacity || 0.6; // Make sure polygons have some transparency
+                    style.weight = style.weight || 1; // Keep border lines thin for performance
+                }
+                return style;
+            },
+            // Function to create markers for point features
+            // Instead of default markers (which can be slow), use simple circles
+            pointToLayer: (feature, latlng) => {
+                const style = styleFunction(feature);
+                // Use circle markers instead of default markers for better performance
+                return leaflet__WEBPACK_IMPORTED_MODULE_0__.circleMarker(latlng, Object.assign(Object.assign({}, style), { radius: style.radius || 5 // Provide a default radius if undefined
+                 }));
+            },
+            // Add text labels for each feature
+            onEachFeature: (feature, layer) => {
+                var _a;
+                const textValue = (_a = feature.properties) === null || _a === void 0 ? void 0 : _a.Text;
+                if (textValue && textValue.trim()) {
+                    // GET POSITION FROM FEATURE GEOMETRY DIRECTLY
+                    let position;
+                    if (feature.geometry.type === 'Point') {
+                        const coords = feature.geometry.coordinates;
+                        position = leaflet__WEBPACK_IMPORTED_MODULE_0__.latLng(coords[1], coords[0]);
+                    }
+                    else {
+                        // For polygons/lines, use the centroid from the layer
+                        position = layer.getBounds().getCenter();
+                    }
+                    // CREATE TEXT MARKER FOR CLUSTERING
+                    const textMarker = leaflet__WEBPACK_IMPORTED_MODULE_0__.marker(position, {
+                        icon: leaflet__WEBPACK_IMPORTED_MODULE_0__.divIcon({
+                            html: textValue,
+                            className: _WebmapWebPart_module_scss__WEBPACK_IMPORTED_MODULE_2__["default"].textLabel,
+                            iconSize: [100, 20]
+                        })
+                    });
+                    // ADD TO CLUSTER GROUP INSTEAD OF TOOLTIP
+                    textClusterGroup.addLayer(textMarker);
+                }
+            },
+            // Disable all interactivity for better performance
+            interactive: false,
+            bubblingMouseEvents: false
+        });
+        // Add the layer to the map
+        geoJsonLayer.addTo(this.map);
+        textClusterGroup.addTo(this.map); // ADD CLUSTER GROUP TO MAP
+        console.log(`Successfully added feature layer: ${layerConfig.title} with ${allFeatures.length} features`);
+        return geoJsonLayer;
+    }
+    getBounds(geoJsonLayer) {
+        try {
+            const bounds = geoJsonLayer.getBounds();
+            // Extract corner coordinates for MapViewService
+            if (bounds.isValid() && this.mapViewService) {
+                const boundsArray = [
+                    bounds.getSouthWest(),
+                    bounds.getNorthEast(),
+                    bounds.getNorthWest(),
+                    bounds.getSouthEast()
+                ];
+                this.mapViewService.setFeatureBounds(boundsArray);
+            }
+        }
+        catch (error) {
+            console.error('Error fitting map to features:', error);
+        }
+    }
+}
+
+
+/***/ }),
+
+/***/ 347:
+/*!***********************************************************************************!*\
+  !*** ./lib/webparts/webmap/services/ArcGISMap/services/layers/MapServiceLayer.js ***!
+  \***********************************************************************************/
+/***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony export */ __webpack_require__.d(__webpack_exports__, {
+/* harmony export */   MapServiceLayerService: () => (/* binding */ MapServiceLayerService)
+/* harmony export */ });
+/* harmony import */ var leaflet__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! leaflet */ 973);
+/* harmony import */ var leaflet__WEBPACK_IMPORTED_MODULE_0___default = /*#__PURE__*/__webpack_require__.n(leaflet__WEBPACK_IMPORTED_MODULE_0__);
+/* ========================================================================== */
+/* services/MapServiceLayerService.ts                                         */
+/* - Service for handling ArcGIS map service layer operations                 */
+/* ========================================================================== */
+
+class MapServiceLayerService {
+    constructor(map) {
+        this.map = map;
+    }
+    /**
+     * Add an ArcGIS Map Service Layer
+     *
+     * ┌─────────────────────────────────────────────────────────────────────────┐
+     * │ WHAT IS A MAP SERVICE LAYER?                                            │
+     * │                                                                         │
+     * │ Unlike feature layers (which send individual features), map service     │
+     * │ layers provide pre-rendered images (tiles) of the map data. This is     │
+     * │ like the difference between:                                            │
+     * │ • Feature Layer: Sending you the blueprints to draw a house             │
+     * │ • Map Service:   Sending you a photograph of the house                  │
+     * │                                                                         │
+     * │ WHEN TO USE MAP SERVICES:                                               │
+     * │ • When you have complex data that would be slow to render as            │
+     * │   individual features                                                   │
+     * │ • When you don't need to interact with individual features              │
+     * │ • When you want consistent styling that matches the original ArcGIS     │
+     * │   map                                                                   │
+     * └─────────────────────────────────────────────────────────────────────────┘
+     */
+    addArcGISMapServiceLayer(layerConfig) {
+        // Safety checks
+        if (!this.map || !layerConfig)
+            return;
+        const baseUrl = layerConfig.url;
+        if (!baseUrl)
+            return;
+        console.log(`Adding map service layer: ${layerConfig.title} from ${baseUrl}`);
+        // For each sublayer, add as a tile layer
+        // Map services can contain multiple sublayers (like separate layers for roads, labels, boundaries)
+        if (layerConfig.layers && Array.isArray(layerConfig.layers)) {
+            this.addMapServiceSublayers(layerConfig, baseUrl);
+        }
+        else {
+            // If no sublayers defined, try to add the entire service as one tile layer
+            this.addSingleMapServiceLayer(layerConfig, baseUrl);
+        }
+    }
+    /**
+     * Add sublayers from a map service
+     */
+    addMapServiceSublayers(layerConfig, baseUrl) {
+        layerConfig.layers.forEach((sublayer) => {
+            // Only add sublayers that are visible by default and have a valid ID
+            if (sublayer && sublayer.defaultVisibility && typeof sublayer.id !== 'undefined') {
+                // Construct tile URL pattern for this specific sublayer
+                // The server will generate tiles on-demand for this sublayer
+                // {z}/{y}/{x} will be replaced by Leaflet with actual tile coordinates
+                const tileUrl = `${baseUrl}/${sublayer.id}/tile/{z}/{y}/{x}`;
+                // Create and add tile layer to the map
+                leaflet__WEBPACK_IMPORTED_MODULE_0__.tileLayer(tileUrl, {
+                    opacity: layerConfig.opacity || 1, // Layer transparency (0 = invisible, 1 = fully opaque)
+                    attribution: 'ArcGIS Map Service' // Credit text shown in map corner
+                }).addTo(this.map);
+                console.log(`Added sublayer ${sublayer.id} as tile layer`);
+            }
+        });
+    }
+    /**
+     * Add a single map service layer (no sublayers)
+     */
+    addSingleMapServiceLayer(layerConfig, baseUrl) {
+        // Some map services are simple and don't have multiple sublayers
+        const tileUrl = `${baseUrl}/tile/{z}/{y}/{x}`;
+        leaflet__WEBPACK_IMPORTED_MODULE_0__.tileLayer(tileUrl, {
+            opacity: layerConfig.opacity || 1,
+            attribution: 'ArcGIS Map Service'
+        }).addTo(this.map);
+        console.log(`Added map service as tile layer: ${layerConfig.title}`);
+    }
+}
+
+
+/***/ }),
+
+/***/ 486:
+/*!***********************************************************************************!*\
+  !*** ./lib/webparts/webmap/services/ArcGISMap/services/styling/ColorConverter.js ***!
+  \***********************************************************************************/
+/***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony export */ __webpack_require__.d(__webpack_exports__, {
+/* harmony export */   esriColorToCSS: () => (/* binding */ esriColorToCSS)
+/* harmony export */ });
+/* ========================================================================== */
+/* utils/ColorConverter.ts                                                    */
+/* - Utilities for converting between ESRI and CSS color formats              */
+/* ========================================================================== */
+/**
+ * @param esriColor - Array of [Red, Green, Blue, Alpha] values (0-255 each)
+ * @returns CSS color string
+ */
+function esriColorToCSS(esriColor) {
+    // Default to blue if color is invalid
+    if (!esriColor || esriColor.length < 3)
+        return '#3388ff';
+    // Destructure color components, default alpha to 255 (fully opaque)
+    const [r, g, b, a = 255] = esriColor;
+    // Use rgba if transparency is specified
+    if (a < 255) {
+        return `rgba(${r}, ${g}, ${b}, ${a / 255})`; // Convert alpha from 0-255 to 0-1 scale
+    }
+    // Use rgb for fully opaque colors (slightly more efficient)
+    return `rgb(${r}, ${g}, ${b})`;
+}
+
+
+/***/ }),
+
+/***/ 707:
+/*!*********************************************************************************!*\
+  !*** ./lib/webparts/webmap/services/ArcGISMap/services/styling/StyleService.js ***!
+  \*********************************************************************************/
+/***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony export */ __webpack_require__.d(__webpack_exports__, {
+/* harmony export */   StyleService: () => (/* binding */ StyleService)
+/* harmony export */ });
+/* harmony import */ var _SymbolConverter__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ./SymbolConverter */ 879);
+/* ========================================================================== */
+/* services/StyleService.ts                                                   */
+/* - Service for creating style functions and handling renderers              */
+/* ========================================================================== */
+
+class StyleService {
+    constructor() {
+        this.symbolConverter = new _SymbolConverter__WEBPACK_IMPORTED_MODULE_0__.SymbolConverter();
+    }
     /**
      * Create style function for GeoJSON layer based on ArcGIS renderer
-     *
-     * WHAT IS A RENDERER?
-     * A renderer is a set of rules that determines how features should look:
-     * - "All highways should be thick red lines"
-     * - "Residential areas should be light green polygons"
-     * - "Schools should be blue circle markers"
-     *
-     * This method converts ArcGIS renderer rules into Leaflet styling functions.
      */
-    ArcGISMapService.prototype.createStyleFunction = function (drawingInfo) {
-        var _this = this;
+    createStyleFunction(drawingInfo) {
         // Return a function that takes a feature and returns its style
-        return function (feature) {
-            var _a;
+        return (feature) => {
             // Default style if no drawing info is available
             // This ensures features are visible even if styling fails
-            var defaultStyle = {
+            const defaultStyle = {
                 color: '#3388ff', // Line/border color (blue)
                 weight: 2, // Line width in pixels
                 opacity: 0.8, // Line opacity (0 = invisible, 1 = fully opaque)
@@ -506,293 +1432,143 @@ var ArcGISMapService = /** @class */ (function () {
             if (!drawingInfo || !drawingInfo.renderer) {
                 return defaultStyle;
             }
-            var renderer = drawingInfo.renderer;
+            const renderer = drawingInfo.renderer;
             // Handle unique value renderer (most common for categorical data)
-            // UNIQUE VALUE RENDERER example:
-            // - If feature.type = "highway" → use thick red line
-            // - If feature.type = "local_road" → use thin gray line
-            // - If feature.type = "bike_path" → use dashed green line
             if (renderer.type === 'uniqueValue') {
-                // Get the value of the field used for rendering (e.g., "highway", "local_road")
-                var fieldValue_1 = feature.properties[renderer.field1];
-                // Find matching unique value info
-                // Look for a styling rule that matches this feature's field value
-                var matchingInfo = (_a = renderer.uniqueValueInfos) === null || _a === void 0 ? void 0 : _a.find(function (info) {
-                    return info.value === fieldValue_1 || info.value === String(fieldValue_1);
-                } // Check both exact and string match
-                );
-                // If found, convert the ESRI symbol to Leaflet style
-                if (matchingInfo && matchingInfo.symbol) {
-                    return _this.convertEsriSymbolToLeafletStyle(matchingInfo.symbol);
-                }
-                // Use default symbol if no specific match found
-                if (renderer.defaultSymbol) {
-                    return _this.convertEsriSymbolToLeafletStyle(renderer.defaultSymbol);
-                }
+                return this.handleUniqueValueRenderer(renderer, feature, defaultStyle);
             }
             // Handle simple renderer
-            // SIMPLE RENDERER: All features use the same style
-            // Example: All buildings are gray rectangles with black outlines
             if (renderer.type === 'simple' && renderer.symbol) {
-                return _this.convertEsriSymbolToLeafletStyle(renderer.symbol);
+                return this.symbolConverter.convertEsriSymbolToLeafletStyle(renderer.symbol);
             }
             return defaultStyle; // Fallback to default style if nothing else works
         };
-    };
+    }
+    /**
+     * Handle unique value renderer styling
+     */
+    handleUniqueValueRenderer(renderer, feature, defaultStyle) {
+        var _a;
+        // Get the value of the field used for rendering (e.g., "highway", "local_road")
+        const fieldValue = feature.properties[renderer.field1];
+        // Find matching unique value info
+        // Look for a styling rule that matches this feature's field value
+        const matchingInfo = (_a = renderer.uniqueValueInfos) === null || _a === void 0 ? void 0 : _a.find((info) => info.value === fieldValue || info.value === String(fieldValue) // Check both exact and string match
+        );
+        // If found, convert the ESRI symbol to Leaflet style
+        if (matchingInfo && matchingInfo.symbol) {
+            return this.symbolConverter.convertEsriSymbolToLeafletStyle(matchingInfo.symbol);
+        }
+        // Use default symbol if no specific match found
+        if (renderer.defaultSymbol) {
+            return this.symbolConverter.convertEsriSymbolToLeafletStyle(renderer.defaultSymbol);
+        }
+        return defaultStyle;
+    }
+}
+
+
+/***/ }),
+
+/***/ 879:
+/*!************************************************************************************!*\
+  !*** ./lib/webparts/webmap/services/ArcGISMap/services/styling/SymbolConverter.js ***!
+  \************************************************************************************/
+/***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony export */ __webpack_require__.d(__webpack_exports__, {
+/* harmony export */   SymbolConverter: () => (/* binding */ SymbolConverter)
+/* harmony export */ });
+/* harmony import */ var _ColorConverter__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ./ColorConverter */ 486);
+/* ========================================================================== */
+/* services/SymbolConverter.ts                                                */
+/* - Service for converting ESRI symbols to Leaflet styles                    */
+/* ========================================================================== */
+
+class SymbolConverter {
     /**
      * Convert ESRI symbol to Leaflet style
-     *
-     * SYMBOL CONVERSION:
-     * ESRI and Leaflet use different formats for describing how features should look.
-     * This is like translating between two different languages that describe the same thing.
-     *
-     * ESRI might say: "esriSLS with color [255,0,0] and width 3"
-     * Leaflet wants: "{ color: 'rgb(255,0,0)', weight: 3 }"
      */
-    ArcGISMapService.prototype.convertEsriSymbolToLeafletStyle = function (symbol) {
-        var style = {}; // Initialize empty style object
+    convertEsriSymbolToLeafletStyle(symbol) {
+        const style = {}; // Initialize empty style object
         // Handle Simple Line Symbol (for roads, boundaries, etc.)
-        if (symbol.type === 'esriSLS') { // esriSLS = ESRI Simple Line Symbol
-            style.color = this.esriColorToCSS(symbol.color); // Convert color format
-            style.weight = symbol.width || 2; // Line width in pixels, default to 2
-            // Calculate opacity from alpha channel if present
-            style.opacity = symbol.color && symbol.color.length > 3 ? symbol.color[3] / 255 : 1;
-            // Handle line style patterns (solid, dashed, dotted, etc.)
-            if (symbol.style === 'esriSLSDash') {
-                style.dashArray = '5,5'; // 5 pixels line, 5 pixels gap, repeat
-            }
-            else if (symbol.style === 'esriSLSDot') {
-                style.dashArray = '2,2'; // 2 pixels dot, 2 pixels gap, repeat
-            }
-            else if (symbol.style === 'esriSLSDashDot') {
-                style.dashArray = '5,2,2,2'; // Dash-dot-dash-dot pattern
-            }
+        if (symbol.type === 'esriSLS') {
+            this.convertLineSymbol(symbol, style);
         }
         // Handle Simple Fill Symbol (for areas like buildings, zones, etc.)
-        else if (symbol.type === 'esriSFS') { // esriSFS = ESRI Simple Fill Symbol
-            style.fillColor = this.esriColorToCSS(symbol.color); // Interior color of the polygon
-            // Calculate fill opacity from alpha channel
-            style.fillOpacity = symbol.color && symbol.color.length > 3 ? symbol.color[3] / 255 : 0.6;
-            // Handle outline (border) of polygon
-            if (symbol.outline) {
-                style.color = this.esriColorToCSS(symbol.outline.color); // Border color
-                style.weight = symbol.outline.width || 1; // Border width in pixels
-                // Calculate border opacity
-                style.opacity = symbol.outline.color && symbol.outline.color.length > 3 ?
-                    symbol.outline.color[3] / 255 : 1;
-            }
+        else if (symbol.type === 'esriSFS') {
+            this.convertFillSymbol(symbol, style);
         }
         // Handle Simple Marker Symbol (for point locations like buildings, landmarks, etc.)
-        else if (symbol.type === 'esriSMS') { // esriSMS = ESRI Simple Marker Symbol
-            style.radius = symbol.size || 6; // Circle radius in pixels
-            style.fillColor = this.esriColorToCSS(symbol.color); // Fill color of the circle
-            // Calculate fill opacity
-            style.fillOpacity = symbol.color && symbol.color.length > 3 ? symbol.color[3] / 255 : 1;
-            // Handle outline (border) of point marker
-            if (symbol.outline) {
-                style.color = this.esriColorToCSS(symbol.outline.color); // Border color
-                style.weight = symbol.outline.width || 1; // Border width
-                // Calculate border opacity
-                style.opacity = symbol.outline.color && symbol.outline.color.length > 3 ?
-                    symbol.outline.color[3] / 255 : 1;
-            }
+        else if (symbol.type === 'esriSMS') {
+            this.convertMarkerSymbol(symbol, style);
         }
         return style; // Return the converted style object for Leaflet to use
-    };
+    }
     /**
-     * Add an ArcGIS Feature Layer with proper styling (Optimized for performance)
+     * Convert ESRI Simple Line Symbol to Leaflet style
      *
-     * WHAT IS A FEATURE LAYER?
-     * A feature layer contains individual geographic features (vector data):
-     * - Each road segment, building outline, or property boundary is a separate "feature"
-     * - Features have both geometry (shape/location) and attributes (properties/data)
-     * - Example: A building feature might have geometry (rectangle outline) and
-     *   attributes (address, owner, year built, etc.)
-     *
-     * PERFORMANCE CONSIDERATIONS:
-     * Feature layers can contain thousands of individual features. Loading and rendering
-     * all of them can be slow, so this method includes several optimizations.
+     * @param symbol - ESRI Simple Line Symbol (esriSLS)
+     * @param style  - Style object to populate
      */
-    ArcGISMapService.prototype.addArcGISFeatureLayer = function (layerConfig) {
-        return __awaiter(this, void 0, void 0, function () {
-            var featureServiceUrl, layerInfoUrl, infoResponse, layerInfo, maxRecordCount, drawingInfo, _a, allFeatures, resultOffset, hasMore, queryParams, queryUrl, response, geojsonData, completeGeoJSON, styleFunction_1, geoJsonLayer, error_2;
-            return __generator(this, function (_b) {
-                switch (_b.label) {
-                    case 0:
-                        // Safety checks - make sure we have everything we need
-                        if (!this.map || !layerConfig || !layerConfig.url)
-                            return [2 /*return*/];
-                        featureServiceUrl = layerConfig.url;
-                        console.log("Loading feature layer: ".concat(layerConfig.title, " from ").concat(featureServiceUrl));
-                        _b.label = 1;
-                    case 1:
-                        _b.trys.push([1, 10, , 11]);
-                        layerInfoUrl = "".concat(featureServiceUrl, "?f=json");
-                        return [4 /*yield*/, fetch(layerInfoUrl)];
-                    case 2:
-                        infoResponse = _b.sent();
-                        return [4 /*yield*/, infoResponse.json()];
-                    case 3:
-                        layerInfo = _b.sent();
-                        maxRecordCount = layerInfo.maxRecordCount || 1000;
-                        _a = layerInfo.drawingInfo;
-                        if (_a) return [3 /*break*/, 5];
-                        return [4 /*yield*/, this.getLayerDrawingInfo(featureServiceUrl)];
-                    case 4:
-                        _a = (_b.sent());
-                        _b.label = 5;
-                    case 5:
-                        drawingInfo = _a;
-                        allFeatures = [];
-                        resultOffset = 0;
-                        hasMore = true;
-                        _b.label = 6;
-                    case 6:
-                        if (!hasMore) return [3 /*break*/, 9];
-                        queryParams = new URLSearchParams({
-                            'where': '1=1', // SQL-like query: "1=1" means "select all features" (always true condition)
-                            'outFields': 'Layer,RefName,Entity', // Limit returned fields to only what's needed for styling (performance optimization)
-                            'f': 'geojson', // Response format: GeoJSON (standardized geographic data format)
-                            'outSR': '4326', // Output spatial reference: WGS 84 (standard latitude/longitude coordinate system)
-                            'returnGeometry': 'true', // Include the shape/location data of features (not just attributes)
-                            'resultOffset': resultOffset.toString(), // Tell the server where to start returning records from
-                            'resultRecordCount': maxRecordCount.toString(), // Maximum number of records to return in this request
-                            'geometryPrecision': '6' // Limit coordinate decimal places (reduces file size and improves performance)
-                        });
-                        queryUrl = "".concat(featureServiceUrl, "/query?").concat(queryParams.toString());
-                        return [4 /*yield*/, fetch(queryUrl)];
-                    case 7:
-                        response = _b.sent();
-                        if (!response.ok) {
-                            // If the request fails, throw an error with the HTTP status code
-                            throw new Error("HTTP error! status: ".concat(response.status));
-                        }
-                        return [4 /*yield*/, response.json()];
-                    case 8:
-                        geojsonData = _b.sent();
-                        // Check if the response has features and add them to our collection
-                        if (geojsonData && geojsonData.features && geojsonData.features.length > 0) {
-                            // Add current batch of features to the master list
-                            allFeatures = allFeatures.concat(geojsonData.features);
-                            // Update the offset for the next request (move to the next "page")
-                            resultOffset += geojsonData.features.length;
-                            // If we received a full batch (max count), assume there may be more features to load
-                            // If we got fewer than the maximum, we've probably reached the end
-                            hasMore = geojsonData.features.length === maxRecordCount;
-                        }
-                        else {
-                            // If no features returned, we've reached the end
-                            hasMore = false;
-                        }
-                        return [3 /*break*/, 6];
-                    case 9:
-                        console.log("Total features fetched for ".concat(layerConfig.title, ": ").concat(allFeatures.length));
-                        if (allFeatures.length > 0) {
-                            completeGeoJSON = {
-                                type: 'FeatureCollection',
-                                features: allFeatures
-                            };
-                            styleFunction_1 = this.createStyleFunction(drawingInfo);
-                            geoJsonLayer = leaflet__WEBPACK_IMPORTED_MODULE_0__.geoJSON(completeGeoJSON, {
-                                // Style function for lines and polygons
-                                // This function is called for each feature to determine its appearance
-                                style: function (feature) {
-                                    var style = styleFunction_1(feature);
-                                    // Ensure polygon visibility
-                                    // Special handling for polygon layers to make sure they're visible
-                                    if (layerConfig.title && layerConfig.title.includes('Polys')) {
-                                        style.fillOpacity = style.fillOpacity || 0.6; // Make sure polygons have some transparency
-                                        style.weight = style.weight || 1; // Keep border lines thin for performance
-                                    }
-                                    return style;
-                                },
-                                // Function to create markers for point features
-                                // Instead of default markers (which can be slow), use simple circles
-                                pointToLayer: function (feature, latlng) {
-                                    var style = styleFunction_1(feature);
-                                    // Use circle markers instead of default markers for better performance
-                                    return leaflet__WEBPACK_IMPORTED_MODULE_0__.circleMarker(latlng, style);
-                                },
-                                // Disable all interactivity for better performance
-                                // PERFORMANCE OPTIMIZATION:
-                                // Interactive features (hover effects, click events) require more processing
-                                // For layers with thousands of features, this can make the map slow
-                                // If you need interactivity, you can enable it, but expect slower performance
-                                interactive: false,
-                                bubblingMouseEvents: false
-                            });
-                            // Add the layer to the map
-                            geoJsonLayer.addTo(this.map);
-                            console.log("\u2713 Successfully added feature layer: ".concat(layerConfig.title, " with ").concat(allFeatures.length, " features"));
-                        }
-                        return [3 /*break*/, 11];
-                    case 10:
-                        error_2 = _b.sent();
-                        // Log errors but don't crash the entire map
-                        // This ensures that if one layer fails, other layers can still load
-                        console.error("Failed to load feature layer ".concat(layerConfig.title || 'Unknown', ":"), error_2);
-                        return [3 /*break*/, 11];
-                    case 11: return [2 /*return*/];
-                }
-            });
-        });
-    };
+    convertLineSymbol(symbol, style) {
+        style.color = (0,_ColorConverter__WEBPACK_IMPORTED_MODULE_0__.esriColorToCSS)(symbol.color); // Convert color format
+        style.weight = symbol.width || 2; // Line width in pixels, default to 2
+        // Calculate opacity from alpha channel if present
+        style.opacity = symbol.color && symbol.color.length > 3 ? symbol.color[3] / 255 : 1;
+        // Handle line style patterns (solid, dashed, dotted, etc.)
+        if (symbol.style === 'esriSLSDash') {
+            style.dashArray = '5,5'; // 5 pixels line, 5 pixels gap, repeat
+        }
+        else if (symbol.style === 'esriSLSDot') {
+            style.dashArray = '2,2'; // 2 pixels dot, 2 pixels gap, repeat
+        }
+        else if (symbol.style === 'esriSLSDashDot') {
+            style.dashArray = '5,2,2,2'; // Dash-dot-dash-dot pattern
+        }
+    }
     /**
-     * Add an ArcGIS Map Service Layer
+     * Convert ESRI Simple Fill Symbol to Leaflet style
      *
-     * WHAT IS A MAP SERVICE LAYER?
-     * Unlike feature layers (which send individual features), map service layers
-     * provide pre-rendered images (tiles) of the map data. This is like the difference between:
-     * - Feature Layer: Sending you the blueprints to draw a house
-     * - Map Service: Sending you a photograph of the house
-     *
-     * WHEN TO USE MAP SERVICES:
-     * - When you have complex data that would be slow to render as individual features
-     * - When you don't need to interact with individual features
-     * - When you want consistent styling that matches the original ArcGIS map
+     * @param symbol - ESRI Simple Fill Symbol (esriSFS)
+     * @param style  - Style object to populate
      */
-    ArcGISMapService.prototype.addArcGISMapServiceLayer = function (layerConfig) {
-        var _this = this;
-        // Safety checks
-        if (!this.map || !layerConfig)
-            return;
-        var baseUrl = layerConfig.url;
-        if (!baseUrl)
-            return;
-        console.log("Adding map service layer: ".concat(layerConfig.title, " from ").concat(baseUrl));
-        // For each sublayer, add as a tile layer
-        // Map services can contain multiple sublayers (like separate layers for roads, labels, boundaries)
-        if (layerConfig.layers && Array.isArray(layerConfig.layers)) {
-            layerConfig.layers.forEach(function (sublayer) {
-                // Only add sublayers that are visible by default and have a valid ID
-                if (sublayer && sublayer.defaultVisibility && typeof sublayer.id !== 'undefined') {
-                    // Construct tile URL pattern for this specific sublayer
-                    // The server will generate tiles on-demand for this sublayer
-                    // {z}/{y}/{x} will be replaced by Leaflet with actual tile coordinates
-                    var tileUrl = "".concat(baseUrl, "/").concat(sublayer.id, "/tile/{z}/{y}/{x}");
-                    // Create and add tile layer to the map
-                    leaflet__WEBPACK_IMPORTED_MODULE_0__.tileLayer(tileUrl, {
-                        opacity: layerConfig.opacity || 1, // Layer transparency (0 = invisible, 1 = fully opaque)
-                        attribution: 'ArcGIS Map Service' // Credit text shown in map corner
-                    }).addTo(_this.map);
-                    console.log("Added sublayer ".concat(sublayer.id, " as tile layer"));
-                }
-            });
+    convertFillSymbol(symbol, style) {
+        style.fillColor = (0,_ColorConverter__WEBPACK_IMPORTED_MODULE_0__.esriColorToCSS)(symbol.color); // Interior color of the polygon
+        // Calculate fill opacity from alpha channel
+        style.fillOpacity = symbol.color && symbol.color.length > 3 ? symbol.color[3] / 255 : 0.6;
+        // Handle outline (border) of polygon
+        if (symbol.outline) {
+            style.color = (0,_ColorConverter__WEBPACK_IMPORTED_MODULE_0__.esriColorToCSS)(symbol.outline.color); // Border color
+            style.weight = symbol.outline.width || 1; // Border width in pixels
+            // Calculate border opacity
+            style.opacity = symbol.outline.color && symbol.outline.color.length > 3 ?
+                symbol.outline.color[3] / 255 : 1;
         }
-        else {
-            // If no sublayers defined, try to add the entire service as one tile layer
-            // Some map services are simple and don't have multiple sublayers
-            var tileUrl = "".concat(baseUrl, "/tile/{z}/{y}/{x}");
-            leaflet__WEBPACK_IMPORTED_MODULE_0__.tileLayer(tileUrl, {
-                opacity: layerConfig.opacity || 1,
-                attribution: 'ArcGIS Map Service'
-            }).addTo(this.map);
-            console.log("Added map service as tile layer: ".concat(layerConfig.title));
+    }
+    /**
+     * Convert ESRI Simple Marker Symbol to Leaflet style
+     *
+     * @param symbol - ESRI Simple Marker Symbol (esriSMS)
+     * @param style  - Style object to populate
+     */
+    convertMarkerSymbol(symbol, style) {
+        style.radius = symbol.size || 6; // Circle radius in pixels
+        style.fillColor = (0,_ColorConverter__WEBPACK_IMPORTED_MODULE_0__.esriColorToCSS)(symbol.color); // Fill color of the circle
+        // Calculate fill opacity
+        style.fillOpacity = symbol.color && symbol.color.length > 3 ? symbol.color[3] / 255 : 1;
+        // Handle outline (border) of point marker
+        if (symbol.outline) {
+            style.color = (0,_ColorConverter__WEBPACK_IMPORTED_MODULE_0__.esriColorToCSS)(symbol.outline.color); // Border color
+            style.weight = symbol.outline.width || 1; // Border width
+            // Calculate border opacity
+            style.opacity = symbol.outline.color && symbol.outline.color.length > 3 ?
+                symbol.outline.color[3] / 255 : 1;
         }
-    };
-    return ArcGISMapService;
-}());
-
+    }
+}
 
 
 /***/ }),
@@ -812,217 +1588,167 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony import */ var _microsoft_sp_http__WEBPACK_IMPORTED_MODULE_0___default = /*#__PURE__*/__webpack_require__.n(_microsoft_sp_http__WEBPACK_IMPORTED_MODULE_0__);
 /* harmony import */ var exif_js__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! exif-js */ 222);
 /* harmony import */ var exif_js__WEBPACK_IMPORTED_MODULE_1___default = /*#__PURE__*/__webpack_require__.n(exif_js__WEBPACK_IMPORTED_MODULE_1__);
-/* harmony import */ var _utils_security__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ../utils/security */ 356);
+/* harmony import */ var _utils_Security__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! ../utils/Security */ 415);
+/* harmony import */ var leaflet__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! leaflet */ 973);
+/* harmony import */ var leaflet__WEBPACK_IMPORTED_MODULE_2___default = /*#__PURE__*/__webpack_require__.n(leaflet__WEBPACK_IMPORTED_MODULE_2__);
 /* ========================================================================== */
 /* DataService.ts                                                             */
 /* - Service for fetching data from SharePoint document libraries             */
 /* - Handles both manual coordinate and EXIF-based location extraction        */
 /* ========================================================================== */
-var __assign = (undefined && undefined.__assign) || function () {
-    __assign = Object.assign || function(t) {
-        for (var s, i = 1, n = arguments.length; i < n; i++) {
-            s = arguments[i];
-            for (var p in s) if (Object.prototype.hasOwnProperty.call(s, p))
-                t[p] = s[p];
-        }
-        return t;
-    };
-    return __assign.apply(this, arguments);
-};
-var __awaiter = (undefined && undefined.__awaiter) || function (thisArg, _arguments, P, generator) {
-    function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
-    return new (P || (P = Promise))(function (resolve, reject) {
-        function fulfilled(value) { try { step(generator.next(value)); } catch (e) { reject(e); } }
-        function rejected(value) { try { step(generator["throw"](value)); } catch (e) { reject(e); } }
-        function step(result) { result.done ? resolve(result.value) : adopt(result.value).then(fulfilled, rejected); }
-        step((generator = generator.apply(thisArg, _arguments || [])).next());
-    });
-};
-var __generator = (undefined && undefined.__generator) || function (thisArg, body) {
-    var _ = { label: 0, sent: function() { if (t[0] & 1) throw t[1]; return t[1]; }, trys: [], ops: [] }, f, y, t, g;
-    return g = { next: verb(0), "throw": verb(1), "return": verb(2) }, typeof Symbol === "function" && (g[Symbol.iterator] = function() { return this; }), g;
-    function verb(n) { return function (v) { return step([n, v]); }; }
-    function step(op) {
-        if (f) throw new TypeError("Generator is already executing.");
-        while (g && (g = 0, op[0] && (_ = 0)), _) try {
-            if (f = 1, y && (t = op[0] & 2 ? y["return"] : op[0] ? y["throw"] || ((t = y["return"]) && t.call(y), 0) : y.next) && !(t = t.call(y, op[1])).done) return t;
-            if (y = 0, t) op = [op[0] & 2, t.value];
-            switch (op[0]) {
-                case 0: case 1: t = op; break;
-                case 4: _.label++; return { value: op[1], done: false };
-                case 5: _.label++; y = op[1]; op = [0]; continue;
-                case 7: op = _.ops.pop(); _.trys.pop(); continue;
-                default:
-                    if (!(t = _.trys, t = t.length > 0 && t[t.length - 1]) && (op[0] === 6 || op[0] === 2)) { _ = 0; continue; }
-                    if (op[0] === 3 && (!t || (op[1] > t[0] && op[1] < t[3]))) { _.label = op[1]; break; }
-                    if (op[0] === 6 && _.label < t[1]) { _.label = t[1]; t = op; break; }
-                    if (t && _.label < t[2]) { _.label = t[2]; _.ops.push(op); break; }
-                    if (t[2]) _.ops.pop();
-                    _.trys.pop(); continue;
-            }
-            op = body.call(thisArg, _);
-        } catch (e) { op = [6, e]; y = 0; } finally { f = t = 0; }
-        if (op[0] & 5) throw op[1]; return { value: op[0] ? op[1] : void 0, done: true };
-    }
-};
 // Import necessary SharePoint and web part libraries
 
 // EXIF-js library for reading GPS data from image metadata
 
 // Security utilities for safely handling user input and URLs
 
+
+const bounds = [];
 /**
  * Service class for handling all data fetching operations
  */
-var DataService = /** @class */ (function () {
-    function DataService(context) {
+class DataService {
+    constructor(context, mapViewService) {
         this.context = context; // Store context for later use
+        this.mapViewService = mapViewService;
     }
     /**
      * Main method to fetch data based on configured properties
      * This is the entry point that other classes call
      */
-    DataService.prototype.fetchMapData = function (properties) {
-        return __awaiter(this, void 0, void 0, function () {
-            return __generator(this, function (_a) {
-                // Currently only supports document libraries, but could be extended
-                // for other data sources (lists, external APIs, etc.)
-                return [2 /*return*/, this.fetchDocumentLibraryData(properties)];
-            });
-        });
-    };
+    async fetchMapData(properties) {
+        // Currently only supports document libraries, but could be extended
+        // for other data sources (lists, external APIs, etc.)
+        return this.fetchDocumentLibraryData(properties);
+    }
     /**
      * Fetches data from Document Library
      * This method handles the entire process of getting images and their locations
      */
-    DataService.prototype.fetchDocumentLibraryData = function (properties) {
-        return __awaiter(this, void 0, void 0, function () {
-            var libraryName, locationMethod, latField, lonField, result, site, libraryPart, baseFields, selectFields, url, response, json, items, noGpsCount, _i, items_1, item, fileName, fileUrl, img, lat, lon, gpsData, sanitizedImg, enriched, err_1;
-            return __generator(this, function (_a) {
-                switch (_a.label) {
-                    case 0:
-                        libraryName = properties.libraryName, locationMethod = properties.locationMethod, latField = properties.latField, lonField = properties.lonField;
-                        result = { items: [], errors: [] };
-                        // Check if library name is provided
-                        if (!libraryName) {
-                            return [2 /*return*/, result];
-                        }
-                        // Validate manual method has required fields
-                        // If user selected manual coordinate entry, both fields must be specified
-                        if (locationMethod === 'manual' && (!latField || !lonField)) {
-                            result.errors.push('Please select both latitude and longitude fields');
-                            return [2 /*return*/, result];
-                        }
-                        site = this.context.pageContext.web.absoluteUrl;
-                        libraryPart = (0,_utils_security__WEBPACK_IMPORTED_MODULE_2__.escODataIdentifier)(libraryName);
-                        _a.label = 1;
-                    case 1:
-                        _a.trys.push([1, 10, , 11]);
-                        baseFields = ['FileRef', 'FileLeafRef'];
-                        // Add lat/lon fields if using manual method
-                        // This ensures we fetch the coordinate data from SharePoint
-                        if (locationMethod === 'manual' && latField && lonField) {
-                            baseFields.push(latField);
-                            baseFields.push(lonField);
-                        }
-                        selectFields = baseFields
-                            .map(function (f) { return (0,_utils_security__WEBPACK_IMPORTED_MODULE_2__.escODataIdentifier)(f); })
-                            .join(',');
-                        url = "".concat(site, "/_api/web/lists/getByTitle('").concat(libraryPart, "')/items?$select=").concat(selectFields, "&$filter=FSObjType eq 0");
-                        return [4 /*yield*/, this.context.spHttpClient.get(url, _microsoft_sp_http__WEBPACK_IMPORTED_MODULE_0__.SPHttpClient.configurations.v1)];
-                    case 2:
-                        response = _a.sent();
-                        return [4 /*yield*/, response.json()];
-                    case 3:
-                        json = _a.sent();
-                        items = json.value;
-                        noGpsCount = 0;
-                        _i = 0, items_1 = items;
-                        _a.label = 4;
-                    case 4:
-                        if (!(_i < items_1.length)) return [3 /*break*/, 9];
-                        item = items_1[_i];
-                        fileName = item.FileLeafRef;
-                        fileUrl = "".concat(site).concat(item.FileRef);
-                        // Check if it's an image file based on the file extension
-                        if (!this.isImageFile(fileUrl))
-                            return [3 /*break*/, 8]; // Skip non-image files
-                        img = fileUrl;
-                        lat = null;
-                        lon = null;
-                        if (!(locationMethod === 'manual')) return [3 /*break*/, 5];
-                        // Manual method: Get coordinates from specified fields
-                        // Check if both fields have values
-                        if (item[latField] && item[lonField]) {
-                            // Parse string values to numbers
-                            lat = parseFloat(item[latField]);
-                            lon = parseFloat(item[lonField]);
-                        }
-                        return [3 /*break*/, 7];
-                    case 5: return [4 /*yield*/, this.extractGPSFromExif(img)];
-                    case 6:
-                        gpsData = _a.sent();
-                        if (gpsData) {
-                            lat = gpsData.lat;
-                            lon = gpsData.lon;
-                        }
-                        else {
-                            noGpsCount++; // Increment counter for error message
-                        }
-                        _a.label = 7;
-                    case 7:
-                        // Skip if no valid coordinates
-                        // Check for null, undefined, or NaN values
-                        if (!lat || !lon || isNaN(lat) || isNaN(lon))
-                            return [3 /*break*/, 8];
-                        sanitizedImg = (0,_utils_security__WEBPACK_IMPORTED_MODULE_2__.sanitizeUrl)(img);
-                        if (!sanitizedImg)
-                            return [3 /*break*/, 8]; // Skip if URL is invalid
-                        enriched = __assign(__assign({}, item), { img: sanitizedImg, // Add sanitized image URL
-                            fileName: fileName // Add filename for convenience
-                         });
-                        // Add to results array
-                        result.items.push({
-                            lat: lat,
-                            lon: lon,
-                            img: sanitizedImg,
-                            data: enriched
-                        });
-                        _a.label = 8;
-                    case 8:
-                        _i++;
-                        return [3 /*break*/, 4];
-                    case 9:
-                        // Add appropriate error messages
-                        // Only show EXIF error if some images were missing GPS data
-                        if (locationMethod === 'exif' && noGpsCount === 1) {
-                            result.errors.push("1 image has no EXIF GPS data and will not be displayed.");
-                        }
-                        else if (locationMethod === 'exif' && noGpsCount > 1) {
-                            result.errors.push("".concat(noGpsCount, " images have no EXIF GPS data and will not be displayed."));
-                        }
-                        return [3 /*break*/, 11];
-                    case 10:
-                        err_1 = _a.sent();
-                        // Log detailed error for developers
-                        console.error('Webmap → document library fetch failed:', err_1);
-                        // Show user-friendly error message
-                        result.errors.push('Failed to load images from document library');
-                        return [3 /*break*/, 11];
-                    case 11: return [2 /*return*/, result];
+    async fetchDocumentLibraryData(properties) {
+        // Destructure properties for easier access
+        const { libraryName, locationMethod, latField, lonField } = properties;
+        // Initialize result object with empty arrays
+        const result = { items: [], errors: [] };
+        // Check if library name is provided
+        if (!libraryName) {
+            return result;
+        }
+        // Validate manual method has required fields
+        // If user selected manual coordinate entry, both fields must be specified
+        if (locationMethod === 'manual' && (!latField || !lonField)) {
+            result.errors.push('Please select both latitude and longitude fields');
+            return result;
+        }
+        // Get the current SharePoint site URL
+        const site = this.context.pageContext.web.absoluteUrl;
+        // Escape the library name to handle special characters safely
+        const libraryPart = (0,_utils_Security__WEBPACK_IMPORTED_MODULE_3__.escODataIdentifier)(libraryName);
+        try {
+            // Build select fields - always include FileRef and FileLeafRef
+            // FileRef = full path to file, FileLeafRef = just the filename
+            const baseFields = ['FileRef', 'FileLeafRef'];
+            // Add lat/lon fields if using manual method
+            // This ensures we fetch the coordinate data from SharePoint
+            if (locationMethod === 'manual' && latField && lonField) {
+                baseFields.push(latField);
+                baseFields.push(lonField);
+            }
+            // Convert field array to comma-separated string for API
+            // Also escape each field name for safety
+            const selectFields = baseFields
+                .map(f => (0,_utils_Security__WEBPACK_IMPORTED_MODULE_3__.escODataIdentifier)(f))
+                .join(',');
+            // Build the SharePoint REST API URL
+            // FSObjType eq 0 filters to only files (not folders)
+            const url = `${site}/_api/web/lists/getByTitle('${libraryPart}')/items?$select=${selectFields}&$filter=FSObjType eq 0`;
+            // Make the API call to SharePoint
+            const response = await this.context.spHttpClient.get(url, _microsoft_sp_http__WEBPACK_IMPORTED_MODULE_0__.SPHttpClient.configurations.v1);
+            const json = await response.json();
+            const items = json.value; // Extract the array of items
+            // Counter for images without GPS data (for error message)
+            let noGpsCount = 0;
+            // Process each item returned from SharePoint
+            for (const item of items) {
+                const fileName = item.FileLeafRef; // Get the filename
+                const fileUrl = `${site}${item.FileRef}`; // Build full URL to file
+                // Check if it's an image file based on the file extension
+                if (!this.isImageFile(fileUrl))
+                    continue; // Skip non-image files
+                // For document libraries, always use the file URL as the image
+                const img = fileUrl;
+                // Initialize coordinate variables
+                let lat = null;
+                let lon = null;
+                if (locationMethod === 'manual') {
+                    // Manual method: Get coordinates from specified fields
+                    // Check if both fields have values
+                    if (item[latField] && item[lonField]) {
+                        // Parse string values to numbers
+                        lat = parseFloat(item[latField]);
+                        lon = parseFloat(item[lonField]);
+                    }
                 }
-            });
-        });
-    };
+                else {
+                    // EXIF method: Extract from image EXIF data
+                    // This is asynchronous as it needs to load the image
+                    const gpsData = await this.extractGPSFromExif(img);
+                    if (gpsData) {
+                        lat = gpsData.lat;
+                        lon = gpsData.lon;
+                    }
+                    else {
+                        noGpsCount++; // Increment counter for error message
+                    }
+                }
+                // Skip if no valid coordinates
+                // Check for null, undefined, or NaN values
+                if (!lat || !lon || isNaN(lat) || isNaN(lon))
+                    continue;
+                // Create marker data
+                // Sanitize the image URL for security
+                const sanitizedImg = (0,_utils_Security__WEBPACK_IMPORTED_MODULE_3__.sanitizeUrl)(img);
+                if (!sanitizedImg)
+                    continue; // Skip if URL is invalid
+                // Create enriched object with all item data plus image URL
+                const enriched = Object.assign(Object.assign({}, item), { img: sanitizedImg, // Add sanitized image URL
+                    fileName // Add filename for convenience
+                 });
+                // Add to results array
+                result.items.push({
+                    lat,
+                    lon,
+                    img: sanitizedImg,
+                    data: enriched
+                });
+            }
+            // Add appropriate error messages
+            // Only show EXIF error if some images were missing GPS data
+            if (locationMethod === 'exif' && noGpsCount === 1) {
+                result.errors.push(`1 image has no EXIF GPS data and will not be displayed.`);
+            }
+            else if (locationMethod === 'exif' && noGpsCount > 1) {
+                result.errors.push(`${noGpsCount} images have no EXIF GPS data and will not be displayed.`);
+            }
+        }
+        catch (err) {
+            // Log detailed error for developers
+            console.error('Webmap → document library fetch failed:', err);
+            // Show user-friendly error message
+            result.errors.push('Failed to load images from document library');
+        }
+        this.getBounds(result.items); // Collect all coordinates for map bounds
+        return result;
+    }
     /**
      * Extracts GPS coordinates from image EXIF data
      * EXIF (Exchangeable Image File Format) data contains metadata embedded in images
      * This includes camera settings, date/time, and sometimes GPS location
      */
-    DataService.prototype.extractGPSFromExif = function (imageUrl) {
-        return new Promise(function (resolve) {
+    extractGPSFromExif(imageUrl) {
+        return new Promise((resolve) => {
             // Create a new Image object to load the image
-            var img = new Image();
+            const img = new Image();
             img.crossOrigin = 'anonymous'; // Enable CORS to allow reading image data
             // Handler for when image loads successfully
             img.onload = function () {
@@ -1030,15 +1756,15 @@ var DataService = /** @class */ (function () {
                 // 'this' refers to the image element
                 exif_js__WEBPACK_IMPORTED_MODULE_1__.getData(img, function () {
                     // Extract GPS-related tags from EXIF data
-                    var lat = exif_js__WEBPACK_IMPORTED_MODULE_1__.getTag(this, 'GPSLatitude'); // Latitude array [degrees, minutes, seconds]
-                    var lon = exif_js__WEBPACK_IMPORTED_MODULE_1__.getTag(this, 'GPSLongitude'); // Longitude array [degrees, minutes, seconds]
-                    var latRef = exif_js__WEBPACK_IMPORTED_MODULE_1__.getTag(this, 'GPSLatitudeRef'); // N or S (North/South)
-                    var lonRef = exif_js__WEBPACK_IMPORTED_MODULE_1__.getTag(this, 'GPSLongitudeRef'); // E or W (East/West)
+                    const lat = exif_js__WEBPACK_IMPORTED_MODULE_1__.getTag(this, 'GPSLatitude'); // Latitude array [degrees, minutes, seconds]
+                    const lon = exif_js__WEBPACK_IMPORTED_MODULE_1__.getTag(this, 'GPSLongitude'); // Longitude array [degrees, minutes, seconds]
+                    const latRef = exif_js__WEBPACK_IMPORTED_MODULE_1__.getTag(this, 'GPSLatitudeRef'); // N or S (North/South)
+                    const lonRef = exif_js__WEBPACK_IMPORTED_MODULE_1__.getTag(this, 'GPSLongitudeRef'); // E or W (East/West)
                     // Check if we have both latitude and longitude
                     if (lat && lon) {
                         // Convert GPS coordinates from degrees/minutes/seconds to decimal
-                        var decimalLat = DataService.convertDMSToDD(lat, latRef);
-                        var decimalLon = DataService.convertDMSToDD(lon, lonRef);
+                        const decimalLat = DataService.convertDMSToDD(lat, latRef);
+                        const decimalLon = DataService.convertDMSToDD(lon, lonRef);
                         // Return coordinates if conversion was successful
                         if (decimalLat !== null && decimalLon !== null) {
                             resolve({ lat: decimalLat, lon: decimalLon });
@@ -1053,55 +1779,208 @@ var DataService = /** @class */ (function () {
                 });
             };
             // Handler for image load errors
-            img.onerror = function () {
+            img.onerror = () => {
                 resolve(null); // Return null if image fails to load
             };
             // Start loading the image
             img.src = imageUrl;
         });
-    };
+    }
     /**
      * Converts GPS coordinates from degrees/minutes/seconds to decimal degrees
      * GPS coordinates in EXIF are stored as [degrees, minutes, seconds]
      * Map libraries expect decimal degrees (e.g., 51.4239 instead of 51° 25' 26.04")
      */
-    DataService.convertDMSToDD = function (dms, ref) {
+    static convertDMSToDD(dms, ref) {
         // Validate input array has all three components
         if (!dms || dms.length !== 3)
             return null;
         // Convert using the formula: decimal = degrees + (minutes/60) + (seconds/3600)
-        var dd = dms[0] + dms[1] / 60 + dms[2] / 3600;
+        let dd = dms[0] + dms[1] / 60 + dms[2] / 3600;
         // Apply hemisphere correction
         // Southern and Western coordinates are negative
         if (ref === 'S' || ref === 'W') {
             dd = dd * -1;
         }
         return dd;
-    };
+    }
     /**
      * Checks if a file is an image based on its extension
      * This is a simple check that looks at the file extension
      */
-    DataService.prototype.isImageFile = function (fileUrl) {
+    isImageFile(fileUrl) {
         // List of common image file extensions
-        var imageExtensions = ['.jpg', '.jpeg', '.png', '.gif', '.bmp', '.webp'];
+        const imageExtensions = ['.jpg', '.jpeg', '.png', '.gif', '.bmp', '.webp'];
         // Extract filename from URL (everything after last /)
-        var fileName = fileUrl.split('/').pop() || fileUrl;
+        const fileName = fileUrl.split('/').pop() || fileUrl;
         // Get the file extension (everything after last .)
-        var ext = fileName.toLowerCase().substring(fileName.lastIndexOf('.'));
+        const ext = fileName.toLowerCase().substring(fileName.lastIndexOf('.'));
         // Check if extension is in our list
         return imageExtensions.indexOf(ext) !== -1;
-    };
-    return DataService;
-}());
-
+    }
+    /**
+     * Collect all coordinates and call MapViewService to set bounds
+     */
+    getBounds(items) {
+        const bounds = [];
+        for (const item of items) {
+            bounds.push(leaflet__WEBPACK_IMPORTED_MODULE_2__.latLng(item.lat, item.lon));
+        }
+        // Pass bounds to MapViewService
+        if (this.mapViewService) {
+            this.mapViewService.setImageBounds(bounds);
+        }
+    }
+}
 
 
 /***/ }),
 
-/***/ 356:
+/***/ 989:
+/*!********************************************************!*\
+  !*** ./lib/webparts/webmap/services/MapViewService.js ***!
+  \********************************************************/
+/***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony export */ __webpack_require__.d(__webpack_exports__, {
+/* harmony export */   MapViewService: () => (/* binding */ MapViewService)
+/* harmony export */ });
+/* harmony import */ var leaflet__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! leaflet */ 973);
+/* harmony import */ var leaflet__WEBPACK_IMPORTED_MODULE_0___default = /*#__PURE__*/__webpack_require__.n(leaflet__WEBPACK_IMPORTED_MODULE_0__);
+/* ========================================================================== */
+/* services/MapView.ts                                                        */
+/* - Service for managing map view and bounds                                 */
+/* - Coordinates between image markers and feature layers                     */
+/* - Handles automatic zoom to fit all content                                */
+/* ========================================================================== */
+
+/**
+ * Hochtief default view coordinates
+ * Used when no content is available to display
+ */
+const HOCHTIEF_DEFAULT_VIEW = {
+    lat: 51.4239, // Hochtief headquarters latitude
+    lon: 6.9985, // Hochtief headquarters longitude
+    zoom: 15 // Default zoom level
+};
+/**
+ * Service for managing map view and bounds
+ * Coordinates between different data sources to ensure optimal map view
+ */
+class MapViewService {
+    constructor(map) {
+        this.imageBounds = []; // Bounds for image markers
+        this.featureBounds = []; // Bounds for feature layers
+        this.map = map;
+    }
+    /**
+     * Set bounds for image markers
+     * Called by DataService after images are loaded
+     */
+    setImageBounds(bounds) {
+        this.imageBounds = [...bounds]; // Create a copy to avoid reference issues
+        console.log(`MapView: Updated image bounds - ${bounds.length} points`);
+        this.updateMapView();
+    }
+    /**
+     * Set bounds for feature layers
+     * Called by FeatureLayerService after features are loaded
+     */
+    setFeatureBounds(bounds) {
+        this.featureBounds = [...bounds]; // Create a copy to avoid reference issues
+        console.log(`MapView: Updated feature bounds - ${bounds.length} points`);
+        this.updateMapView();
+    }
+    /**
+     * Clear all bounds (useful when refreshing data)
+     */
+    clearBounds() {
+        this.imageBounds = [];
+        this.featureBounds = [];
+        console.log('MapView: Cleared all bounds');
+    }
+    /**
+     * Main method to update map view based on current bounds
+     * Implements the logic for different scenarios
+     */
+    updateMapView() {
+        try {
+            // Combine all available bounds
+            const allBounds = [...this.imageBounds, ...this.featureBounds];
+            if (allBounds.length === 0) {
+                // No content available - set Hochtief default view
+                console.log('MapView: No content available, setting Hochtief default view');
+                this.map.setView([HOCHTIEF_DEFAULT_VIEW.lat, HOCHTIEF_DEFAULT_VIEW.lon], HOCHTIEF_DEFAULT_VIEW.zoom);
+                return;
+            }
+            if (allBounds.length === 1) {
+                // Only one point - center on it with reasonable zoom
+                console.log('MapView: Single point detected, centering with default zoom');
+                const point = allBounds[0];
+                this.map.setView([point.lat, point.lng], 16); // Zoom level 16 for single points
+                return;
+            }
+            // Multiple points - fit all bounds
+            console.log(`MapView: Multiple points detected (${allBounds.length}), fitting to bounds`);
+            // Create LatLngBounds object from all points
+            const boundsGroup = new leaflet__WEBPACK_IMPORTED_MODULE_0__.LatLngBounds(allBounds);
+            // Fit the map to show all points with some padding
+            this.map.fitBounds(boundsGroup, {
+                padding: [20, 20], // Add 20px padding on all sides
+                maxZoom: 18 // Don't zoom in too close even for nearby points
+            });
+            // Log the final bounds for debugging
+            const center = boundsGroup.getCenter();
+            console.log(`MapView: Set view to center: ${center.lat.toFixed(4)}, ${center.lng.toFixed(4)}`);
+        }
+        catch (error) {
+            // If anything goes wrong with bounds calculation, fall back to default view
+            console.error('MapView: Error updating map view, falling back to default:', error);
+            this.map.setView([HOCHTIEF_DEFAULT_VIEW.lat, HOCHTIEF_DEFAULT_VIEW.lon], HOCHTIEF_DEFAULT_VIEW.zoom);
+        }
+    }
+    /**
+     * Force immediate view update
+     * Useful for manual triggers or debugging
+     */
+    forceUpdateView() {
+        console.log('MapView: Force updating view');
+        this.updateMapView();
+    }
+    /**
+     * Get current bounds summary for debugging
+     */
+    getBoundsSummary() {
+        return {
+            images: this.imageBounds.length,
+            features: this.featureBounds.length,
+            total: this.imageBounds.length + this.featureBounds.length
+        };
+    }
+    /**
+     * Check if map has any content to display
+     */
+    hasContent() {
+        return this.imageBounds.length > 0 || this.featureBounds.length > 0;
+    }
+    /**
+     * Set default Hochtief view manually
+     * Useful for reset operations
+     */
+    setDefaultView() {
+        console.log('MapView: Setting Hochtief default view');
+        this.map.setView([HOCHTIEF_DEFAULT_VIEW.lat, HOCHTIEF_DEFAULT_VIEW.lon], HOCHTIEF_DEFAULT_VIEW.zoom);
+    }
+}
+
+
+/***/ }),
+
+/***/ 415:
 /*!***********************************************!*\
-  !*** ./lib/webparts/webmap/utils/security.js ***!
+  !*** ./lib/webparts/webmap/utils/Security.js ***!
   \***********************************************/
 /***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
 
@@ -1125,7 +2004,7 @@ __webpack_require__.r(__webpack_exports__);
  * @returns A URL-safe, OData-safe identifier.
  */
 function escODataIdentifier(id) {
-    var doubled = id.replace(/'/g, "''");
+    const doubled = id.replace(/'/g, "''");
     return encodeURIComponent(doubled);
 }
 /**
@@ -1138,7 +2017,7 @@ function escODataIdentifier(id) {
 function sanitizeUrl(url) {
     try {
         // The second argument provides a base URL for relative paths.
-        var u = new URL(url, window.location.origin);
+        const u = new URL(url, window.location.origin);
         return (u.protocol === 'http:' || u.protocol === 'https:') ? u.href : '';
     }
     catch (_a) {
@@ -1165,7 +2044,7 @@ function escAttr(v) {
 /**
  * Allowed ArcGIS domains for security validation
  */
-var ALLOWED_ARCGIS_DOMAINS = [
+const ALLOWED_ARCGIS_DOMAINS = [
     'maps.arcgis.com',
     'mapsdevext.arcgis.com',
     'maps.arcgis.de',
@@ -1180,15 +2059,15 @@ function validateArcGISUrl(url) {
     if (!url)
         return null;
     try {
-        var parsedUrl = new URL(url.trim());
+        const parsedUrl = new URL(url.trim());
         // Must be HTTPS protocol
         if (parsedUrl.protocol !== 'https:') {
             return null;
         }
         // Check if hostname ends with any allowed domain (compatible with older JS)
-        var hostname_1 = parsedUrl.hostname.toLowerCase();
-        var isValidDomain = ALLOWED_ARCGIS_DOMAINS.some(function (domain) {
-            return hostname_1 === domain || hostname_1.indexOf('.' + domain) === hostname_1.length - domain.length - 1;
+        const hostname = parsedUrl.hostname.toLowerCase();
+        const isValidDomain = ALLOWED_ARCGIS_DOMAINS.some(domain => {
+            return hostname === domain || hostname.indexOf('.' + domain) === hostname.length - domain.length - 1;
         });
         if (isValidDomain) {
             return parsedUrl.href;
@@ -1198,6 +2077,55 @@ function validateArcGISUrl(url) {
         // Invalid URL format
     }
     return null;
+}
+
+
+/***/ }),
+
+/***/ 776:
+/*!***************************************************!*\
+  !*** ./lib/webparts/webmap/utils/ToastManager.js ***!
+  \***************************************************/
+/***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony export */ __webpack_require__.d(__webpack_exports__, {
+/* harmony export */   ToastManager: () => (/* binding */ ToastManager)
+/* harmony export */ });
+/* harmony import */ var _WebmapWebPart_module_scss__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ../WebmapWebPart.module.scss */ 641);
+/* ========================================================================== */
+/* ToastManager.ts                                                            */
+/* - Utility for showing toast notifications                                  */
+/* ========================================================================== */
+
+class ToastManager {
+    /**
+     * Shows a toast notification
+     */
+    static show(message, type = 'info') {
+        // Create a new div element for the toast notification
+        const toast = document.createElement('div');
+        // Apply CSS classes - base toast class plus error class if type is 'error'
+        toast.className = `${_WebmapWebPart_module_scss__WEBPACK_IMPORTED_MODULE_0__["default"].toast} ${type === 'error' ? _WebmapWebPart_module_scss__WEBPACK_IMPORTED_MODULE_0__["default"].toastError : ''}`;
+        toast.textContent = message; // Set the message text
+        // Add animation manually (optional, fallback for older browsers)
+        // This makes the toast slide up from the bottom
+        toast.style.animation = 'slideUp 0.3s ease-out';
+        // Add the toast to the page body
+        document.body.appendChild(toast);
+        // Set up automatic removal after 3 seconds
+        setTimeout(() => {
+            // Animate sliding down before removal
+            toast.style.animation = 'slideDown 0.3s ease-in';
+            // Wait for animation to complete, then remove from DOM
+            setTimeout(() => {
+                if (toast.parentElement) {
+                    document.body.removeChild(toast);
+                }
+            }, 300); // 300ms matches the animation duration
+        }, 3000); // Show for 3 seconds
+    }
 }
 
 
@@ -5568,28 +6496,20 @@ var __webpack_exports__ = {};
   \**********************************************/
 __webpack_require__.r(__webpack_exports__);
 /* harmony export */ __webpack_require__.d(__webpack_exports__, {
-/* harmony export */   "default": () => (__WEBPACK_DEFAULT_EXPORT__)
+/* harmony export */   "default": () => (/* binding */ WebmapWebPart)
 /* harmony export */ });
 /* harmony import */ var _microsoft_sp_core_library__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! @microsoft/sp-core-library */ 676);
 /* harmony import */ var _microsoft_sp_core_library__WEBPACK_IMPORTED_MODULE_0___default = /*#__PURE__*/__webpack_require__.n(_microsoft_sp_core_library__WEBPACK_IMPORTED_MODULE_0__);
-/* harmony import */ var _microsoft_sp_property_pane__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! @microsoft/sp-property-pane */ 877);
-/* harmony import */ var _microsoft_sp_property_pane__WEBPACK_IMPORTED_MODULE_1___default = /*#__PURE__*/__webpack_require__.n(_microsoft_sp_property_pane__WEBPACK_IMPORTED_MODULE_1__);
-/* harmony import */ var _microsoft_sp_webpart_base__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! @microsoft/sp-webpart-base */ 642);
-/* harmony import */ var _microsoft_sp_webpart_base__WEBPACK_IMPORTED_MODULE_2___default = /*#__PURE__*/__webpack_require__.n(_microsoft_sp_webpart_base__WEBPACK_IMPORTED_MODULE_2__);
-/* harmony import */ var _microsoft_sp_http__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! @microsoft/sp-http */ 909);
-/* harmony import */ var _microsoft_sp_http__WEBPACK_IMPORTED_MODULE_3___default = /*#__PURE__*/__webpack_require__.n(_microsoft_sp_http__WEBPACK_IMPORTED_MODULE_3__);
-/* harmony import */ var leaflet__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(/*! leaflet */ 973);
-/* harmony import */ var leaflet__WEBPACK_IMPORTED_MODULE_4___default = /*#__PURE__*/__webpack_require__.n(leaflet__WEBPACK_IMPORTED_MODULE_4__);
-/* harmony import */ var leaflet_dist_leaflet_css__WEBPACK_IMPORTED_MODULE_5__ = __webpack_require__(/*! leaflet/dist/leaflet.css */ 796);
-/* harmony import */ var leaflet_markercluster__WEBPACK_IMPORTED_MODULE_6__ = __webpack_require__(/*! leaflet.markercluster */ 528);
-/* harmony import */ var leaflet_markercluster__WEBPACK_IMPORTED_MODULE_6___default = /*#__PURE__*/__webpack_require__.n(leaflet_markercluster__WEBPACK_IMPORTED_MODULE_6__);
-/* harmony import */ var leaflet_markercluster_dist_MarkerCluster_css__WEBPACK_IMPORTED_MODULE_7__ = __webpack_require__(/*! leaflet.markercluster/dist/MarkerCluster.css */ 897);
-/* harmony import */ var leaflet_markercluster_dist_MarkerCluster_Default_css__WEBPACK_IMPORTED_MODULE_8__ = __webpack_require__(/*! leaflet.markercluster/dist/MarkerCluster.Default.css */ 152);
-/* harmony import */ var _services_ArcgisMap__WEBPACK_IMPORTED_MODULE_9__ = __webpack_require__(/*! ./services/ArcgisMap */ 314);
-/* harmony import */ var _WebmapWebPart_module_scss__WEBPACK_IMPORTED_MODULE_10__ = __webpack_require__(/*! ./WebmapWebPart.module.scss */ 641);
-/* harmony import */ var _utils_security__WEBPACK_IMPORTED_MODULE_13__ = __webpack_require__(/*! ./utils/security */ 356);
-/* harmony import */ var _services_DataService__WEBPACK_IMPORTED_MODULE_11__ = __webpack_require__(/*! ./services/DataService */ 320);
-/* harmony import */ var _assets_viconWatermark__WEBPACK_IMPORTED_MODULE_12__ = __webpack_require__(/*! ./assets/viconWatermark */ 479);
+/* harmony import */ var _microsoft_sp_webpart_base__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! @microsoft/sp-webpart-base */ 642);
+/* harmony import */ var _microsoft_sp_webpart_base__WEBPACK_IMPORTED_MODULE_1___default = /*#__PURE__*/__webpack_require__.n(_microsoft_sp_webpart_base__WEBPACK_IMPORTED_MODULE_1__);
+/* harmony import */ var _components_MapManager__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ./components/MapManager */ 230);
+/* harmony import */ var _components_ClusterManager__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! ./components/ClusterManager */ 482);
+/* harmony import */ var _components_PropertyPaneManager__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(/*! ./components/PropertyPaneManager */ 105);
+/* harmony import */ var _services_DataService__WEBPACK_IMPORTED_MODULE_5__ = __webpack_require__(/*! ./services/DataService */ 320);
+/* harmony import */ var _utils_ToastManager__WEBPACK_IMPORTED_MODULE_6__ = __webpack_require__(/*! ./utils/ToastManager */ 776);
+/* harmony import */ var _utils_Security__WEBPACK_IMPORTED_MODULE_9__ = __webpack_require__(/*! ./utils/Security */ 415);
+/* harmony import */ var _services_MapViewService__WEBPACK_IMPORTED_MODULE_7__ = __webpack_require__(/*! ./services/MapViewService */ 989);
+/* harmony import */ var _WebmapWebPart_module_scss__WEBPACK_IMPORTED_MODULE_8__ = __webpack_require__(/*! ./WebmapWebPart.module.scss */ 641);
 /* ========================================================================== */
 /* WebmapWebPart.ts                                                           */
 /* - SPFx client-side web-part                                                */
@@ -5602,113 +6522,54 @@ __webpack_require__.r(__webpack_exports__);
 /*   - OpenStreetMap                                                          */
 /*   - ArcGIS Web Map                                                         */
 /* ========================================================================== */
-var __extends = (undefined && undefined.__extends) || (function () {
-    var extendStatics = function (d, b) {
-        extendStatics = Object.setPrototypeOf ||
-            ({ __proto__: [] } instanceof Array && function (d, b) { d.__proto__ = b; }) ||
-            function (d, b) { for (var p in b) if (Object.prototype.hasOwnProperty.call(b, p)) d[p] = b[p]; };
-        return extendStatics(d, b);
-    };
-    return function (d, b) {
-        if (typeof b !== "function" && b !== null)
-            throw new TypeError("Class extends value " + String(b) + " is not a constructor or null");
-        extendStatics(d, b);
-        function __() { this.constructor = d; }
-        d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
-    };
-})();
-var __awaiter = (undefined && undefined.__awaiter) || function (thisArg, _arguments, P, generator) {
-    function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
-    return new (P || (P = Promise))(function (resolve, reject) {
-        function fulfilled(value) { try { step(generator.next(value)); } catch (e) { reject(e); } }
-        function rejected(value) { try { step(generator["throw"](value)); } catch (e) { reject(e); } }
-        function step(result) { result.done ? resolve(result.value) : adopt(result.value).then(fulfilled, rejected); }
-        step((generator = generator.apply(thisArg, _arguments || [])).next());
-    });
-};
-var __generator = (undefined && undefined.__generator) || function (thisArg, body) {
-    var _ = { label: 0, sent: function() { if (t[0] & 1) throw t[1]; return t[1]; }, trys: [], ops: [] }, f, y, t, g;
-    return g = { next: verb(0), "throw": verb(1), "return": verb(2) }, typeof Symbol === "function" && (g[Symbol.iterator] = function() { return this; }), g;
-    function verb(n) { return function (v) { return step([n, v]); }; }
-    function step(op) {
-        if (f) throw new TypeError("Generator is already executing.");
-        while (g && (g = 0, op[0] && (_ = 0)), _) try {
-            if (f = 1, y && (t = op[0] & 2 ? y["return"] : op[0] ? y["throw"] || ((t = y["return"]) && t.call(y), 0) : y.next) && !(t = t.call(y, op[1])).done) return t;
-            if (y = 0, t) op = [op[0] & 2, t.value];
-            switch (op[0]) {
-                case 0: case 1: t = op; break;
-                case 4: _.label++; return { value: op[1], done: false };
-                case 5: _.label++; y = op[1]; op = [0]; continue;
-                case 7: op = _.ops.pop(); _.trys.pop(); continue;
-                default:
-                    if (!(t = _.trys, t = t.length > 0 && t[t.length - 1]) && (op[0] === 6 || op[0] === 2)) { _ = 0; continue; }
-                    if (op[0] === 3 && (!t || (op[1] > t[0] && op[1] < t[3]))) { _.label = op[1]; break; }
-                    if (op[0] === 6 && _.label < t[1]) { _.label = t[1]; t = op; break; }
-                    if (t && _.label < t[2]) { _.label = t[2]; _.ops.push(op); break; }
-                    if (t[2]) _.ops.pop();
-                    _.trys.pop(); continue;
-            }
-            op = body.call(thisArg, _);
-        } catch (e) { op = [6, e]; y = 0; } finally { f = t = 0; }
-        if (op[0] & 5) throw op[1]; return { value: op[0] ? op[1] : void 0, done: true };
-    }
-};
 // Imports from the SharePoint Framework (SPFx) libraries.
  // Used for versioning the web part.
-
  // The base class for all client-side web parts.
- // Used for making REST API calls to SharePoint.
-// Imports for the Leaflet mapping library and its marker cluster plugin.
- // The core Leaflet library.
- // Default CSS for Leaflet for proper rendering of map controls, etc.
- // The marker cluster plugin logic.
- // Main CSS for the cluster plugin.
- // Default theme for the cluster icons.
- // ArcGIS map service for handling ArcGIS layers and web maps.
+// Import managers and services
+
+
+
+
+
+
+
 // Imports the web part's specific styles defined in a scss module.
-
-// Import security functions
- // Security helpers for escaping identifiers and URLs.
-// Import the new DataService
-
 
 /* ------------------------------------------------------------------ */
 /* Web-part                                                           */
 /* ------------------------------------------------------------------ */
 // Main web part class that extends the base SharePoint web part class
-var WebmapWebPart = /** @class */ (function (_super) {
-    __extends(WebmapWebPart, _super);
-    function WebmapWebPart() {
-        var _this = _super !== null && _super.apply(this, arguments) || this;
-        // Caching for property pane dropdown options to avoid redundant API calls.
-        _this._libraries = []; // Cached list of SharePoint document libraries available in the site
-        _this._fields = []; // Cached list of fields for the selected library (for manual coordinate method)
-        // Keys to check if the cache is still valid.
-        _this._siteForLibraries = null; // The site URL for which the `_libraries` cache is valid - helps detect if we moved to a different site
-        _this._libraryForFields = null; // The library name for which the `_fields` cache is valid - helps detect if user selected a different library
-        /* ------------------------------------------------------------- */
-        /* RENDER                                                        */
-        /* ------------------------------------------------------------- */
-        /**
-         * The main render method called by the SPFx framework to display the web part.
-         */
+class WebmapWebPart extends _microsoft_sp_webpart_base__WEBPACK_IMPORTED_MODULE_1__.BaseClientSideWebPart {
+    constructor() {
+        super(...arguments);
         // Generate a unique ID for the map container to avoid conflicts if multiple web parts are on the same page
-        _this.mapId = "map-".concat(Math.random().toString(36).substr(2, 9));
-        return _this;
+        this.mapId = `map-${Math.random().toString(36).substr(2, 9)}`;
     }
-    WebmapWebPart.prototype.render = function () {
-        // Initialize the data service if not already done
-        // This service handles all the data fetching logic from SharePoint
-        if (!this.dataService) {
-            this.dataService = new _services_DataService__WEBPACK_IMPORTED_MODULE_11__.DataService(this.context);
+    /* ------------------------------------------------------------- */
+    /* RENDER                                                        */
+    /* ------------------------------------------------------------- */
+    /**
+     * The main render method called by the SPFx framework to display the web part.
+     */
+    render() {
+        // // Initialize managers and services if not already done
+        // if (!this.dataService) {
+        //   this.dataService = new DataService(this.context);
+        // }
+        if (!this.propertyPaneManager) {
+            this.propertyPaneManager = new _components_PropertyPaneManager__WEBPACK_IMPORTED_MODULE_4__.PropertyPaneManager(this.context, this.properties);
         }
         // Sets the basic HTML structure for the web part.
         // It creates a container `div` with a unique ID ('map') that Leaflet will use to initialize the map.
         // The styles.mapContainer applies CSS styling from the SCSS module
-        this.domElement.innerHTML = "\n      <div>\n        <div id=\"".concat(this.mapId, "\" class=\"").concat(_WebmapWebPart_module_scss__WEBPACK_IMPORTED_MODULE_10__["default"].mapContainer, "\"></div>\n      </div>\n    ");
+        this.domElement.innerHTML = `
+      <div>
+        <div id="${this.mapId}" class="${_WebmapWebPart_module_scss__WEBPACK_IMPORTED_MODULE_8__["default"].mapContainer}"></div>
+      </div>
+    `;
         // Calls the method to initialize the Leaflet map logic.
         this.renderMap();
-    };
+    }
     /* ------------------------------------------------------------- */
     /* Map creation / refresh                                        */
     /* ------------------------------------------------------------- */
@@ -5716,490 +6577,128 @@ var WebmapWebPart = /** @class */ (function (_super) {
      * Initializes or refreshes the Leaflet map instance. This method handles
      * cleanup of old instances and setup of the map, layers, and events.
      */
-    WebmapWebPart.prototype.renderMap = function () {
-        var _this = this;
-        /* 1. Dispose previous instance (avoid "Map container is already initialized") */
-        // If a map instance already exists, remove it to prevent errors on re-render.
-        // This is important because Leaflet throws an error if you try to create a map on a container that already has one
-        if (this.map) {
-            this.map.remove(); // Clean up all map resources and event listeners
-            this.map = undefined; // Clear the reference
+    renderMap() {
+        /* 1. Dispose previous instances */
+        if (this.mapManager) {
+            this.mapManager.dispose();
+            this.mapManager = undefined;
         }
-        // If a data refresh timer is running, clear it.
-        // Currently commented out but would refresh data every 30 seconds
-        // if (this.dataTimer) {
-        //   window.clearInterval(this.dataTimer);
-        //   this.dataTimer = undefined;
-        // }
-        /* 2. Create fresh map */
-        // Initialize a new map on the 'map' div, setting an initial view (coordinates and zoom level).
-        // [51.4239, 6.9985] are the latitude/longitude coordinates (Hochtief location)
-        // 10 is the zoom level (higher = more zoomed in)
-        this.map = leaflet__WEBPACK_IMPORTED_MODULE_4__.map(this.mapId).setView([51.4239, 6.9985], 10); // Default view over Hochtief location
-        /* 3. Add base layer based on map type */
-        if (this.properties.mapType === 'arcgis' && this.properties.arcgisMapUrl) {
-            // SECURITY: Validate the ArcGIS URL before using it
-            var validatedUrl = (0,_utils_security__WEBPACK_IMPORTED_MODULE_13__.validateArcGISUrl)(this.properties.arcgisMapUrl);
-            if (validatedUrl) {
-                // Use your existing extraction methods (they're fine)
-                var webmapId = this.extractWebmapId(validatedUrl);
-                var domain = this.extractArcGISDomain(validatedUrl);
-                if (webmapId && domain) {
-                    this.arcgisMap = new _services_ArcgisMap__WEBPACK_IMPORTED_MODULE_9__.ArcGISMapService(this.map);
-                    this.arcgisMap.addArcGISTileLayer(webmapId, domain);
-                }
-                else {
-                    console.error('Could not extract webmap ID or domain from ArcGIS URL');
-                    this.showToast('Invalid ArcGIS map configuration', 'error');
-                    this.addOpenStreetMapLayer();
-                }
-            }
-            else {
-                console.error('Invalid ArcGIS map URL - must be HTTPS and from maps.arcgis.com');
-                this.showToast('Please enter a valid ArcGIS web map URL', 'error');
-                this.addOpenStreetMapLayer();
-            }
+        if (this.clusterManager) {
+            this.clusterManager.dispose();
+            this.clusterManager = undefined;
         }
-        else {
-            this.addOpenStreetMapLayer();
+        /* 2. Create fresh map and cluster managers */
+        this.mapManager = new _components_MapManager__WEBPACK_IMPORTED_MODULE_2__.MapManager(this.mapId);
+        const map = this.mapManager.initializeMap(this.properties);
+        if (!map) {
+            _utils_ToastManager__WEBPACK_IMPORTED_MODULE_6__.ToastManager.show('Failed to initialize map', 'error');
+            return;
         }
-        /* 4. Cluster layer */
-        // Initialize the marker cluster group.
-        // This groups nearby markers together to avoid cluttering the map
-        this.markerCluster = leaflet__WEBPACK_IMPORTED_MODULE_4__.markerClusterGroup({
-            // `iconCreateFunction` is a customization that defines how a cluster icon looks.
-            // This function is called for each cluster to create its visual representation
-            iconCreateFunction: function (cluster) {
-                var _a;
-                // Get the first marker in the cluster to use its image for the cluster icon.
-                // This makes the cluster show a preview of what's inside
-                var first = cluster.getAllChildMarkers()[0]; // Use the specific L.Marker type instead of 'any'.
-                var img = (0,_utils_security__WEBPACK_IMPORTED_MODULE_13__.sanitizeUrl)((_a = first === null || first === void 0 ? void 0 : first.options.data) === null || _a === void 0 ? void 0 : _a.img); // Safely get and sanitize the image URL
-                var count = cluster.getChildCount(); // How many markers are in this cluster.
-                var digits = String(count).length; // Number of digits in the count (1, 2, 3, etc.).
-                var badgeH = 22; // Height of the count badge in pixels.
-                // Dynamically calculate the width of the badge to fit the count number.
-                // Single digit = 22px wide, each additional digit adds 10px
-                var badgeW = digits === 1 ? badgeH : badgeH + (digits - 1) * 10;
-                // The HTML for the custom cluster icon.
-                // Note the use of `escAttr` for security when inserting the image URL.
-                var html = "\n          <div style=\"position:relative;width:60px;height:60px;display:inline-block;\">\n            <div style=\"width:60px;height:60px;border-radius:10px;overflow:hidden;\">\n              <img src=\"".concat((0,_utils_security__WEBPACK_IMPORTED_MODULE_13__.escAttr)(img), "\" style=\"width:100%;height:100%;object-fit:cover;\" />\n            </div>\n            <div style=\"\n              position:absolute;top:-8px;right:-8px;width:").concat(badgeW, "px;height:").concat(badgeH, "px;\n              background:#007AFF;color:#fff;font:700 12px/1 'Segoe UI',sans-serif;\n              padding:0 4px;border-radius:9999px;display:flex;align-items:center;\n              justify-content:center;box-shadow:0 0 2px rgba(0,0,0,.25);\">\n              ").concat(count, "\n            </div>\n          </div>\n        ");
-                // Return a Leaflet DivIcon with our custom HTML
-                // className: '' prevents Leaflet from adding default styles
-                // iconSize: [60, 60] tells Leaflet the size of our icon
-                return leaflet__WEBPACK_IMPORTED_MODULE_4__.divIcon({ html: html, className: '', iconSize: [60, 60] });
-            },
-            zoomToBoundsOnClick: false, // Disable the default behavior of zooming in when a cluster is clicked.
-            showCoverageOnHover: false // Don't show the coverage area of the cluster on hover (blue outline).
-        });
-        // Add the newly created cluster layer to the map.
-        this.map.addLayer(this.markerCluster);
-        /* 5. Gallery popup on cluster click */
-        // Since zoomToBoundsOnClick is false, we can define our own click behavior.
-        // This creates a photo gallery popup when clicking on a cluster
-        this.markerCluster.on('clusterclick', function (e) {
-            var markers = e.layer.getAllChildMarkers(); // Get all individual markers within the clicked cluster
-            if (!markers.length)
-                return; // Exit if no markers (shouldn't happen but good to check)
-            // Create a simple image gallery from all the images within the cluster.
-            var imgList = markers.map(function (m) { var _a; return (0,_utils_security__WEBPACK_IMPORTED_MODULE_13__.sanitizeUrl)((_a = m.options.data) === null || _a === void 0 ? void 0 : _a.img); }); // Extract and sanitize all image URLs
-            var current = 0; // Index of the currently displayed image in the gallery.
-            // Programmatically create the HTML elements for the gallery popup using Leaflet's DOM utilities.
-            var container = leaflet__WEBPACK_IMPORTED_MODULE_4__.DomUtil.create('div', _WebmapWebPart_module_scss__WEBPACK_IMPORTED_MODULE_10__["default"].galleryContainer); // Main container with gallery styles
-            // Create a wrapper link for the image
-            // This allows users to click the image to open it full-size in a new tab
-            var imgLink = leaflet__WEBPACK_IMPORTED_MODULE_4__.DomUtil.create('a', '', container);
-            imgLink.href = imgList[0]; // Set initial href to first image
-            imgLink.target = '_blank'; // Open in new tab
-            imgLink.rel = 'noopener noreferrer'; // Security best practice for external links
-            imgLink.style.cursor = 'pointer'; // Show pointer cursor on hover
-            // Create the actual image element inside the link
-            var imgEl = leaflet__WEBPACK_IMPORTED_MODULE_4__.DomUtil.create('img', _WebmapWebPart_module_scss__WEBPACK_IMPORTED_MODULE_10__["default"].popupImg, imgLink);
-            imgEl.src = imgList[0]; // Set initial image to first in list
-            // Create navigation container for prev/next buttons
-            var nav = leaflet__WEBPACK_IMPORTED_MODULE_4__.DomUtil.create('div', _WebmapWebPart_module_scss__WEBPACK_IMPORTED_MODULE_10__["default"].galleryNav, container);
-            // Create previous button
-            var prevBtn = leaflet__WEBPACK_IMPORTED_MODULE_4__.DomUtil.create('button', '', nav);
-            prevBtn.innerHTML = '◀'; // Left arrow character
-            prevBtn.onclick = function () {
-                // Move to previous image, wrapping around to end if at beginning
-                current = (current - 1 + imgList.length) % imgList.length; // Cycle backwards.
-                imgEl.src = imgList[current]; // Update displayed image
-                imgLink.href = imgList[current]; // Update the link href
-            };
-            // Create next button
-            var nextBtn = leaflet__WEBPACK_IMPORTED_MODULE_4__.DomUtil.create('button', '', nav);
-            nextBtn.innerHTML = '▶'; // Right arrow character
-            nextBtn.onclick = function () {
-                // Move to next image, wrapping around to beginning if at end
-                current = (current + 1) % imgList.length; // Cycle forwards.
-                imgEl.src = imgList[current]; // Update displayed image
-                imgLink.href = imgList[current]; // Update the link href
-            };
-            // Create and open the Leaflet popup at the cluster's location, containing the gallery.
-            leaflet__WEBPACK_IMPORTED_MODULE_4__.popup({
-                className: 'photoGalleryPopup', // CSS class for styling
-                maxWidth: 300 // Maximum width in pixels
-            })
-                .setLatLng(e.latlng) // Position at cluster location
-                .setContent(container) // Set our gallery container as content
-                .openOn(_this.map); // Open on the map (! tells TypeScript map is defined)
-        });
-        /* 6. Add watermark */
-        (0,_assets_viconWatermark__WEBPACK_IMPORTED_MODULE_12__.addWatermark)(this.map); // Add the ViCon watermark to the map
-        /* 7. First data load */
+        this.mapViewService = new _services_MapViewService__WEBPACK_IMPORTED_MODULE_7__.MapViewService(map);
+        this.mapManager.setMapViewService(this.mapViewService); // Pass MapViewService to MapManager
+        // Pass MapViewService to other services
+        this.dataService = new _services_DataService__WEBPACK_IMPORTED_MODULE_5__.DataService(this.context, this.mapViewService);
+        /* 3. Initialize cluster manager */
+        this.clusterManager = new _components_ClusterManager__WEBPACK_IMPORTED_MODULE_3__.ClusterManager(map);
+        /* 4. First data load */
         this.loadMapData(); // Load the data immediately when map is created.
         // Currently commented out, but this would reload data every 30 seconds to show new images
         //this.dataTimer = window.setInterval(() => this.loadMapData(), 30_000); // And then reload every 30 seconds.
-    };
-    /**
-     * Add OpenStreetMap tile layer
-     * OpenStreetMap is a free, community-driven mapping service
-     * It's very reliable and doesn't require any API keys or authentication
-     */
-    WebmapWebPart.prototype.addOpenStreetMapLayer = function () {
-        if (!this.map)
-            return; // Safety check - exit if map doesn't exist
-        // Add OpenStreetMap tiles to the map
-        // {s} is replaced by a, b, or c for load balancing across servers
-        // {z}/{x}/{y} are replaced by zoom level and tile coordinates
-        leaflet__WEBPACK_IMPORTED_MODULE_4__.tileLayer('https://{s}.tile.openstreetmap.de/tiles/osmde/{z}/{x}/{y}.png', {
-            attribution: '&copy; <a href="https://www.openstreetmap.org/">OpenStreetMap</a> contributors', // Legal attribution required by OSM
-        }).addTo(this.map);
-    };
-    /**
-     * Extract webmap ID from ArcGIS URL
-     */
-    WebmapWebPart.prototype.extractWebmapId = function (url) {
-        if (!url)
-            return null; // Return null if no URL provided
-        // Pattern: https://{domain}.maps.arcgis.com/apps/mapviewer/index.html?webmap={webmap_id}
-        // This regex pattern matches the standard ArcGIS web map URL format
-        var urlPattern = /https?:\/\/[^\/]+\.maps\.arcgis\.com\/apps\/mapviewer\/index\.html\?webmap=([a-zA-Z0-9]+)/;
-        var match = url.match(urlPattern);
-        if (match && match[1]) {
-            return match[1]; // Return the captured webmap ID
-        }
-        // Also check for webmap ID in other common ArcGIS URL formats
-        // Sometimes the URL might be formatted differently
-        var webmapPattern = /webmap=([a-zA-Z0-9]+)/;
-        var webmapMatch = url.match(webmapPattern);
-        if (webmapMatch && webmapMatch[1]) {
-            return webmapMatch[1]; // Return the captured webmap ID
-        }
-        return null; // No valid webmap ID found
-    };
-    /**
-     * Extract domain from ArcGIS URL
-     */
-    WebmapWebPart.prototype.extractArcGISDomain = function (url) {
-        if (!url)
-            return null; // Return null if no URL provided
-        // Pattern to extract the domain part (e.g., "hochtiefinfra" from "hochtiefinfra.maps.arcgis.com")
-        // This captures the subdomain before .maps.arcgis.com
-        var domainPattern = /https?:\/\/([^\/]+)\.maps\.arcgis\.com/;
-        var match = url.match(domainPattern);
-        if (match && match[1]) {
-            return match[1]; // Return the captured domain
-        }
-        return null; // No valid domain found
-    };
-    /**
-     * Shows a toast notification
-     */
-    WebmapWebPart.prototype.showToast = function (message, type) {
-        if (type === void 0) { type = 'info'; }
-        // Create a new div element for the toast notification
-        var toast = document.createElement('div');
-        // Apply CSS classes - base toast class plus error class if type is 'error'
-        toast.className = "".concat(_WebmapWebPart_module_scss__WEBPACK_IMPORTED_MODULE_10__["default"].toast, " ").concat(type === 'error' ? _WebmapWebPart_module_scss__WEBPACK_IMPORTED_MODULE_10__["default"].toastError : '');
-        toast.textContent = message; // Set the message text
-        // Add animation manually (optional, fallback for older browsers)
-        // This makes the toast slide up from the bottom
-        toast.style.animation = 'slideUp 0.3s ease-out';
-        // Add the toast to the page body
-        document.body.appendChild(toast);
-        // Set up automatic removal after 3 seconds
-        setTimeout(function () {
-            // Animate sliding down before removal
-            toast.style.animation = 'slideDown 0.3s ease-in';
-            // Wait for animation to complete, then remove from DOM
-            setTimeout(function () {
-                if (toast.parentElement) {
-                    document.body.removeChild(toast);
-                }
-            }, 300); // 300ms matches the animation duration
-        }, 3000); // Show for 3 seconds
-    };
+    }
     /* ------------------------------------------------------------- */
     /* Load data from map                                            */
     /* ------------------------------------------------------------- */
     /**
      * Fetches data from the configured SharePoint document library and populates the map with markers.
      */
-    WebmapWebPart.prototype.loadMapData = function () {
-        return __awaiter(this, void 0, void 0, function () {
-            var result, allLatLngs, bounds;
-            var _this = this;
-            return __generator(this, function (_a) {
-                switch (_a.label) {
-                    case 0:
-                        // Guard clause: do nothing if the cluster layer isn't ready.
-                        if (!this.markerCluster || !this.dataService)
-                            return [2 /*return*/];
-                        return [4 /*yield*/, this.dataService.fetchMapData(this.properties)];
-                    case 1:
-                        result = _a.sent();
-                        // Clear all old markers before adding new ones.
-                        // This ensures we don't have duplicate markers if data is refreshed
-                        this.markerCluster.clearLayers();
-                        allLatLngs = [];
-                        // Process the fetched items
-                        result.items.forEach(function (item) {
-                            // Add the valid coordinates to our array for bounds calculation
-                            allLatLngs.push(leaflet__WEBPACK_IMPORTED_MODULE_4__.latLng(item.lat, item.lon));
-                            // Create a custom icon for the individual marker (not a cluster).
-                            // This shows the actual image as a small thumbnail on the map
-                            var icon = leaflet__WEBPACK_IMPORTED_MODULE_4__.divIcon({
-                                html: "<img src=\"".concat(item.img, "\" style=\"width:40px;height:40px;border-radius:5px;\" />"),
-                                className: '', // Empty className prevents Leaflet default styles
-                                iconSize: [40, 40] // Size of the icon in pixels
-                            });
-                            // Create the Leaflet marker with coordinates, the custom icon, and our enriched data payload.
-                            var marker = leaflet__WEBPACK_IMPORTED_MODULE_4__.marker([item.lat, item.lon], {
-                                icon: icon, // Our custom image icon
-                                data: item.data // Attach the full SharePoint item data for later use
-                            });
-                            // Bind a simple popup to the individual marker, showing its image.
-                            // This appears when clicking on a single (non-clustered) marker
-                            marker.bindPopup("\n        <div>\n          <a href=\"".concat(item.img, "\" target=\"_blank\" rel=\"noopener noreferrer\" style=\"cursor: pointer;\">\n            <img src=\"").concat(item.img, "\" class=\"").concat(_WebmapWebPart_module_scss__WEBPACK_IMPORTED_MODULE_10__["default"].popupImg, "\" />\n          </a>\n        </div>\n      "));
-                            // Add the final marker to the cluster layer.
-                            // The cluster layer will automatically group it with nearby markers
-                            _this.markerCluster.addLayer(marker);
-                        });
-                        // After processing all items, check if we have any coordinates
-                        if (allLatLngs.length > 0 && this.map) {
-                            bounds = leaflet__WEBPACK_IMPORTED_MODULE_4__.latLngBounds(allLatLngs);
-                            // Tell the map to fit itself to these bounds, with a little padding -> map displays all images and is postioned in the middle
-                            // pad(0.1) adds 10% padding around the bounds for better visibility
-                            this.map.fitBounds(bounds.pad(0.1));
-                        }
-                        // Show any errors that occurred during fetching
-                        // This helps users understand if something went wrong
-                        result.errors.forEach(function (error) {
-                            _this.showToast(error, 'error');
-                        });
-                        return [2 /*return*/];
-                }
-            });
+    async loadMapData() {
+        // Guard clause: do nothing if managers aren't ready.
+        if (!this.clusterManager || !this.dataService || !this.mapManager)
+            return;
+        // Use the DataService to fetch data
+        // This handles all the complexity of getting images and coordinates from SharePoint
+        const result = await this.dataService.fetchMapData(this.properties);
+        // Clear all old markers before adding new ones.
+        // This ensures we don't have duplicate markers if data is refreshed
+        this.clusterManager.clearMarkers();
+        result.items.forEach((item) => {
+            // Add marker to cluster
+            this.clusterManager.addMarker(item.lat, item.lon, item.data, item.img);
         });
-    };
+        // Show any errors that occurred during fetching
+        // This helps users understand if something went wrong
+        result.errors.forEach(error => {
+            _utils_ToastManager__WEBPACK_IMPORTED_MODULE_6__.ToastManager.show(error, 'error');
+        });
+    }
     /* ------------------------------------------------------------- */
     /* Property-pane                                                 */
     /* ------------------------------------------------------------- */
     /**
      * Defines the configuration for the web part's property pane (the settings panel).
      */
-    WebmapWebPart.prototype.getPropertyPaneConfiguration = function () {
-        // Start with the base groups
-        // Groups organize related settings together
-        var groups = [
-            {
-                groupName: 'Map Configuration',
-                groupFields: [
-                    (0,_microsoft_sp_property_pane__WEBPACK_IMPORTED_MODULE_1__.PropertyPaneDropdown)('mapType', {
-                        label: 'Map Type',
-                        options: [
-                            { key: 'openstreetmap', text: 'OpenStreetMap (Default)' },
-                            { key: 'arcgis', text: 'ArcGIS Web Map' }
-                        ],
-                        selectedKey: this.properties.mapType || 'openstreetmap' // Default to OSM if not set
-                    })
-                ]
-            }
-        ];
-        // If ArcGIS is selected, show URL field
-        // This demonstrates conditional property pane fields
-        if (this.properties.mapType === 'arcgis') {
-            groups[0].groupFields.push((0,_microsoft_sp_property_pane__WEBPACK_IMPORTED_MODULE_1__.PropertyPaneTextField)('arcgisMapUrl', {
-                label: 'ArcGIS Web Map URL',
-                description: 'Enter the ArcGIS web map URL (e.g., https://domain.maps.arcgis.com/apps/mapviewer/index.html?webmap=xxxxx)',
-                placeholder: 'https://domain.maps.arcgis.com/apps/mapviewer/index.html?webmap=xxxxx',
-                value: this.properties.arcgisMapUrl
-            }));
+    getPropertyPaneConfiguration() {
+        if (!this.propertyPaneManager) {
+            this.propertyPaneManager = new _components_PropertyPaneManager__WEBPACK_IMPORTED_MODULE_4__.PropertyPaneManager(this.context, this.properties);
         }
-        // Data source configuration group
-        groups.push({
-            groupName: 'Data Source Configuration',
-            groupFields: [
-                (0,_microsoft_sp_property_pane__WEBPACK_IMPORTED_MODULE_1__.PropertyPaneDropdown)('libraryName', {
-                    label: 'Document Library',
-                    options: this._libraries, // Dynamically loaded list of libraries
-                    disabled: !this._libraries.length // Disable if no libraries loaded yet
-                }),
-                (0,_microsoft_sp_property_pane__WEBPACK_IMPORTED_MODULE_1__.PropertyPaneDropdown)('locationMethod', {
-                    label: 'Location Method',
-                    options: [
-                        { key: 'exif', text: 'Extract from Image EXIF Data' },
-                        { key: 'manual', text: 'Select latitude and longitude fields' }
-                    ],
-                    selectedKey: this.properties.locationMethod || 'exif' // Default to EXIF
-                })
-            ]
-        });
-        // If manual method is selected, show field selectors
-        // Another example of conditional fields based on user selection
-        if (this.properties.locationMethod === 'manual') {
-            groups.push({
-                groupName: 'Coordinate Fields',
-                groupFields: [
-                    (0,_microsoft_sp_property_pane__WEBPACK_IMPORTED_MODULE_1__.PropertyPaneDropdown)('latField', {
-                        label: 'Latitude Field',
-                        options: this._fields, // Dynamically loaded list of fields from selected library
-                        disabled: !this._fields.length // Disable if no fields loaded yet
-                    }),
-                    (0,_microsoft_sp_property_pane__WEBPACK_IMPORTED_MODULE_1__.PropertyPaneDropdown)('lonField', {
-                        label: 'Longitude Field',
-                        options: this._fields, // Same list of fields
-                        disabled: !this._fields.length
-                    })
-                ]
-            });
-        }
-        return {
-            pages: [
-                {
-                    header: { description: '' }, // No header description
-                    groups: groups // All our configured groups
-                }
-            ]
-        };
-    };
-    /* ------------------------------------------------------------- */
-    /* Dynamic options loader                                        */
-    /* ------------------------------------------------------------- */
+        return this.propertyPaneManager.getConfiguration();
+    }
     /**
      * This SPFx lifecycle method is called when the property pane is opened.
      * It's used here to dynamically load the list of available SharePoint document libraries.
      */
-    WebmapWebPart.prototype.onPropertyPaneConfigurationStart = function () {
-        var _this = this;
-        var site = this.context.pageContext.web.absoluteUrl; // Get current site URL
-        // Check if we need to fetch libraries (i.e., if the site context has changed).
-        // This caching prevents unnecessary API calls
-        if (site !== this._siteForLibraries) {
-            // Clear all cached options and selections.
-            // This ensures we start fresh when the site changes
-            this._libraries = [];
-            this._fields = [];
-            this.properties.libraryName = '';
-            this.properties.latField = '';
-            this.properties.lonField = '';
-            this._siteForLibraries = site; // Update the cache key.
-            // Fetch all non-hidden document libraries from the current site.
-            // BaseTemplate 101 = Document Library in SharePoint
-            var librariesUrl = "".concat(site, "/_api/web/lists?$filter=Hidden eq false and BaseTemplate eq 101");
-            this.context.spHttpClient
-                .get(librariesUrl, _microsoft_sp_http__WEBPACK_IMPORTED_MODULE_3__.SPHttpClient.configurations.v1)
-                .then(function (r) { return r.json(); })
-                .then(function (json) {
-                // Map the API response to the format required by PropertyPaneDropdown.
-                // Use the specific ISPList interface instead of 'any'.
-                _this._libraries = json.value.map(function (l) { return ({
-                    key: l.Title, // Use title as both key and display text
-                    text: l.Title
-                }); });
-                // Refresh the property pane to show the newly loaded libraries.
-                _this.context.propertyPane.refresh();
-            })
-                .catch(function (err) { return console.error('Webmap → library enumeration failed:', err); });
+    onPropertyPaneConfigurationStart() {
+        if (!this.propertyPaneManager) {
+            this.propertyPaneManager = new _components_PropertyPaneManager__WEBPACK_IMPORTED_MODULE_4__.PropertyPaneManager(this.context, this.properties);
         }
-    };
+        this.propertyPaneManager.loadLibraries();
+    }
     /**
      * This SPFx lifecycle method is called whenever a property pane field is changed by the user.
      */
-    WebmapWebPart.prototype.onPropertyPaneFieldChanged = function (path, oldValue, newValue) {
-        var _this = this;
+    onPropertyPaneFieldChanged(path, oldValue, newValue) {
+        if (!this.propertyPaneManager) {
+            this.propertyPaneManager = new _components_PropertyPaneManager__WEBPACK_IMPORTED_MODULE_4__.PropertyPaneManager(this.context, this.properties);
+        }
         /* Handle map type change */
         if (path === 'mapType') {
             // Clear ArcGIS URL if switching away from ArcGIS
             // This prevents confusion if user switches back later
-            if (newValue !== 'arcgis') {
+            if (newValue !== 'project') {
                 this.properties.arcgisMapUrl = '';
             }
             this.context.propertyPane.refresh(); // Refresh to show/hide ArcGIS URL field
         }
         /* Validate ArcGIS URL when it changes */
         if (path === 'arcgisMapUrl' && newValue) {
-            var isValid = (0,_utils_security__WEBPACK_IMPORTED_MODULE_13__.validateArcGISUrl)(newValue);
+            const isValid = (0,_utils_Security__WEBPACK_IMPORTED_MODULE_9__.validateArcGISUrl)(newValue);
             if (!isValid) {
-                this.showToast('Please enter a valid HTTPS ArcGIS URL', 'error');
-            }
-            var webmapId = this.extractWebmapId(newValue);
-            if (!webmapId) {
-                // Log error to help developers/users understand the expected format
-                console.error('Invalid ArcGIS map URL format. Expected format: https://domain.maps.arcgis.com/apps/mapviewer/index.html?webmap=xxxxx');
+                _utils_ToastManager__WEBPACK_IMPORTED_MODULE_6__.ToastManager.show('Please enter a valid HTTPS ArcGIS URL', 'error');
             }
         }
         /* Handle location method change */
         if (path === 'locationMethod') {
             // Clear field selections when switching methods
             // This prevents confusion from having old selections when changing between EXIF and manual
-            this.properties.latField = '';
-            this.properties.lonField = '';
-            this._fields = [];
+            this.propertyPaneManager.clearFieldCache();
             // If switching to manual method, trigger field loading
             if (newValue === 'manual' && this.properties.libraryName) {
-                this._libraryForFields = null; // Force reload of fields
-                // Recursively call this method to trigger field loading
-                this.onPropertyPaneFieldChanged('libraryName', '', this.properties.libraryName);
+                // Force reload of fields
+                this.propertyPaneManager.loadFields(this.properties.libraryName);
             }
             this.context.propertyPane.refresh(); // Refresh to show/hide field selectors
         }
         /* Reload field dropdowns when the library changes */
-        if (path === 'libraryName' && newValue && newValue !== this._libraryForFields) {
-            // Only load fields if we're using manual method
-            // EXIF method doesn't need field selection
-            if (this.properties.locationMethod !== 'manual')
-                return;
-            // Clear old field options and selections.
-            this._fields = [];
-            this.properties.latField = '';
-            this.properties.lonField = '';
-            this._libraryForFields = newValue; // Update the cache key.
-            var site = this.context.pageContext.web.absoluteUrl;
-            // Fetch all non-hidden, non-readonly fields for the newly selected library.
-            // escODataIdentifier ensures special characters in library name are properly encoded
-            var fieldsUrl = "".concat(site, "/_api/web/lists/getByTitle('").concat((0,_utils_security__WEBPACK_IMPORTED_MODULE_13__.escODataIdentifier)(newValue), "')/fields") +
-                "?$filter=Hidden eq false and ReadOnlyField eq false";
-            this.context.spHttpClient
-                .get(fieldsUrl, _microsoft_sp_http__WEBPACK_IMPORTED_MODULE_3__.SPHttpClient.configurations.v1)
-                .then(function (r) { return r.json(); })
-                .then(function (json) {
-                // Only show field types that are likely to contain the required data.
-                // Text fields might contain coordinates as strings
-                // Number fields would contain numeric lat/lon values
-                // URL fields might contain location data in some custom implementations
-                var okTypes = ['Text', 'Number', 'URL'];
-                // FIX: Use the specific ISPField interface instead of 'any'.
-                _this._fields = json.value
-                    .filter(function (f) { return okTypes.indexOf(f.TypeAsString) !== -1; }) // Filter to allowed types
-                    .map(function (f) { return ({
-                    key: f.InternalName, // Use the internal name for API calls.
-                    text: f.Title // Show the user-friendly display name.
-                }); });
-                // Refresh the property pane to show the new field options.
-                _this.context.propertyPane.refresh();
-            })
-                .catch(function (err) { return console.error('Webmap → field enumeration failed:', err); });
+        if (path === 'libraryName' && newValue) {
+            this.propertyPaneManager.loadFields(newValue);
         }
         /* Re-render map whenever any data-source field changes */
         // If any of the core data properties have changed, trigger a full re-render of the web part.
         // This ensures the map updates immediately when settings change
-        if (['libraryName', 'locationMethod', 'latField', 'lonField', 'mapType', 'arcgisMapUrl'].indexOf(path) !== -1) {
+        if (['libraryName', 'locationMethod', 'latField', 'lonField', 'mapType', 'arcgisMapUrl', 'mapType'].indexOf(path) !== -1) {
             this.render(); // Full re-render to apply new settings
         }
-    };
+    }
     /* ------------------------------------------------------------- */
     /* Clean-up                                                      */
     /* ------------------------------------------------------------- */
@@ -6207,31 +6706,24 @@ var WebmapWebPart = /** @class */ (function (_super) {
      * This SPFx lifecycle method is called when the web part is removed from the page.
      * It's crucial for cleaning up resources to prevent memory leaks.
      */
-    WebmapWebPart.prototype.onDispose = function () {
-        var _a;
-        // Completely remove the map instance and its event listeners.
-        // The ?. operator safely calls remove() only if map exists
-        (_a = this.map) === null || _a === void 0 ? void 0 : _a.remove();
-        // Stop the data refresh timer if it exists
-        //if (this.dataTimer) window.clearInterval(this.dataTimer);
-    };
-    Object.defineProperty(WebmapWebPart.prototype, "dataVersion", {
-        /* ------------------------------------------------------------- */
-        /* SPFx boiler-plate                                             */
-        /* ------------------------------------------------------------- */
-        /**
-         * Standard SPFx property to get the version of the data structure.
-         * This helps SharePoint understand if property migrations are needed when updating the web part
-         */
-        get: function () {
-            return _microsoft_sp_core_library__WEBPACK_IMPORTED_MODULE_0__.Version.parse('1.0');
-        },
-        enumerable: false,
-        configurable: true
-    });
-    return WebmapWebPart;
-}(_microsoft_sp_webpart_base__WEBPACK_IMPORTED_MODULE_2__.BaseClientSideWebPart));
-/* harmony default export */ const __WEBPACK_DEFAULT_EXPORT__ = (WebmapWebPart);
+    onDispose() {
+        var _a, _b;
+        // Clean up all managers
+        (_a = this.mapManager) === null || _a === void 0 ? void 0 : _a.dispose();
+        (_b = this.clusterManager) === null || _b === void 0 ? void 0 : _b.dispose();
+        this.mapViewService = undefined;
+    }
+    /* ------------------------------------------------------------- */
+    /* SPFx boiler-plate                                             */
+    /* ------------------------------------------------------------- */
+    /**
+     * Standard SPFx property to get the version of the data structure.
+     * This helps SharePoint understand if property migrations are needed when updating the web part
+     */
+    get dataVersion() {
+        return _microsoft_sp_core_library__WEBPACK_IMPORTED_MODULE_0__.Version.parse('1.0');
+    }
+}
 
 })();
 
