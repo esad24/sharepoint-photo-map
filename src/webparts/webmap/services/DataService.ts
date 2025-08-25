@@ -133,7 +133,12 @@ private async fetchDocumentLibraryData(properties: IWebmapWebPartProps): Promise
     // Process each item returned from SharePoint
     for (const item of items) {
       const fileName = item.FileLeafRef; // Get the filename
-      const fileUrl = `${site}${item.FileRef}`; // Build full URL to file
+      const siteServerRelativeUrl = this.context.pageContext.web.serverRelativeUrl;
+      const searchString = siteServerRelativeUrl === '/' ? '/' : siteServerRelativeUrl + '/';
+      const relativeFileRef = item.FileRef.replace(searchString, ''); // Get server-relative URL
+      const fileUrl = `${site}/${relativeFileRef}`; // Build full URL to file
+
+      console.log(`Image Output: ${site} | ${siteServerRelativeUrl} | ${relativeFileRef} | ${fileUrl} | ${fileName}`);
       
       // Check if it's an image file based on the file extension
       if (!this.isImageFile(fileUrl)) continue; // Skip non-image files
