@@ -123,8 +123,6 @@ export default class WebmapWebPart extends BaseClientSideWebPart<IWebmapWebPartP
 
     /* 4. First data load */
     this.loadMapData(); // Load the data immediately when map is created.
-    // Currently commented out, but this would reload data every 30 seconds to show new images
-    //this.dataTimer = window.setInterval(() => this.loadMapData(), 30_000); // And then reload every 30 seconds.
   }
 
   /* ------------------------------------------------------------- */

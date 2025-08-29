@@ -42,7 +42,7 @@ export class ClusterManager {
         // Return a Leaflet DivIcon with our custom HTML
         // className: '' prevents Leaflet from adding default styles
         // iconSize: [60, 60] tells Leaflet the size of our icon
-        return L.divIcon({ html, className: '', iconSize: [60, 60] });
+        return L.divIcon({ html, className: '', iconSize: [70, 70] });
       },
       zoomToBoundsOnClick: false, // Disable the default behavior of zooming in when a cluster is clicked.
       showCoverageOnHover: false // Don't show the coverage area of the cluster on hover (blue outline).
@@ -77,14 +77,20 @@ export class ClusterManager {
       // Create a wrapper link for the image
       // This allows users to click the image to open it full-size in a new tab
       const imgLink = L.DomUtil.create('a', '', container) as HTMLAnchorElement;
-      imgLink.href = imgList[0]; // Set initial href to first image
-      imgLink.target = '_blank'; // Open in new tab
-      imgLink.rel = 'noopener noreferrer'; // Security best practice for external links
-      imgLink.style.cursor = 'pointer'; // Show pointer cursor on hover
 
-      // Create the actual image element inside the link
-      const imgEl = L.DomUtil.create('img', styles.popupImg, imgLink) as HTMLImageElement;  
-      imgEl.src = imgList[0]; // Set initial image to first in list
+
+
+      // Create clickable image element
+      const imgEl = L.DomUtil.create('img', styles.popupImg, container) as HTMLImageElement;
+      imgEl.src = imgList[0];
+      imgEl.style.cursor = 'pointer';
+      
+      // Add event listener for new tab opening
+      imgEl.addEventListener('click', (event) => {
+        event.preventDefault();
+        event.stopPropagation();
+        window.open(imgList[current], '_blank', 'noopener,noreferrer');
+      });
 
       // Create navigation container for prev/next buttons
       const nav = L.DomUtil.create('div', styles.galleryNav, container);
@@ -136,27 +142,30 @@ export class ClusterManager {
     // Create a custom icon for the individual marker (not a cluster).
     // This shows the actual image as a small thumbnail on the map
     const icon = L.divIcon({
-      html: `<img src="${imgUrl}" style="width:40px;height:40px;border-radius:5px;" />`,
+      html: `<img src="${imgUrl}" style="width:60px;height:60px;border-radius:6px;" />`,
       className: '', // Empty className prevents Leaflet default styles
-      iconSize: [40, 40] // Size of the icon in pixels
+      iconSize: [60, 60] // Size of the icon in pixels
     });
 
-    // Create the Leaflet marker with coordinates, the custom icon, and our enriched data payload.
     const marker = L.marker([lat, lon], { 
-      icon, // Our custom image icon
-      data: item // Attach the full SharePoint item data for later use
+      icon,
+      data: item
     });
-
-    // Bind a simple popup to the individual marker, showing its image.
-    // This appears when clicking on a single (non-clustered) marker
-    marker.bindPopup(`
-      <div>
-        <a href="${imgUrl}" target="_blank" rel="noopener noreferrer" style="cursor: pointer;">
-          <img src="${imgUrl}" class="${styles.popupImg}" />
-        </a>
-      </div>
-    `);
-
+  
+    // Create popup content with event listener
+    const popupContent = L.DomUtil.create('div');
+    const imgElement = L.DomUtil.create('img', styles.popupImg, popupContent) as HTMLImageElement;
+    imgElement.src = imgUrl;
+    imgElement.style.cursor = 'pointer';
+    
+    // Add event listener for new tab opening
+    imgElement.addEventListener('click', (event) => {
+      event.preventDefault();
+      event.stopPropagation();
+      window.open(imgUrl, '_blank', 'noopener,noreferrer');
+    });
+  
+    marker.bindPopup(popupContent);
     // Add the final marker to the cluster layer.
     // The cluster layer will automatically group it with nearby markers
     this.markerCluster!.addLayer(marker);
