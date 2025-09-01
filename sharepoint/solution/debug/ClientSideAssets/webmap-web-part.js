@@ -16,7 +16,7 @@ __webpack_require__.r(__webpack_exports__);
 // Imports
 
 
-_node_modules_microsoft_sp_css_loader_node_modules_microsoft_load_themed_styles_lib_es6_index_js__WEBPACK_IMPORTED_MODULE_0__.loadStyles(".webmap_67f2c4c9{color:\"[theme:bodyText, default: #323130]\";color:var(--bodyText);overflow:hidden;padding:1em}.webmap_67f2c4c9.teams_67f2c4c9{font-family:Segoe UI,-apple-system,BlinkMacSystemFont,Roboto,Helvetica Neue,sans-serif}.welcome_67f2c4c9{text-align:center}.welcomeImage_67f2c4c9{max-width:420px;width:100%}.mapContainer_67f2c4c9{border-radius:20px;box-shadow:0 0 10px rgba(0,0,0,.2);height:600px;width:100%}.popupImg_67f2c4c9{border-radius:10px;max-height:300px;max-width:300px}.galleryContainer_67f2c4c9{align-items:center;display:flex;flex-direction:column;text-align:center;width:300px}.photoGalleryPopup_67f2c4c9 .leaflet-popup-content,.photoGalleryPopup_67f2c4c9 .leaflet-popup-content-wrapper{margin:0!important;padding:0!important}.leaflet-popup-content-wrapper{border-radius:12px;box-shadow:0 8px 24px rgba(0,0,0,.3)}.leaflet-popup-content-wrapper,.leaflet-popup-tip{backdrop-filter:blur(12px);-webkit-backdrop-filter:blur(12px);background:hsla(0,0%,100%,.15);border:1px solid hsla(0,0%,100%,.3)}.galleryNav_67f2c4c9{display:flex;gap:10px;justify-content:center;margin-top:8px}.galleryNavPrev_67f2c4c9:before{transform:rotate(135deg)}.galleryNavNext_67f2c4c9:before,.galleryNavPrev_67f2c4c9:before{border:solid #000;border-width:0 2px 2px 0;content:\"\";display:inline-block;padding:3px}.galleryNavNext_67f2c4c9:before{transform:rotate(-45deg)}.links_67f2c4c9 a{color:\"[theme:link, default:#03787c]\";color:var(--link);text-decoration:none}.links_67f2c4c9 a:hover{color:\"[theme:linkHovered, default: #014446]\";color:var(--linkHovered);text-decoration:underline}.toast_67f2c4c9{animation:slideUp_67f2c4c9 .3s ease-out;background-color:#1976d2;border-radius:4px;bottom:20px;box-shadow:0 2px 5px rgba(0,0,0,.2);color:#fff;font-family:Segoe UI,sans-serif;left:50%;padding:16px 24px;position:fixed;transform:translateX(-50%);z-index:9999}.toastError_67f2c4c9{background-color:#d32f2f}@keyframes slideUp_67f2c4c9{0%{opacity:0;transform:translateX(-50%) translateY(100%)}to{opacity:1;transform:translateX(-50%) translateY(0)}}@keyframes slideDown_67f2c4c9{0%{opacity:1;transform:translateX(-50%) translateY(0)}to{opacity:0;transform:translateX(-50%) translateY(100%)}}.textLabel_67f2c4c9{background:0 0;border:none;box-shadow:none;color:#fff;font-weight:400;padding:0;text-shadow:-1px -1px 0 #000,1px -1px 0 #000,-1px 1px 0 #000,1px 1px 0 #000}", true);
+_node_modules_microsoft_sp_css_loader_node_modules_microsoft_load_themed_styles_lib_es6_index_js__WEBPACK_IMPORTED_MODULE_0__.loadStyles(".webmap_67f2c4c9{color:\"[theme:bodyText, default: #323130]\";color:var(--bodyText);overflow:hidden;padding:1em}.webmap_67f2c4c9.teams_67f2c4c9{font-family:Segoe UI,-apple-system,BlinkMacSystemFont,Roboto,Helvetica Neue,sans-serif}.welcome_67f2c4c9{text-align:center}.welcomeImage_67f2c4c9{max-width:420px;width:100%}.mapContainer_67f2c4c9{border-radius:20px;box-shadow:0 0 10px rgba(0,0,0,.2);height:600px;width:100%}.popupImg_67f2c4c9{border-radius:10px;max-height:300px;max-width:300px}.galleryContainer_67f2c4c9{align-items:center;display:flex;flex-direction:column;text-align:center;width:300px}.photoGalleryPopup_67f2c4c9 .leaflet-popup-content,.photoGalleryPopup_67f2c4c9 .leaflet-popup-content-wrapper{margin:0!important;padding:0!important}.leaflet-popup-content-wrapper{border-radius:12px;box-shadow:0 8px 24px rgba(0,0,0,.3)}.leaflet-popup-content-wrapper,.leaflet-popup-tip{backdrop-filter:blur(12px);-webkit-backdrop-filter:blur(12px);background:hsla(0,0%,100%,.15);border:1px solid hsla(0,0%,100%,.3)}.galleryNav_67f2c4c9{display:flex;gap:10px;justify-content:center;margin-top:8px}.galleryNavPrev_67f2c4c9:before{transform:rotate(135deg)}.galleryNavNext_67f2c4c9:before,.galleryNavPrev_67f2c4c9:before{border:solid #000;border-width:0 2px 2px 0;content:\"\";display:inline-block;padding:3px}.galleryNavNext_67f2c4c9:before{transform:rotate(-45deg)}.links_67f2c4c9 a{color:\"[theme:link, default:#03787c]\";color:var(--link);text-decoration:none}.links_67f2c4c9 a:hover{color:\"[theme:linkHovered, default: #014446]\";color:var(--linkHovered);text-decoration:underline}.toast_67f2c4c9{animation:slideUp_67f2c4c9 .3s ease-out;background-color:#1976d2;border-radius:4px;bottom:20px;box-shadow:0 2px 5px rgba(0,0,0,.2);color:#fff;font-family:Segoe UI,sans-serif;left:50%;padding:16px 24px;position:fixed;transform:translateX(-50%);z-index:9999}.toastError_67f2c4c9{background-color:#d32f2f}@keyframes slideUp_67f2c4c9{0%{opacity:0;transform:translateX(-50%) translateY(100%)}to{opacity:1;transform:translateX(-50%) translateY(0)}}@keyframes slideDown_67f2c4c9{0%{opacity:1;transform:translateX(-50%) translateY(0)}to{opacity:0;transform:translateX(-50%) translateY(100%)}}.textLabel_67f2c4c9{background:0 0;border:none;box-shadow:none;color:#fff;font-weight:400;padding:0;text-shadow:-1px -1px 0 #000,1px -1px 0 #000,-1px 1px 0 #000,1px 1px 0 #000}\n/*# sourceMappingURL=data:application/json;base64,eyJ2ZXJzaW9uIjozLCJzb3VyY2VzIjpbImZpbGU6Ly8vQzovVXNlcnMvQkdMVXNlcjAxL0RvY3VtZW50cy9Gb3RvTWFwL3NoYXJlcG9pbnQtcGhvdG8tbWFwL3NyYy93ZWJwYXJ0cy93ZWJtYXAvV2VibWFwV2ViUGFydC5tb2R1bGUuc2NzcyJdLCJuYW1lcyI6W10sIm1hcHBpbmdzIjoiQUFFQSxpQkFHRSwwQ0FBQSxDQUNBLHFCQUFBLENBSEEsZUFBQSxDQUNBLFdBRUEsQ0FDQSxnQ0FDRSxzRkFBQSxDQUlKLGtCQUNFLGlCQUFBLENBR0YsdUJBRUUsZUFBQSxDQURBLFVBQ0EsQ0FHRix1QkFHRSxrQkFBQSxDQUNBLGtDQUFBLENBSEEsWUFBQSxDQUNBLFVBRUEsQ0FJRixtQkFHRSxrQkFBQSxDQURBLGdCQUFBLENBREEsZUFFQSxDQUlGLDJCQUlFLGtCQUFBLENBRkEsWUFBQSxDQUNBLHFCQUFBLENBRUEsaUJBQUEsQ0FKQSxXQUlBLENBTUUsOEdBRUUsa0JBQUEsQ0FDQSxtQkFBQSxDQU1OLCtCQUlFLGtCQUFBLENBRUEsb0NBQUEsQ0FHRixrREFQRSwwQkFBQSxDQUNBLGtDQUFBLENBRkEsOEJBQUEsQ0FJQSxtQ0FRQSxDQUtGLHFCQUVFLFlBQUEsQ0FFQSxRQUFBLENBREEsc0JBQUEsQ0FGQSxjQUdBLENBR0YsZ0NBTUUsd0JBQUEsQ0FHRixnRUFORSxpQkFBQSxDQUFBLHdCQUFBLENBRkEsVUFBQSxDQUdBLG9CQUFBLENBQ0EsV0FVQSxDQU5GLGdDQU1FLHdCQUFBLENBS0Esa0JBRUUscUNBQUEsQ0FDQSxpQkFBQSxDQUZBLG9CQUVBLENBRUEsd0JBRUUsNkNBQUEsQ0FDQSx3QkFBQSxDQUZBLHlCQUVBLENBTU4sZ0JBWUUsdUNBQUEsQ0FQQSx3QkFBQSxDQUdBLGlCQUFBLENBTkEsV0FBQSxDQU9BLG1DQUFBLENBSEEsVUFBQSxDQUtBLCtCQUFBLENBUkEsUUFBQSxDQUlBLGlCQUFBLENBTkEsY0FBQSxDQUdBLDBCQUFBLENBTUEsWUFFQSxDQUdGLHFCQUNFLHdCQUFBLENBR0YsNEJBQ0UsR0FFRSxTQUFBLENBREEsMkNBQ0EsQ0FFRixHQUVFLFNBQUEsQ0FEQSx3Q0FDQSxDQUFBLENBSUosOEJBQ0UsR0FFRSxTQUFBLENBREEsd0NBQ0EsQ0FFRixHQUVFLFNBQUEsQ0FEQSwyQ0FDQSxDQUFBLENBS0osb0JBQ0UsY0FBQSxDQUNBLFdBQUEsQ0FDQSxlQUFBLENBQ0EsVUFBQSxDQU1BLGVBQUEsQ0FDQSxTQUFBLENBTkEsMkVBTUEiLCJmaWxlIjoiV2VibWFwV2ViUGFydC5tb2R1bGUuY3NzIn0= */", true);
 
 // Exports
 /* harmony default export */ const __WEBPACK_DEFAULT_EXPORT__ = ({
@@ -222,14 +222,14 @@ const createClusterIconHtml = (imageUrl, count) => {
     const badgeH = 22;
     const badgeW = digits === 1 ? 22 : 22 + (digits - 1) * 10;
     return `
-    <div style="position:relative;width:60px;height:60px;display:inline-block;">
-      <div style="width:60px;height:60px;border-radius:10px;overflow:hidden;">
+    <div style="position:relative;width:70px;height:70px;display:inline-block;">
+      <div style="width:70px;height:70px;border-radius:11px;overflow:hidden;">
         <img src="${(0,_utils_Security__WEBPACK_IMPORTED_MODULE_0__.escAttr)(imageUrl)}" style="width:100%;height:100%;object-fit:cover;" />
       </div>
-      <div style="
+      <div style=" 
         position:absolute;top:-8px;right:-8px;width:${badgeW}px;height:${badgeH}px;
         background:#007AFF;color:#fff;font:700 12px/1 'Segoe UI',sans-serif;
-        padding:0 4px;border-radius:9999px;display:flex;align-items:center;
+        padding:0 4px;border-radius:9999px;display:flex;align-items:center; 
         justify-content:center;box-shadow:0 0 2px rgba(0,0,0,.25);">
         ${count}
       </div>
@@ -295,7 +295,7 @@ class ClusterManager {
                 // Return a Leaflet DivIcon with our custom HTML
                 // className: '' prevents Leaflet from adding default styles
                 // iconSize: [60, 60] tells Leaflet the size of our icon
-                return leaflet__WEBPACK_IMPORTED_MODULE_0__.divIcon({ html, className: '', iconSize: [60, 60] });
+                return leaflet__WEBPACK_IMPORTED_MODULE_0__.divIcon({ html, className: '', iconSize: [70, 70] });
             },
             zoomToBoundsOnClick: false, // Disable the default behavior of zooming in when a cluster is clicked.
             showCoverageOnHover: false // Don't show the coverage area of the cluster on hover (blue outline).
@@ -325,13 +325,16 @@ class ClusterManager {
             // Create a wrapper link for the image
             // This allows users to click the image to open it full-size in a new tab
             const imgLink = leaflet__WEBPACK_IMPORTED_MODULE_0__.DomUtil.create('a', '', container);
-            imgLink.href = imgList[0]; // Set initial href to first image
-            imgLink.target = '_blank'; // Open in new tab
-            imgLink.rel = 'noopener noreferrer'; // Security best practice for external links
-            imgLink.style.cursor = 'pointer'; // Show pointer cursor on hover
-            // Create the actual image element inside the link
-            const imgEl = leaflet__WEBPACK_IMPORTED_MODULE_0__.DomUtil.create('img', _WebmapWebPart_module_scss__WEBPACK_IMPORTED_MODULE_4__["default"].popupImg, imgLink);
-            imgEl.src = imgList[0]; // Set initial image to first in list
+            // Create clickable image element
+            const imgEl = leaflet__WEBPACK_IMPORTED_MODULE_0__.DomUtil.create('img', _WebmapWebPart_module_scss__WEBPACK_IMPORTED_MODULE_4__["default"].popupImg, container);
+            imgEl.src = imgList[0];
+            imgEl.style.cursor = 'pointer';
+            // Add event listener for new tab opening
+            imgEl.addEventListener('click', (event) => {
+                event.preventDefault();
+                event.stopPropagation();
+                window.open(imgList[current], '_blank', 'noopener,noreferrer');
+            });
             // Create navigation container for prev/next buttons
             const nav = leaflet__WEBPACK_IMPORTED_MODULE_0__.DomUtil.create('div', _WebmapWebPart_module_scss__WEBPACK_IMPORTED_MODULE_4__["default"].galleryNav, container);
             // Create previous button
@@ -378,24 +381,26 @@ class ClusterManager {
         // Create a custom icon for the individual marker (not a cluster).
         // This shows the actual image as a small thumbnail on the map
         const icon = leaflet__WEBPACK_IMPORTED_MODULE_0__.divIcon({
-            html: `<img src="${imgUrl}" style="width:40px;height:40px;border-radius:5px;" />`,
+            html: `<img src="${imgUrl}" style="width:60px;height:60px;border-radius:6px;" />`,
             className: '', // Empty className prevents Leaflet default styles
-            iconSize: [40, 40] // Size of the icon in pixels
+            iconSize: [60, 60] // Size of the icon in pixels
         });
-        // Create the Leaflet marker with coordinates, the custom icon, and our enriched data payload.
         const marker = leaflet__WEBPACK_IMPORTED_MODULE_0__.marker([lat, lon], {
-            icon, // Our custom image icon
-            data: item // Attach the full SharePoint item data for later use
+            icon,
+            data: item
         });
-        // Bind a simple popup to the individual marker, showing its image.
-        // This appears when clicking on a single (non-clustered) marker
-        marker.bindPopup(`
-      <div>
-        <a href="${imgUrl}" target="_blank" rel="noopener noreferrer" style="cursor: pointer;">
-          <img src="${imgUrl}" class="${_WebmapWebPart_module_scss__WEBPACK_IMPORTED_MODULE_4__["default"].popupImg}" />
-        </a>
-      </div>
-    `);
+        // Create popup content with event listener
+        const popupContent = leaflet__WEBPACK_IMPORTED_MODULE_0__.DomUtil.create('div');
+        const imgElement = leaflet__WEBPACK_IMPORTED_MODULE_0__.DomUtil.create('img', _WebmapWebPart_module_scss__WEBPACK_IMPORTED_MODULE_4__["default"].popupImg, popupContent);
+        imgElement.src = imgUrl;
+        imgElement.style.cursor = 'pointer';
+        // Add event listener for new tab opening
+        imgElement.addEventListener('click', (event) => {
+            event.preventDefault();
+            event.stopPropagation();
+            window.open(imgUrl, '_blank', 'noopener,noreferrer');
+        });
+        marker.bindPopup(popupContent);
         // Add the final marker to the cluster layer.
         // The cluster layer will automatically group it with nearby markers
         this.markerCluster.addLayer(marker);
@@ -595,7 +600,7 @@ class PropertyPaneManager {
             }), (0,_microsoft_sp_property_pane__WEBPACK_IMPORTED_MODULE_0__.PropertyPaneDropdown)('mapView', {
                 label: 'Map View',
                 options: [
-                    { key: 'openstreetmap', text: 'OpenStreetMap' },
+                    { key: 'openstreetmap', text: 'Open Street Map' },
                     { key: 'satellite', text: 'Satellite' }
                 ],
                 selectedKey: this.properties.mapView || 'openstreetmap' // Default to OpenStreetMap
@@ -6606,8 +6611,6 @@ class WebmapWebPart extends _microsoft_sp_webpart_base__WEBPACK_IMPORTED_MODULE_
         this.clusterManager = new _components_ClusterManager__WEBPACK_IMPORTED_MODULE_3__.ClusterManager(map);
         /* 4. First data load */
         this.loadMapData(); // Load the data immediately when map is created.
-        // Currently commented out, but this would reload data every 30 seconds to show new images
-        //this.dataTimer = window.setInterval(() => this.loadMapData(), 30_000); // And then reload every 30 seconds.
     }
     /* ------------------------------------------------------------- */
     /* Load data from map                                            */
