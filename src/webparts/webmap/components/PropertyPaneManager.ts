@@ -66,7 +66,7 @@ import {
           PropertyPaneDropdown('mapView', {
             label: 'Map View',
             options: [
-              { key: 'openstreetmap', text: 'OpenStreetMap' },
+              { key: 'openstreetmap', text: 'Open Street Map' },
               { key: 'satellite', text: 'Satellite' }
             ],
             selectedKey: this.properties.mapView || 'openstreetmap' // Default to OpenStreetMap
