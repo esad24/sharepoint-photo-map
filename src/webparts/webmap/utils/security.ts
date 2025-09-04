@@ -10,7 +10,7 @@
  * @param id The identifier string to escape.
  * @returns A URL-safe, OData-safe identifier.
  */
-export function escODataIdentifier(id: string): string { //  SECURITY
+export function escODataIdentifier(id: string): string { 
 const doubled = id.replace(/'/g, "''");
 return encodeURIComponent(doubled);
 }
@@ -37,7 +37,7 @@ catch { return ''; } // Return empty string if URL parsing fails.
  * @param v The string value to escape.
  * @returns A sanitized string safe for HTML attributes.
  */
-export function escAttr(v: string): string { // SECURITY
+export function escAttr(v: string): string { 
 return v.replace(/&/g,  '&amp;')
         .replace(/"/g, '&quot;')
         .replace(/</g,  '&lt;')

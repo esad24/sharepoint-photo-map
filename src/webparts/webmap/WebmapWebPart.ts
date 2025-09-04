@@ -196,6 +196,7 @@ export default class WebmapWebPart extends BaseClientSideWebPart<IWebmapWebPartP
       }
       this.context.propertyPane.refresh(); // Refresh to show/hide ArcGIS URL field
     }
+  
 
     /* Validate ArcGIS URL when it changes */
     if (path === 'arcgisMapUrl' && newValue) {
