@@ -1,7 +1,0 @@
-Here are some widely used ArcGIS basemap services:
-
-Imagery (Satellite):
-https://services.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}
-
-OpenStreetMap:
-https://tile.openstreetmap.org/{z}/{x}/{y}.png

@@ -7,7 +7,7 @@
 
 import * as L from 'leaflet';
 
-import { HOCHTIEF_DEFAULT_VIEW } from '../config/constants';
+import { HOCHTIEF_DEFAULT_VIEW } from '../constants/constants';
 
 
 

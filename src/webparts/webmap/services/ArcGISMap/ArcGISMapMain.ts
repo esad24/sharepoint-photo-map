@@ -28,7 +28,7 @@ import { MapServiceLayerService } from './services/layers/MapServiceLayer';
 import { WebmapData, LayerConfig } from './types/ArcGISTypes';
 import { MapViewService } from '../MapViewService';
 
-import {OPEN_STREET_MAP_TILE_URL, IMAGERY_TILE_URL } from '../../config/constants';
+import {OPEN_STREET_MAP_TILE_URL, IMAGERY_TILE_URL } from '../../constants/constants';
 
 
 export class ArcGISMapService {

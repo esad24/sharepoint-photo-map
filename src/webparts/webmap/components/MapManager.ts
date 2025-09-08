@@ -15,7 +15,7 @@ import { MapViewService } from '../services/MapViewService';
 
 import { extractArcGISDomain, extractWebmapId } from '../services/ArcGISMap/services/ArcGISUrlService';
 
-import {OPEN_STREET_MAP_TILE_URL, HOCHTIEF_DEFAULT_VIEW } from '../config/constants';
+import {OPEN_STREET_MAP_TILE_URL, HOCHTIEF_DEFAULT_VIEW } from '../constants/constants';
 
 
 export class MapManager {
