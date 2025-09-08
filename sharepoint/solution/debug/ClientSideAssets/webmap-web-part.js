@@ -434,9 +434,10 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony import */ var leaflet__WEBPACK_IMPORTED_MODULE_0___default = /*#__PURE__*/__webpack_require__.n(leaflet__WEBPACK_IMPORTED_MODULE_0__);
 /* harmony import */ var leaflet_dist_leaflet_css__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! leaflet/dist/leaflet.css */ 796);
 /* harmony import */ var _services_ArcGISMap_ArcGISMapMain__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ../services/ArcGISMap/ArcGISMapMain */ 185);
-/* harmony import */ var _utils_Security__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(/*! ../utils/Security */ 415);
+/* harmony import */ var _utils_Security__WEBPACK_IMPORTED_MODULE_5__ = __webpack_require__(/*! ../utils/Security */ 415);
 /* harmony import */ var _assets_ViconWatermark__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! ../assets/ViconWatermark */ 607);
-/* harmony import */ var _services_ArcGISMap_services_ArcGISUrlService__WEBPACK_IMPORTED_MODULE_5__ = __webpack_require__(/*! ../services/ArcGISMap/services/ArcGISUrlService */ 57);
+/* harmony import */ var _services_ArcGISMap_services_ArcGISUrlService__WEBPACK_IMPORTED_MODULE_6__ = __webpack_require__(/*! ../services/ArcGISMap/services/ArcGISUrlService */ 57);
+/* harmony import */ var _config_constants__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(/*! ../config/constants */ 176);
 /* ========================================================================== */
 /* MapManager.ts                                                              */
 /* - Handles Leaflet map initialization and management                        */
@@ -448,12 +449,7 @@ __webpack_require__.r(__webpack_exports__);
 
 
 
-const HOCHTIEF_DEFAULT_VIEW = {
-    lat: 51.4239, // Hochtief headquarters latitude
-    lon: 6.9985, // Hochtief headquarters longitude
-    zoom: 15 // Default zoom level
-};
-const OPEN_STREET_MAP_TILE_URL = 'https://tile.openstreetmap.org/{z}/{x}/{y}.png	'; // OpenStreetMap tile URL
+
 class MapManager {
     constructor(mapId) {
         this.mapId = mapId;
@@ -470,7 +466,7 @@ class MapManager {
         }
         /* 2. Create fresh map */
         // Initialize a new map on the 'map' div, setting an initial view (coordinates and zoom level).
-        this.map = leaflet__WEBPACK_IMPORTED_MODULE_0__.map(this.mapId).setView([HOCHTIEF_DEFAULT_VIEW.lat, HOCHTIEF_DEFAULT_VIEW.lon], HOCHTIEF_DEFAULT_VIEW.zoom); // Default view over Hochtief location
+        this.map = leaflet__WEBPACK_IMPORTED_MODULE_0__.map(this.mapId).setView([_config_constants__WEBPACK_IMPORTED_MODULE_4__.HOCHTIEF_DEFAULT_VIEW.lat, _config_constants__WEBPACK_IMPORTED_MODULE_4__.HOCHTIEF_DEFAULT_VIEW.lon], _config_constants__WEBPACK_IMPORTED_MODULE_4__.HOCHTIEF_DEFAULT_VIEW.zoom); // Default view over Hochtief location
         /* 3. Add base layer based on map type */
         if (properties.mapType === 'project' && properties.arcgisMapUrl) {
             const mapView = properties.mapView || 'openstreetmap'; // Default to OpenStreetMap if not set
@@ -487,17 +483,17 @@ class MapManager {
     addOpenStreetMapLayer() {
         if (!this.map)
             return; // Safety check - exit if map doesn't exist
-        leaflet__WEBPACK_IMPORTED_MODULE_0__.tileLayer(OPEN_STREET_MAP_TILE_URL, {
+        leaflet__WEBPACK_IMPORTED_MODULE_0__.tileLayer(_config_constants__WEBPACK_IMPORTED_MODULE_4__.OPEN_STREET_MAP_TILE_URL, {
             attribution: '&copy; <a href="https://www.openstreetmap.org/">OpenStreetMap</a> contributors', // Legal attribution required by OSM
         }).addTo(this.map);
     }
     addArcGISLayer(arcgisMapUrl, mapView) {
         //  Validate the ArcGIS URL before using it
-        const validatedUrl = (0,_utils_Security__WEBPACK_IMPORTED_MODULE_4__.validateArcGISUrl)(arcgisMapUrl);
+        const validatedUrl = (0,_utils_Security__WEBPACK_IMPORTED_MODULE_5__.validateArcGISUrl)(arcgisMapUrl);
         if (validatedUrl) {
             // Use your existing extraction methods (they're fine)
-            const webmapId = (0,_services_ArcGISMap_services_ArcGISUrlService__WEBPACK_IMPORTED_MODULE_5__.extractWebmapId)(validatedUrl);
-            const domain = (0,_services_ArcGISMap_services_ArcGISUrlService__WEBPACK_IMPORTED_MODULE_5__.extractArcGISDomain)(validatedUrl);
+            const webmapId = (0,_services_ArcGISMap_services_ArcGISUrlService__WEBPACK_IMPORTED_MODULE_6__.extractWebmapId)(validatedUrl);
+            const domain = (0,_services_ArcGISMap_services_ArcGISUrlService__WEBPACK_IMPORTED_MODULE_6__.extractArcGISDomain)(validatedUrl);
             if (webmapId && domain && this.map) {
                 this.arcgisMap = new _services_ArcGISMap_ArcGISMapMain__WEBPACK_IMPORTED_MODULE_2__.ArcGISMapService(this.map);
                 this.arcgisMap.addArcGISTileLayer(webmapId, domain, mapView);
@@ -745,6 +741,30 @@ class PropertyPaneManager {
 
 /***/ }),
 
+/***/ 176:
+/*!*************************************************!*\
+  !*** ./lib/webparts/webmap/config/constants.js ***!
+  \*************************************************/
+/***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony export */ __webpack_require__.d(__webpack_exports__, {
+/* harmony export */   HOCHTIEF_DEFAULT_VIEW: () => (/* binding */ HOCHTIEF_DEFAULT_VIEW),
+/* harmony export */   IMAGERY_TILE_URL: () => (/* binding */ IMAGERY_TILE_URL),
+/* harmony export */   OPEN_STREET_MAP_TILE_URL: () => (/* binding */ OPEN_STREET_MAP_TILE_URL)
+/* harmony export */ });
+const IMAGERY_TILE_URL = 'https://services.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}';
+const OPEN_STREET_MAP_TILE_URL = 'https://tile.openstreetmap.org/{z}/{x}/{y}.png';
+const HOCHTIEF_DEFAULT_VIEW = {
+    lat: 51.4239,
+    lon: 6.9985,
+    zoom: 15
+};
+
+
+/***/ }),
+
 /***/ 185:
 /*!*****************************************************************!*\
   !*** ./lib/webparts/webmap/services/ArcGISMap/ArcGISMapMain.js ***!
@@ -760,15 +780,14 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony import */ var leaflet__WEBPACK_IMPORTED_MODULE_0___default = /*#__PURE__*/__webpack_require__.n(leaflet__WEBPACK_IMPORTED_MODULE_0__);
 /* harmony import */ var _services_layers_FeatureLayer__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ./services/layers/FeatureLayer */ 510);
 /* harmony import */ var _services_layers_MapServiceLayer__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ./services/layers/MapServiceLayer */ 347);
+/* harmony import */ var _config_constants__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! ../../config/constants */ 176);
 /* ========================================================================== */
 /* ArcGISMapService.ts                                                        */
 /* - Service class for handling ArcGIS map layers and operations             */
 /* - Now accepts webmap ID as parameter instead of hardcoding                */
 /* ========================================================================== */
 /*
- * ═══════════════════════════════════════════════════════════════════════════
  * WHAT IS ARCGIS?
- * ═══════════════════════════════════════════════════════════════════════════
  * ArcGIS is a mapping platform by Esri that allows organizations to create,
  * manage, and share interactive maps and spatial data.
  *
@@ -786,9 +805,7 @@ __webpack_require__.r(__webpack_exports__);
 // Import modularized services
 
 
-// Basemap tile URLs
-const IMAGERY_TILE_URL = 'https://services.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}';
-const OPEN_STREET_MAP_TILE_URL = 'https://tile.openstreetmap.org/{z}/{x}/{y}.png';
+
 class ArcGISMapService {
     constructor(map) {
         this.map = map; // Store map reference for use in methods
@@ -803,13 +820,12 @@ class ArcGISMapService {
     /**
      * Add ArcGIS tile layer to the map
      *
-     * ┌─────────────────────────────────────────────────────────────────────────┐
-     * │ WHAT ARE TILES?                                                         │
-     * │                                                                         │
-     * │ Maps are made up of small square images called "tiles" (usually         │
-     * │ 256x256 pixels). When you zoom or pan a map, your browser downloads     │
-     * │ the specific tiles needed for that view.                                │
-     * └─────────────────────────────────────────────────────────────────────────┘
+     *  WHAT ARE TILES?
+     *
+     *  Maps are made up of small square images called "tiles" (usually
+     *  256x256 pixels). When you zoom or pan a map, your browser downloads
+     *  the specific tiles needed for that view.
+     *
      *
      * @param webmapId - The ArcGIS webmap ID extracted from the URL (unique identifier for a saved map)
      * @param domain   - The ArcGIS domain (e.g., 'hochtiefinfra' from 'hochtiefinfra.maps.arcgis.com')
@@ -821,14 +837,14 @@ class ArcGISMapService {
         try {
             // add ArcGIS basemap tiles
             if (mapView === 'satellite') {
-                leaflet__WEBPACK_IMPORTED_MODULE_0__.tileLayer(IMAGERY_TILE_URL, {
+                leaflet__WEBPACK_IMPORTED_MODULE_0__.tileLayer(_config_constants__WEBPACK_IMPORTED_MODULE_3__.IMAGERY_TILE_URL, {
                     attribution: '&copy; <a href="https://www.esri.com/">Esri</a>, Maxar, Earthstar Geographics, and the GIS User Community',
                     maxZoom: 19, // Maximum zoom level supported by this tile service
                     id: 'imagery-tile' // Identifier for this layer (useful for debugging)
                 }).addTo(this.map);
             }
             else {
-                leaflet__WEBPACK_IMPORTED_MODULE_0__.tileLayer(OPEN_STREET_MAP_TILE_URL, {
+                leaflet__WEBPACK_IMPORTED_MODULE_0__.tileLayer(_config_constants__WEBPACK_IMPORTED_MODULE_3__.OPEN_STREET_MAP_TILE_URL, {
                     attribution: '&copy; <a href="https://www.openstreetmap.org/">OpenStreetMap</a> contributors', // Legal attribution required by OSM
                     maxZoom: 19, // Maximum zoom level supported by this tile service
                     id: 'osm-tile' // Identifier for this layer (useful for debugging)
@@ -845,17 +861,15 @@ class ArcGISMapService {
     /**
      * Add ArcGIS vector layer (webmap content)
      *
-     * ┌─────────────────────────────────────────────────────────────────────────┐
-     * │ WHAT IS A VECTOR LAYER?                                                 │
-     * │                                                                         │
-     * │ Unlike tiles (which are images), vector layers contain actual           │
-     * │ geometric data:                                                         │
-     * │ • Points   (like building locations)                                    │
-     * │ • Lines    (like roads or pipelines)                                    │
-     * │ • Polygons (like property boundaries or zones)                          │
-     * │                                                                         │
-     * │ This data can be styled, queried, and interacted with programmatically. │
-     * └─────────────────────────────────────────────────────────────────────────┘
+     * WHAT IS A VECTOR LAYER?
+     *
+     * Unlike tiles (which are images), vector layers contain actual
+     * geometric data:
+     * • Points   (like building locations)
+     * • Lines    (like roads or pipelines)
+     * • Polygons (like property boundaries or zones)
+     *
+     * This data can be styled, queried, and interacted with programmatically.
      *
      * @param webmapId - The ArcGIS webmap ID
      * @param domain   - The ArcGIS domain (e.g., 'hochtiefinfra')
@@ -867,7 +881,7 @@ class ArcGISMapService {
         // Construct the webmap URL using the provided domain
         // This URL returns JSON data describing the webmap configuration
         const webmapUrl = `https://${domain}.maps.arcgis.com/sharing/rest/content/items/${webmapId}/data?f=json`;
-        console.log(`Fetching webmap from: ${webmapUrl}`);
+        //console.log(`Fetching webmap from: ${webmapUrl}`);
         // Fetch webmap definition
         fetch(webmapUrl)
             .then(response => {
@@ -880,7 +894,7 @@ class ArcGISMapService {
             .then(webmapData => {
             // Validate that we received a valid object
             if (webmapData && typeof webmapData === 'object') {
-                console.log('Webmap data:', webmapData);
+                //console.log('Webmap data:', webmapData);
                 // Process operational layers from the webmap
                 this.processOperationalLayers(webmapData);
             }
@@ -900,7 +914,7 @@ class ArcGISMapService {
         }
         // Loop through each layer defined in the webmap
         webmapData.operationalLayers.forEach((layer) => {
-            console.log('Processing layer:', layer.title, layer.layerType);
+            //console.log('Processing layer:', layer.title, layer.layerType);
             // Handle Group Layers (like BR_Leverkusen_01)
             if (layer && layer.layerType === 'GroupLayer' && layer.layers && Array.isArray(layer.layers)) {
                 this.processGroupLayer(layer);
@@ -919,10 +933,10 @@ class ArcGISMapService {
      * Process group layers and their sublayers
      */
     processGroupLayer(layer) {
-        console.log(`Found Group Layer: ${layer.title} with ${layer.layers.length} sublayers`);
+        //console.log(`Found Group Layer: ${layer.title} with ${layer.layers.length} sublayers`);
         // Process each sublayer within the group
         layer.layers.forEach((sublayer) => {
-            console.log('Processing sublayer:', sublayer.title, sublayer.layerType, sublayer.url);
+            //console.log('Processing sublayer:', sublayer.title, sublayer.layerType, sublayer.url);
             // Feature layers contain vector data (points, lines, polygons)
             // These are individual geographic features that can be styled and queried
             if (sublayer && sublayer.layerType === 'ArcGISFeatureLayer' && sublayer.url) {
@@ -1022,29 +1036,13 @@ class FeatureLayerService {
     /**
      * Add an ArcGIS Feature Layer with proper styling (Optimized for performance)
      *
-     * ┌─────────────────────────────────────────────────────────────────────────┐
-     * │ WHAT IS A FEATURE LAYER?                                                │
-     * │                                                                         │
-     * │ A feature layer contains individual geographic features (vector data):  │
-     * │ • Each road segment, building outline, or property boundary is a        │
-     * │   separate "feature"                                                    │
-     * │ • Features have both geometry (shape/location) and attributes           │
-     * │   (properties/data)                                                     │
-     * │ • Example: A building feature might have geometry (rectangle outline)   │
-     * │   and attributes (address, owner, year built, etc.)                     │
-     * │                                                                         │
-     * │ PERFORMANCE CONSIDERATIONS:                                             │
-     * │ Feature layers can contain thousands of individual features. Loading    │
-     * │ and rendering all of them can be slow, so this method includes several  │
-     * │ optimizations.                                                          │
-     * └─────────────────────────────────────────────────────────────────────────┘
      */
     async addArcGISFeatureLayer(layerConfig) {
         // Safety checks - make sure we have everything we need
         if (!this.map || !layerConfig || !layerConfig.url)
             return;
         const featureServiceUrl = layerConfig.url;
-        console.log(`Loading feature layer: ${layerConfig.title} from ${featureServiceUrl}`);
+        //console.log(`Loading feature layer: ${layerConfig.title} from ${featureServiceUrl}`);
         try {
             // First, get the layer info to understand the data structure
             const layerInfo = await this.getFeatureLayerInfo(featureServiceUrl);
@@ -1066,7 +1064,7 @@ class FeatureLayerService {
         catch (error) {
             // Log errors but don't crash the entire map
             // This ensures that if one layer fails, other layers can still load
-            console.error(`Failed to load feature layer ${layerConfig.title || 'Unknown'}:`, error);
+            // console.error(`Failed to load feature layer ${layerConfig.title || 'Unknown'}:`, error);
         }
     }
     /**
@@ -1078,21 +1076,21 @@ class FeatureLayerService {
             const url = String(serviceUrl);
             // Add JSON format parameter to the URL (?f=json tells ArcGIS to return JSON data)
             const layerInfoUrl = url.indexOf('?') !== -1 ? `${url}&f=json` : `${url}?f=json`;
-            console.log('Fetching layer info from:', layerInfoUrl);
+            //console.log('Fetching layer info from:', layerInfoUrl);
             // Fetch layer metadata (information about the layer)
             const response = await fetch(layerInfoUrl);
             if (!response.ok) {
-                console.warn(`Failed to fetch layer info: ${response.status}`);
+                //console.warn(`Failed to fetch layer info: ${response.status}`);
                 return null;
             }
             // Parse JSON response
             const layerInfo = await response.json();
-            console.log('Layer info:', layerInfo);
+            //console.log('Layer info:', layerInfo);
             // Return drawing info if available, otherwise null
             return layerInfo.drawingInfo || null;
         }
         catch (error) {
-            console.error('Failed to get layer drawing info:', error);
+            // console.error('Failed to get layer drawing info:', error);
             return null;
         }
     }
@@ -1148,7 +1146,7 @@ class FeatureLayerService {
                 hasMore = false;
             }
         }
-        console.log(`Total features fetched: ${allFeatures.length}`);
+        //console.log(`Total features fetched: ${allFeatures.length}`);
         return allFeatures;
     }
     /**
@@ -1238,7 +1236,7 @@ class FeatureLayerService {
         // Add the layer to the map
         geoJsonLayer.addTo(this.map);
         textClusterGroup.addTo(this.map); // ADD CLUSTER GROUP TO MAP
-        console.log(`Successfully added feature layer: ${layerConfig.title} with ${allFeatures.length} features`);
+        //console.log(`Successfully added feature layer: ${layerConfig.title} with ${allFeatures.length} features`);
         return geoJsonLayer;
     }
     getBounds(geoJsonLayer) {
@@ -1256,7 +1254,7 @@ class FeatureLayerService {
             }
         }
         catch (error) {
-            console.error('Error fitting map to features:', error);
+            //console.error('Error fitting map to features:', error);
         }
     }
 }
@@ -1313,7 +1311,7 @@ class MapServiceLayerService {
         const baseUrl = layerConfig.url;
         if (!baseUrl)
             return;
-        console.log(`Adding map service layer: ${layerConfig.title} from ${baseUrl}`);
+        //console.log(`Adding map service layer: ${layerConfig.title} from ${baseUrl}`);
         // For each sublayer, add as a tile layer
         // Map services can contain multiple sublayers (like separate layers for roads, labels, boundaries)
         if (layerConfig.layers && Array.isArray(layerConfig.layers)) {
@@ -1340,7 +1338,7 @@ class MapServiceLayerService {
                     opacity: layerConfig.opacity || 1, // Layer transparency (0 = invisible, 1 = fully opaque)
                     attribution: 'ArcGIS Map Service' // Credit text shown in map corner
                 }).addTo(this.map);
-                console.log(`Added sublayer ${sublayer.id} as tile layer`);
+                //console.log(`Added sublayer ${sublayer.id} as tile layer`);
             }
         });
     }
@@ -1354,7 +1352,7 @@ class MapServiceLayerService {
             opacity: layerConfig.opacity || 1,
             attribution: 'ArcGIS Map Service'
         }).addTo(this.map);
-        console.log(`Added map service as tile layer: ${layerConfig.title}`);
+        //console.log(`Added map service as tile layer: ${layerConfig.title}`);
     }
 }
 
@@ -1680,7 +1678,7 @@ class DataService {
                 const searchString = siteServerRelativeUrl === '/' ? '/' : siteServerRelativeUrl + '/';
                 const relativeFileRef = item.FileRef.replace(searchString, ''); // Get server-relative URL
                 const fileUrl = `${site}/${relativeFileRef}`; // Build full URL to file
-                console.log(`Image Output: ${site} | ${siteServerRelativeUrl} | ${relativeFileRef} | ${fileUrl} | ${fileName}`);
+                //console.log(`Image Output: ${site} | ${siteServerRelativeUrl} | ${relativeFileRef} | ${fileUrl} | ${fileName}`);
                 // Check if it's an image file based on the file extension
                 if (!this.isImageFile(fileUrl))
                     continue; // Skip non-image files
@@ -1694,8 +1692,17 @@ class DataService {
                     // Check if both fields have values
                     if (item[latField] && item[lonField]) {
                         // Parse string values to numbers
-                        lat = parseFloat(item[latField]);
-                        lon = parseFloat(item[lonField]);
+                        let latString = item[latField];
+                        let lonString = item[lonField];
+                        // Replace comma with period if comma is used as decimal separator
+                        if (latString.includes(',')) {
+                            latString = latString.replace(',', '.');
+                        }
+                        if (lonString.includes(',')) {
+                            lonString = lonString.replace(',', '.');
+                        }
+                        lat = parseFloat(latString);
+                        lon = parseFloat(lonString);
                     }
                 }
                 else {
@@ -1858,6 +1865,7 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony export */ });
 /* harmony import */ var leaflet__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! leaflet */ 973);
 /* harmony import */ var leaflet__WEBPACK_IMPORTED_MODULE_0___default = /*#__PURE__*/__webpack_require__.n(leaflet__WEBPACK_IMPORTED_MODULE_0__);
+/* harmony import */ var _config_constants__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ../config/constants */ 176);
 /* ========================================================================== */
 /* services/MapView.ts                                                        */
 /* - Service for managing map view and bounds                                 */
@@ -1865,15 +1873,7 @@ __webpack_require__.r(__webpack_exports__);
 /* - Handles automatic zoom to fit all content                                */
 /* ========================================================================== */
 
-/**
- * Hochtief default view coordinates
- * Used when no content is available to display
- */
-const HOCHTIEF_DEFAULT_VIEW = {
-    lat: 51.4239, // Hochtief headquarters latitude
-    lon: 6.9985, // Hochtief headquarters longitude
-    zoom: 15 // Default zoom level
-};
+
 /**
  * Service for managing map view and bounds
  * Coordinates between different data sources to ensure optimal map view
@@ -1890,7 +1890,7 @@ class MapViewService {
      */
     setImageBounds(bounds) {
         this.imageBounds = [...bounds]; // Create a copy to avoid reference issues
-        console.log(`MapView: Updated image bounds - ${bounds.length} points`);
+        //console.log(`MapView: Updated image bounds - ${bounds.length} points`);
         this.updateMapView();
     }
     /**
@@ -1899,7 +1899,7 @@ class MapViewService {
      */
     setFeatureBounds(bounds) {
         this.featureBounds = [...bounds]; // Create a copy to avoid reference issues
-        console.log(`MapView: Updated feature bounds - ${bounds.length} points`);
+        //console.log(`MapView: Updated feature bounds - ${bounds.length} points`);
         this.updateMapView();
     }
     /**
@@ -1908,7 +1908,7 @@ class MapViewService {
     clearBounds() {
         this.imageBounds = [];
         this.featureBounds = [];
-        console.log('MapView: Cleared all bounds');
+        //console.log('MapView: Cleared all bounds');
     }
     /**
      * Main method to update map view based on current bounds
@@ -1920,19 +1920,19 @@ class MapViewService {
             const allBounds = [...this.imageBounds, ...this.featureBounds];
             if (allBounds.length === 0) {
                 // No content available - set Hochtief default view
-                console.log('MapView: No content available, setting Hochtief default view');
-                this.map.setView([HOCHTIEF_DEFAULT_VIEW.lat, HOCHTIEF_DEFAULT_VIEW.lon], HOCHTIEF_DEFAULT_VIEW.zoom);
+                //console.log('MapView: No content available, setting Hochtief default view');
+                this.map.setView([_config_constants__WEBPACK_IMPORTED_MODULE_1__.HOCHTIEF_DEFAULT_VIEW.lat, _config_constants__WEBPACK_IMPORTED_MODULE_1__.HOCHTIEF_DEFAULT_VIEW.lon], _config_constants__WEBPACK_IMPORTED_MODULE_1__.HOCHTIEF_DEFAULT_VIEW.zoom);
                 return;
             }
             if (allBounds.length === 1) {
                 // Only one point - center on it with reasonable zoom
-                console.log('MapView: Single point detected, centering with default zoom');
+                //console.log('MapView: Single point detected, centering with default zoom');
                 const point = allBounds[0];
                 this.map.setView([point.lat, point.lng], 16); // Zoom level 16 for single points
                 return;
             }
             // Multiple points - fit all bounds
-            console.log(`MapView: Multiple points detected (${allBounds.length}), fitting to bounds`);
+            //console.log(`MapView: Multiple points detected (${allBounds.length}), fitting to bounds`);
             // Create LatLngBounds object from all points
             const boundsGroup = new leaflet__WEBPACK_IMPORTED_MODULE_0__.LatLngBounds(allBounds);
             // Fit the map to show all points with some padding
@@ -1942,12 +1942,12 @@ class MapViewService {
             });
             // Log the final bounds for debugging
             const center = boundsGroup.getCenter();
-            console.log(`MapView: Set view to center: ${center.lat.toFixed(4)}, ${center.lng.toFixed(4)}`);
+            //console.log(`MapView: Set view to center: ${center.lat.toFixed(4)}, ${center.lng.toFixed(4)}`);
         }
         catch (error) {
             // If anything goes wrong with bounds calculation, fall back to default view
-            console.error('MapView: Error updating map view, falling back to default:', error);
-            this.map.setView([HOCHTIEF_DEFAULT_VIEW.lat, HOCHTIEF_DEFAULT_VIEW.lon], HOCHTIEF_DEFAULT_VIEW.zoom);
+            //console.error('MapView: Error updating map view, falling back to default:', error);
+            this.map.setView([_config_constants__WEBPACK_IMPORTED_MODULE_1__.HOCHTIEF_DEFAULT_VIEW.lat, _config_constants__WEBPACK_IMPORTED_MODULE_1__.HOCHTIEF_DEFAULT_VIEW.lon], _config_constants__WEBPACK_IMPORTED_MODULE_1__.HOCHTIEF_DEFAULT_VIEW.zoom);
         }
     }
     /**
@@ -1955,7 +1955,7 @@ class MapViewService {
      * Useful for manual triggers or debugging
      */
     forceUpdateView() {
-        console.log('MapView: Force updating view');
+        //console.log('MapView: Force updating view');
         this.updateMapView();
     }
     /**
@@ -1979,8 +1979,8 @@ class MapViewService {
      * Useful for reset operations
      */
     setDefaultView() {
-        console.log('MapView: Setting Hochtief default view');
-        this.map.setView([HOCHTIEF_DEFAULT_VIEW.lat, HOCHTIEF_DEFAULT_VIEW.lon], HOCHTIEF_DEFAULT_VIEW.zoom);
+        //console.log('MapView: Setting Hochtief default view');
+        this.map.setView([_config_constants__WEBPACK_IMPORTED_MODULE_1__.HOCHTIEF_DEFAULT_VIEW.lat, _config_constants__WEBPACK_IMPORTED_MODULE_1__.HOCHTIEF_DEFAULT_VIEW.lon], _config_constants__WEBPACK_IMPORTED_MODULE_1__.HOCHTIEF_DEFAULT_VIEW.zoom);
     }
 }
 
@@ -6561,10 +6561,6 @@ class WebmapWebPart extends _microsoft_sp_webpart_base__WEBPACK_IMPORTED_MODULE_
      * The main render method called by the SPFx framework to display the web part.
      */
     render() {
-        // // Initialize managers and services if not already done
-        // if (!this.dataService) {
-        //   this.dataService = new DataService(this.context);
-        // }
         if (!this.propertyPaneManager) {
             this.propertyPaneManager = new _components_PropertyPaneManager__WEBPACK_IMPORTED_MODULE_4__.PropertyPaneManager(this.context, this.properties);
         }
