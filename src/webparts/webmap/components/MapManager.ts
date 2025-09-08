@@ -15,13 +15,8 @@ import { MapViewService } from '../services/MapViewService';
 
 import { extractArcGISDomain, extractWebmapId } from '../services/ArcGISMap/services/ArcGISUrlService';
 
-const HOCHTIEF_DEFAULT_VIEW = {
-  lat: 51.4239,    // Hochtief headquarters latitude
-  lon: 6.9985,     // Hochtief headquarters longitude
-  zoom: 15         // Default zoom level
-};
+import {OPEN_STREET_MAP_TILE_URL, HOCHTIEF_DEFAULT_VIEW } from '../config/constants';
 
-const OPEN_STREET_MAP_TILE_URL = 'https://tile.openstreetmap.org/{z}/{x}/{y}.png	'; // OpenStreetMap tile URL
 
 export class MapManager {
   private map: L.Map | undefined;

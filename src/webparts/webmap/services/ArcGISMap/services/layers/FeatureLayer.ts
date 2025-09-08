@@ -26,29 +26,13 @@ export class FeatureLayerService {
   /**
    * Add an ArcGIS Feature Layer with proper styling (Optimized for performance)
    * 
-   * ┌─────────────────────────────────────────────────────────────────────────┐
-   * │ WHAT IS A FEATURE LAYER?                                                │
-   * │                                                                         │
-   * │ A feature layer contains individual geographic features (vector data):  │
-   * │ • Each road segment, building outline, or property boundary is a        │
-   * │   separate "feature"                                                    │
-   * │ • Features have both geometry (shape/location) and attributes           │
-   * │   (properties/data)                                                     │
-   * │ • Example: A building feature might have geometry (rectangle outline)   │
-   * │   and attributes (address, owner, year built, etc.)                     │
-   * │                                                                         │
-   * │ PERFORMANCE CONSIDERATIONS:                                             │
-   * │ Feature layers can contain thousands of individual features. Loading    │
-   * │ and rendering all of them can be slow, so this method includes several  │
-   * │ optimizations.                                                          │
-   * └─────────────────────────────────────────────────────────────────────────┘
    */
   public async addArcGISFeatureLayer(layerConfig: LayerConfig): Promise<void> {
     // Safety checks - make sure we have everything we need
     if (!this.map || !layerConfig || !layerConfig.url) return;
 
     const featureServiceUrl = layerConfig.url;
-    console.log(`Loading feature layer: ${layerConfig.title} from ${featureServiceUrl}`);
+    //console.log(`Loading feature layer: ${layerConfig.title} from ${featureServiceUrl}`);
     
     try {
         // First, get the layer info to understand the data structure
@@ -75,7 +59,7 @@ export class FeatureLayerService {
     catch (error) {
             // Log errors but don't crash the entire map
             // This ensures that if one layer fails, other layers can still load
-            console.error(`Failed to load feature layer ${layerConfig.title || 'Unknown'}:`, error);
+            // console.error(`Failed to load feature layer ${layerConfig.title || 'Unknown'}:`, error);
     }
   }
 
@@ -88,23 +72,23 @@ export class FeatureLayerService {
       const url = String(serviceUrl);
       // Add JSON format parameter to the URL (?f=json tells ArcGIS to return JSON data)
       const layerInfoUrl = url.indexOf('?') !== -1 ? `${url}&f=json` : `${url}?f=json`;
-      console.log('Fetching layer info from:', layerInfoUrl);
+      //console.log('Fetching layer info from:', layerInfoUrl);
       
       // Fetch layer metadata (information about the layer)
       const response = await fetch(layerInfoUrl);
       if (!response.ok) {
-        console.warn(`Failed to fetch layer info: ${response.status}`);
+        //console.warn(`Failed to fetch layer info: ${response.status}`);
         return null;
       }
       
       // Parse JSON response
       const layerInfo = await response.json();
-      console.log('Layer info:', layerInfo);
+      //console.log('Layer info:', layerInfo);
       
       // Return drawing info if available, otherwise null
       return layerInfo.drawingInfo || null;
     } catch (error) {
-      console.error('Failed to get layer drawing info:', error);
+      // console.error('Failed to get layer drawing info:', error);
       return null;
     }
   }
@@ -169,7 +153,7 @@ export class FeatureLayerService {
         }
     }
 
-    console.log(`Total features fetched: ${allFeatures.length}`);
+    //console.log(`Total features fetched: ${allFeatures.length}`);
     return allFeatures;
   }
 
@@ -271,7 +255,7 @@ export class FeatureLayerService {
     textClusterGroup.addTo(this.map!);  // ADD CLUSTER GROUP TO MAP
 
     
-    console.log(`Successfully added feature layer: ${layerConfig.title} with ${allFeatures.length} features`);
+    //console.log(`Successfully added feature layer: ${layerConfig.title} with ${allFeatures.length} features`);
 
     return geoJsonLayer;
   }
@@ -291,7 +275,7 @@ export class FeatureLayerService {
         this.mapViewService.setFeatureBounds(boundsArray);
       }
     } catch (error) {
-      console.error('Error fitting map to features:', error);
+      //console.error('Error fitting map to features:', error);
     }
   }
 }

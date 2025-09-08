@@ -5,9 +5,7 @@
 /* ========================================================================== */
 
 /*
- * ═══════════════════════════════════════════════════════════════════════════
  * WHAT IS ARCGIS?
- * ═══════════════════════════════════════════════════════════════════════════
  * ArcGIS is a mapping platform by Esri that allows organizations to create, 
  * manage, and share interactive maps and spatial data.
  * 
@@ -30,12 +28,8 @@ import { MapServiceLayerService } from './services/layers/MapServiceLayer';
 import { WebmapData, LayerConfig } from './types/ArcGISTypes';
 import { MapViewService } from '../MapViewService';
 
+import {OPEN_STREET_MAP_TILE_URL, IMAGERY_TILE_URL } from '../../config/constants';
 
-
-
-// Basemap tile URLs
-const IMAGERY_TILE_URL = 'https://services.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}';
-const OPEN_STREET_MAP_TILE_URL = 'https://tile.openstreetmap.org/{z}/{x}/{y}.png'; 
 
 export class ArcGISMapService {
   private map: L.Map; // Reference to the Leaflet map instance
@@ -59,14 +53,13 @@ export class ArcGISMapService {
   /**
    * Add ArcGIS tile layer to the map
    * 
-   * ┌─────────────────────────────────────────────────────────────────────────┐
-   * │ WHAT ARE TILES?                                                         │
-   * │                                                                         │
-   * │ Maps are made up of small square images called "tiles" (usually         │
-   * │ 256x256 pixels). When you zoom or pan a map, your browser downloads     │
-   * │ the specific tiles needed for that view.                                │
-   * └─────────────────────────────────────────────────────────────────────────┘
+   *  WHAT ARE TILES?                                                         
+   *                                                                          
+   *  Maps are made up of small square images called "tiles" (usually         
+   *  256x256 pixels). When you zoom or pan a map, your browser downloads     
+   *  the specific tiles needed for that view.                                
    * 
+   *
    * @param webmapId - The ArcGIS webmap ID extracted from the URL (unique identifier for a saved map)
    * @param domain   - The ArcGIS domain (e.g., 'hochtiefinfra' from 'hochtiefinfra.maps.arcgis.com')
    */
@@ -102,17 +95,15 @@ export class ArcGISMapService {
   /**
    * Add ArcGIS vector layer (webmap content)
    * 
-   * ┌─────────────────────────────────────────────────────────────────────────┐
-   * │ WHAT IS A VECTOR LAYER?                                                 │
-   * │                                                                         │
-   * │ Unlike tiles (which are images), vector layers contain actual           │
-   * │ geometric data:                                                         │
-   * │ • Points   (like building locations)                                    │
-   * │ • Lines    (like roads or pipelines)                                    │
-   * │ • Polygons (like property boundaries or zones)                          │
-   * │                                                                         │
-   * │ This data can be styled, queried, and interacted with programmatically. │
-   * └─────────────────────────────────────────────────────────────────────────┘
+   * WHAT IS A VECTOR LAYER?                                                 
+   *                                                                         
+   * Unlike tiles (which are images), vector layers contain actual           
+   * geometric data:                                                         
+   * • Points   (like building locations)                                    
+   * • Lines    (like roads or pipelines)                                    
+   * • Polygons (like property boundaries or zones)                    
+   *                                                                         
+   * This data can be styled, queried, and interacted with programmatically.
    * 
    * @param webmapId - The ArcGIS webmap ID
    * @param domain   - The ArcGIS domain (e.g., 'hochtiefinfra')
@@ -125,7 +116,7 @@ export class ArcGISMapService {
     // This URL returns JSON data describing the webmap configuration
     const webmapUrl = `https://${domain}.maps.arcgis.com/sharing/rest/content/items/${webmapId}/data?f=json`;
     
-    console.log(`Fetching webmap from: ${webmapUrl}`);
+    //console.log(`Fetching webmap from: ${webmapUrl}`);
     
     // Fetch webmap definition
     fetch(webmapUrl)
@@ -139,7 +130,7 @@ export class ArcGISMapService {
       .then(webmapData => {
         // Validate that we received a valid object
         if (webmapData && typeof webmapData === 'object') {
-          console.log('Webmap data:', webmapData);
+          //console.log('Webmap data:', webmapData);
           // Process operational layers from the webmap
           this.processOperationalLayers(webmapData);
         }
@@ -161,7 +152,7 @@ export class ArcGISMapService {
 
     // Loop through each layer defined in the webmap
     webmapData.operationalLayers.forEach((layer: any) => {
-      console.log('Processing layer:', layer.title, layer.layerType);
+      //console.log('Processing layer:', layer.title, layer.layerType);
       
       // Handle Group Layers (like BR_Leverkusen_01)
       if (layer && layer.layerType === 'GroupLayer' && layer.layers && Array.isArray(layer.layers)) {
@@ -182,11 +173,11 @@ export class ArcGISMapService {
    * Process group layers and their sublayers
    */
   private processGroupLayer(layer: any): void {
-    console.log(`Found Group Layer: ${layer.title} with ${layer.layers.length} sublayers`);
+    //console.log(`Found Group Layer: ${layer.title} with ${layer.layers.length} sublayers`);
     
     // Process each sublayer within the group
     layer.layers.forEach((sublayer: any) => {
-      console.log('Processing sublayer:', sublayer.title, sublayer.layerType, sublayer.url);
+      //console.log('Processing sublayer:', sublayer.title, sublayer.layerType, sublayer.url);
       
       // Feature layers contain vector data (points, lines, polygons)
       // These are individual geographic features that can be styled and queried

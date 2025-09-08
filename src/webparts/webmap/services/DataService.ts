@@ -138,7 +138,7 @@ private async fetchDocumentLibraryData(properties: IWebmapWebPartProps): Promise
       const relativeFileRef = item.FileRef.replace(searchString, ''); // Get server-relative URL
       const fileUrl = `${site}/${relativeFileRef}`; // Build full URL to file
 
-      console.log(`Image Output: ${site} | ${siteServerRelativeUrl} | ${relativeFileRef} | ${fileUrl} | ${fileName}`);
+      //console.log(`Image Output: ${site} | ${siteServerRelativeUrl} | ${relativeFileRef} | ${fileUrl} | ${fileName}`);
       
       // Check if it's an image file based on the file extension
       if (!this.isImageFile(fileUrl)) continue; // Skip non-image files
@@ -155,8 +155,19 @@ private async fetchDocumentLibraryData(properties: IWebmapWebPartProps): Promise
         // Check if both fields have values
         if (item[latField!] && item[lonField!]) {
           // Parse string values to numbers
-          lat = parseFloat(item[latField!] as string);
-          lon = parseFloat(item[lonField!] as string);
+          let latString = item[latField!] as string;
+          let lonString = item[lonField!] as string;
+          
+          // Replace comma with period if comma is used as decimal separator
+          if (latString.includes(',')) {
+            latString = latString.replace(',', '.');
+          }
+          if (lonString.includes(',')) {
+            lonString = lonString.replace(',', '.');
+          }
+          
+          lat = parseFloat(latString);
+          lon = parseFloat(lonString);
         }
       } else {
         // EXIF method: Extract from image EXIF data

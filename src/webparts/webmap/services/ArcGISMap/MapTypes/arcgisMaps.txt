@@ -1,19 +1,7 @@
 Here are some widely used ArcGIS basemap services:
 
-Topographic Map:
-https://services.arcgisonline.com/ArcGIS/rest/services/World_Topo_Map/MapServer
-
 Imagery (Satellite):
-https://services.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer
+https://services.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}
 
-Street Map:
-https://services.arcgisonline.com/ArcGIS/rest/services/World_Street_Map/MapServer
-
-Light Gray Canvas:
-https://services.arcgisonline.com/ArcGIS/rest/services/Canvas/World_Light_Gray_Base/MapServer
-
-Dark Gray Canvas:
-https://services.arcgisonline.com/ArcGIS/rest/services/Canvas/World_Dark_Gray_Base/MapServer
-
-National Geographic:
-https://services.arcgisonline.com/ArcGIS/rest/services/NatGeo_World_Map/MapServer
+OpenStreetMap:
+https://tile.openstreetmap.org/{z}/{x}/{y}.png

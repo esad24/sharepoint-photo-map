@@ -61,10 +61,7 @@ export default class WebmapWebPart extends BaseClientSideWebPart<IWebmapWebPartP
    * The main render method called by the SPFx framework to display the web part.
    */
   public render(): void {
-    // // Initialize managers and services if not already done
-    // if (!this.dataService) {
-    //   this.dataService = new DataService(this.context);
-    // }
+
     if (!this.propertyPaneManager) {
       this.propertyPaneManager = new PropertyPaneManager(this.context, this.properties);
     }

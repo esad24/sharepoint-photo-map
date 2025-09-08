@@ -40,7 +40,7 @@ export class MapServiceLayerService {
     const baseUrl = layerConfig.url;
     if (!baseUrl) return;
     
-    console.log(`Adding map service layer: ${layerConfig.title} from ${baseUrl}`);
+    //console.log(`Adding map service layer: ${layerConfig.title} from ${baseUrl}`);
     
     // For each sublayer, add as a tile layer
     // Map services can contain multiple sublayers (like separate layers for roads, labels, boundaries)
@@ -70,7 +70,7 @@ export class MapServiceLayerService {
           attribution: 'ArcGIS Map Service'  // Credit text shown in map corner
         }).addTo(this.map!);
         
-        console.log(`Added sublayer ${sublayer.id} as tile layer`);
+        //console.log(`Added sublayer ${sublayer.id} as tile layer`);
       }
     });
   }
@@ -87,6 +87,6 @@ export class MapServiceLayerService {
       attribution: 'ArcGIS Map Service'
     }).addTo(this.map!);
     
-    console.log(`Added map service as tile layer: ${layerConfig.title}`);
+    //console.log(`Added map service as tile layer: ${layerConfig.title}`);
   }
 }

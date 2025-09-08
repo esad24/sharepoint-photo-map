@@ -7,15 +7,9 @@
 
 import * as L from 'leaflet';
 
-/**
- * Hochtief default view coordinates
- * Used when no content is available to display
- */
-const HOCHTIEF_DEFAULT_VIEW = {
-lat: 51.4239,    // Hochtief headquarters latitude
-lon: 6.9985,     // Hochtief headquarters longitude
-zoom: 15         // Default zoom level
-};
+import { HOCHTIEF_DEFAULT_VIEW } from '../config/constants';
+
+
 
 /**
  * Service for managing map view and bounds
@@ -36,7 +30,7 @@ constructor(map: L.Map) {
  */
 public setImageBounds(bounds: L.LatLng[]): void {
   this.imageBounds = [...bounds]; // Create a copy to avoid reference issues
-  console.log(`MapView: Updated image bounds - ${bounds.length} points`);
+  //console.log(`MapView: Updated image bounds - ${bounds.length} points`);
   this.updateMapView();
 }
 
@@ -46,7 +40,7 @@ public setImageBounds(bounds: L.LatLng[]): void {
  */
 public setFeatureBounds(bounds: L.LatLng[]): void {
   this.featureBounds = [...bounds]; // Create a copy to avoid reference issues
-  console.log(`MapView: Updated feature bounds - ${bounds.length} points`);
+  //console.log(`MapView: Updated feature bounds - ${bounds.length} points`);
   this.updateMapView();
 }
 
@@ -56,7 +50,7 @@ public setFeatureBounds(bounds: L.LatLng[]): void {
 public clearBounds(): void {
   this.imageBounds = [];
   this.featureBounds = [];
-  console.log('MapView: Cleared all bounds');
+  //console.log('MapView: Cleared all bounds');
 }
 
 /**
@@ -70,21 +64,21 @@ private updateMapView(): void {
     
     if (allBounds.length === 0) {
       // No content available - set Hochtief default view
-      console.log('MapView: No content available, setting Hochtief default view');
+      //console.log('MapView: No content available, setting Hochtief default view');
       this.map.setView([HOCHTIEF_DEFAULT_VIEW.lat, HOCHTIEF_DEFAULT_VIEW.lon], HOCHTIEF_DEFAULT_VIEW.zoom);
       return;
     }
 
     if (allBounds.length === 1) {
       // Only one point - center on it with reasonable zoom
-      console.log('MapView: Single point detected, centering with default zoom');
+      //console.log('MapView: Single point detected, centering with default zoom');
       const point = allBounds[0];
       this.map.setView([point.lat, point.lng], 16); // Zoom level 16 for single points
       return;
     }
 
     // Multiple points - fit all bounds
-    console.log(`MapView: Multiple points detected (${allBounds.length}), fitting to bounds`);
+    //console.log(`MapView: Multiple points detected (${allBounds.length}), fitting to bounds`);
     
     // Create LatLngBounds object from all points
     const boundsGroup = new L.LatLngBounds(allBounds);
@@ -97,11 +91,11 @@ private updateMapView(): void {
 
     // Log the final bounds for debugging
     const center = boundsGroup.getCenter();
-    console.log(`MapView: Set view to center: ${center.lat.toFixed(4)}, ${center.lng.toFixed(4)}`);
+    //console.log(`MapView: Set view to center: ${center.lat.toFixed(4)}, ${center.lng.toFixed(4)}`);
     
   } catch (error) {
     // If anything goes wrong with bounds calculation, fall back to default view
-    console.error('MapView: Error updating map view, falling back to default:', error);
+    //console.error('MapView: Error updating map view, falling back to default:', error);
     this.map.setView([HOCHTIEF_DEFAULT_VIEW.lat, HOCHTIEF_DEFAULT_VIEW.lon], HOCHTIEF_DEFAULT_VIEW.zoom);
   }
 }
@@ -111,7 +105,7 @@ private updateMapView(): void {
  * Useful for manual triggers or debugging
  */
 public forceUpdateView(): void {
-  console.log('MapView: Force updating view');
+  //console.log('MapView: Force updating view');
   this.updateMapView();
 }
 
@@ -138,7 +132,7 @@ public hasContent(): boolean {
  * Useful for reset operations
  */
 public setDefaultView(): void {
-  console.log('MapView: Setting Hochtief default view');
+  //console.log('MapView: Setting Hochtief default view');
   this.map.setView([HOCHTIEF_DEFAULT_VIEW.lat, HOCHTIEF_DEFAULT_VIEW.lon], HOCHTIEF_DEFAULT_VIEW.zoom);
 }
 }
