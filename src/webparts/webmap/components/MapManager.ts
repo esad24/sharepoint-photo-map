@@ -64,6 +64,7 @@ export class MapManager {
 
     L.tileLayer(OPEN_STREET_MAP_TILE_URL, {
       attribution: '&copy; <a href="https://www.openstreetmap.org/">OpenStreetMap</a> contributors', // Legal attribution required by OSM
+      maxZoom: 19
     }).addTo(this.map);
   }
 
