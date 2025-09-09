@@ -59,6 +59,7 @@ export class ArcGISMapService {
    *  256x256 pixels). When you zoom or pan a map, your browser downloads     
    *  the specific tiles needed for that view.                                
    * 
+   * test
    *
    * @param webmapId - The ArcGIS webmap ID extracted from the URL (unique identifier for a saved map)
    * @param domain   - The ArcGIS domain (e.g., 'hochtiefinfra' from 'hochtiefinfra.maps.arcgis.com')
