@@ -33,7 +33,7 @@ export class ClusterManager {
       iconCreateFunction: (cluster) => {
         // Get the first marker in the cluster to use its image for the cluster icon.
         // This makes the cluster show a preview of what's inside
-        const first: L.Marker = cluster.getAllChildMarkers()[0]; // Use the specific L.Marker type instead of 'any'.
+        const first: L.Marker = cluster.getAllChildMarkers()[0];
         const img = sanitizeUrl(first?.options.data?.img as string); // Safely get and sanitize the image URL
         const count  = cluster.getChildCount(); // How many markers are in this cluster.
 

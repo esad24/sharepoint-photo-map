@@ -7,10 +7,17 @@ import { IPropertyPaneDropdownOption } from '@microsoft/sp-property-pane';
 import * as L from 'leaflet';
 
 // These interfaces define the structure of SharePoint data we expect to receive -> avoid 'any' type
-export interface ISPList { Title: string; } // SharePoint list object with just the Title property we need
-export interface ISPField { TypeAsString: string; InternalName: string; Title: string; } // SharePoint field with its type and names
-export interface IClusterClickEvent extends L.LeafletEvent { layer: L.MarkerCluster; latlng: L.LatLng; } // Custom event type for cluster clicks
-
+export interface ISPList { // SharePoint list object with just the Title property we need
+  Title: string; 
+} 
+export interface ISPField { // SharePoint field with its type and names
+  TypeAsString: string;
+  InternalName: string; 
+  Title: string; } 
+export interface IClusterClickEvent extends L.LeafletEvent { // Custom event type for cluster clicks
+  layer: L.MarkerCluster; 
+  latlng: L.LatLng; 
+} 
 // Map type options
 export type MapType = 'general' | 'project'; // Only two allowed values for map type
 

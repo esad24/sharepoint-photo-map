@@ -19,7 +19,7 @@ import { BaseClientSideWebPart } from '@microsoft/sp-webpart-base'; // The base 
 // Imports for the Leaflet mapping library
 import * as L from 'leaflet';               // The core Leaflet library.
 
-// Import interfaces and types
+// Import interfaces
 import { IWebmapWebPartProps } from './types/IWebmapTypes';
 
 // Import managers and services
@@ -53,6 +53,8 @@ export default class WebmapWebPart extends BaseClientSideWebPart<IWebmapWebPartP
 
   // Generate a unique ID for the map container to avoid conflicts if multiple web parts are on the same page
   private mapId: string = `map-${Math.random().toString(36).substr(2, 9)}`;
+  private loaderId: string = `loader-${Math.random().toString(36).substr(2, 9)}`;
+
 
   /* ------------------------------------------------------------- */
   /* RENDER                                                        */
@@ -70,13 +72,40 @@ export default class WebmapWebPart extends BaseClientSideWebPart<IWebmapWebPartP
     // It creates a container `div` with a unique ID ('map') that Leaflet will use to initialize the map.
     // The styles.mapContainer applies CSS styling from the SCSS module
     this.domElement.innerHTML = `
-      <div>
-        <div id="${this.mapId}" class="${styles.mapContainer}"></div>
+    <div style="position: relative;">
+      <div id="${this.mapId}" class="${styles.mapContainer}"></div>
+      <div id="${this.loaderId}" class="${styles.loader}" style="display: none;">
+        <div class="${styles.loaderSpinner}"></div>
+        <div class="${styles.loaderText}">Loading images...</div>
       </div>
+    </div>
     `;
 
     // Calls the method to initialize the Leaflet map logic.
     this.renderMap();
+  }
+
+  /* ------------------------------------------------------------- */
+  /* Loader management                                             */
+  /* ------------------------------------------------------------- */
+  /**
+   * Shows the loading indicator
+   */
+  private showLoader(): void {
+    const loader = document.getElementById(this.loaderId);
+    if (loader) {
+      loader.style.display = 'flex';
+    }
+  }
+
+  /**
+   * Hides the loading indicator
+   */
+  private hideLoader(): void {
+    const loader = document.getElementById(this.loaderId);
+    if (loader) {
+      loader.style.display = 'none';
+    }
   }
 
   /* ------------------------------------------------------------- */
@@ -118,8 +147,9 @@ export default class WebmapWebPart extends BaseClientSideWebPart<IWebmapWebPartP
     this.clusterManager = new ClusterManager(map);
 
 
-    /* 4. First data load */
-    this.loadMapData(); // Load the data immediately when map is created.
+    if (this.properties.libraryName) {
+      this.loadMapData();
+    }
   }
 
   /* ------------------------------------------------------------- */
@@ -130,27 +160,35 @@ export default class WebmapWebPart extends BaseClientSideWebPart<IWebmapWebPartP
    */
   private async loadMapData(): Promise<void> {
     // Guard clause: do nothing if managers aren't ready.
-    if (!this.clusterManager || !this.dataService || !this.mapManager) return;
+    if (!this.clusterManager || !this.dataService || !this.mapManager ||!this.properties.libraryName) return;
 
-    // Use the DataService to fetch data
-    // This handles all the complexity of getting images and coordinates from SharePoint
-    const result = await this.dataService.fetchMapData(this.properties);
+    this.showLoader();
 
-    // Clear all old markers before adding new ones.
-    // This ensures we don't have duplicate markers if data is refreshed
-    this.clusterManager.clearMarkers();
+    try {
+      // Use the DataService to fetch data
+      // This handles all the complexity of getting images and coordinates from SharePoint
+      const result = await this.dataService.fetchMapData(this.properties);
 
-    result.items.forEach((item: IMapItem) => {
-      // Add marker to cluster
-      this.clusterManager!.addMarker(item.lat, item.lon, item.data, item.img);
-    });
+      // Clear all old markers before adding new ones.
+      // This ensures we don't have duplicate markers if data is refreshed
+      this.clusterManager.clearMarkers();
 
-    // Show any errors that occurred during fetching
-    // This helps users understand if something went wrong
-    result.errors.forEach(error => {
-      ToastManager.show(error, 'error');
-    });
+      result.items.forEach((item: IMapItem) => {
+        // Add marker to cluster
+        this.clusterManager!.addMarker(item.lat, item.lon, item.data, item.img);
+      });
+
+      // Show any errors that occurred during fetching
+      // This helps users understand if something went wrong
+      result.errors.forEach(error => {
+        ToastManager.show(error, 'error');
+      });
+    } catch (error) {
+      console.error('Error loading Images:', error);
+    } finally {
+      this.hideLoader();
   }
+}
 
   /* ------------------------------------------------------------- */
   /* Property-pane                                                 */
@@ -221,6 +259,7 @@ export default class WebmapWebPart extends BaseClientSideWebPart<IWebmapWebPartP
     /* Reload field dropdowns when the library changes */
     if (path === 'libraryName' && newValue) {
       this.propertyPaneManager.loadFields(newValue as string);
+      this.render();
     }
 
     /* Re-render map whenever any data-source field changes */

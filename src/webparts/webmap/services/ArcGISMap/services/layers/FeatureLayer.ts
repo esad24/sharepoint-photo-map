@@ -71,7 +71,7 @@ export class FeatureLayerService {
       // Ensure we're getting the correct layer info URL
       const url = String(serviceUrl);
       // Add JSON format parameter to the URL (?f=json tells ArcGIS to return JSON data)
-      const layerInfoUrl = url.indexOf('?') !== -1 ? `${url}&f=json` : `${url}?f=json`;
+      const layerInfoUrl = url.includes('?') ? `${url}&f=json` : `${url}?f=json`;
       //console.log('Fetching layer info from:', layerInfoUrl);
       
       // Fetch layer metadata (information about the layer)
@@ -113,8 +113,8 @@ export class FeatureLayerService {
     while (hasMore) {
         // Create query parameters for the current request
         const queryParams = new URLSearchParams({
-            'where': '1=1',                  // SQL-like query: "1=1" means "select all features" (always true condition)
-            'outFields': '*', // Limit returned fields to only what's needed for styling (performance optimization)
+            'where': '1=1',                  // "1=1" means "select all features" (always true condition)
+            'outFields': '*',                // all Fields (attributes) of the features
             'f': 'geojson',                  // Response format: GeoJSON (standardized geographic data format)
             'outSR': '4326',                 // Output spatial reference: WGS 84 (standard latitude/longitude coordinate system)
             'returnGeometry': 'true',        // Include the shape/location data of features (not just attributes)

@@ -16,22 +16,20 @@ export class MapServiceLayerService {
   /**
    * Add an ArcGIS Map Service Layer
    * 
-   * ┌─────────────────────────────────────────────────────────────────────────┐
-   * │ WHAT IS A MAP SERVICE LAYER?                                            │
-   * │                                                                         │
-   * │ Unlike feature layers (which send individual features), map service     │
-   * │ layers provide pre-rendered images (tiles) of the map data. This is     │
-   * │ like the difference between:                                            │
-   * │ • Feature Layer: Sending you the blueprints to draw a house             │
-   * │ • Map Service:   Sending you a photograph of the house                  │
-   * │                                                                         │
-   * │ WHEN TO USE MAP SERVICES:                                               │
-   * │ • When you have complex data that would be slow to render as            │
-   * │   individual features                                                   │
-   * │ • When you don't need to interact with individual features              │
-   * │ • When you want consistent styling that matches the original ArcGIS     │
-   * │   map                                                                   │
-   * └─────────────────────────────────────────────────────────────────────────┘
+   *  WHAT IS A MAP SERVICE LAYER?                                            
+   *                                                                         
+   *  Unlike feature layers (which send individual features), map service     
+   *  layers provide pre-rendered images (tiles) of the map data. This is     
+   *  like the difference between:                                            
+   *  • Feature Layer: Sending you the blueprints to draw a house             
+   *  • Map Service:   Sending you a photograph of the house                  
+   *                                                                          
+   *  WHEN TO USE MAP SERVICES:                                               
+   *  • When you have complex data that would be slow to render as            
+   *    individual features                                                   
+   *  • When you don't need to interact with individual features              
+   *  • When you want consistent styling that matches the original ArcGIS     
+   *    map                                                                   
    */
   public addArcGISMapServiceLayer(layerConfig: LayerConfig): void {
     // Safety checks

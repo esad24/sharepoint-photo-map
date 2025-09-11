@@ -1,23 +1,27 @@
 
 require("./WebmapWebPart.module.css");
 const styles = {
-  webmap: 'webmap_67f2c4c9',
-  teams: 'teams_67f2c4c9',
-  welcome: 'welcome_67f2c4c9',
-  welcomeImage: 'welcomeImage_67f2c4c9',
-  mapContainer: 'mapContainer_67f2c4c9',
-  popupImg: 'popupImg_67f2c4c9',
-  galleryContainer: 'galleryContainer_67f2c4c9',
-  photoGalleryPopup: 'photoGalleryPopup_67f2c4c9',
-  galleryNav: 'galleryNav_67f2c4c9',
-  galleryNavPrev: 'galleryNavPrev_67f2c4c9',
-  galleryNavNext: 'galleryNavNext_67f2c4c9',
-  links: 'links_67f2c4c9',
-  toast: 'toast_67f2c4c9',
-  slideUp: 'slideUp_67f2c4c9',
-  toastError: 'toastError_67f2c4c9',
-  textLabel: 'textLabel_67f2c4c9',
-  slideDown: 'slideDown_67f2c4c9'
+  webmap: 'webmap_e6cdd56f',
+  teams: 'teams_e6cdd56f',
+  welcome: 'welcome_e6cdd56f',
+  welcomeImage: 'welcomeImage_e6cdd56f',
+  mapContainer: 'mapContainer_e6cdd56f',
+  popupImg: 'popupImg_e6cdd56f',
+  galleryContainer: 'galleryContainer_e6cdd56f',
+  photoGalleryPopup: 'photoGalleryPopup_e6cdd56f',
+  galleryNav: 'galleryNav_e6cdd56f',
+  galleryNavPrev: 'galleryNavPrev_e6cdd56f',
+  galleryNavNext: 'galleryNavNext_e6cdd56f',
+  links: 'links_e6cdd56f',
+  toast: 'toast_e6cdd56f',
+  slideUp: 'slideUp_e6cdd56f',
+  toastError: 'toastError_e6cdd56f',
+  textLabel: 'textLabel_e6cdd56f',
+  loader: 'loader_e6cdd56f',
+  loaderSpinner: 'loaderSpinner_e6cdd56f',
+  spin: 'spin_e6cdd56f',
+  loaderText: 'loaderText_e6cdd56f',
+  slideDown: 'slideDown_e6cdd56f'
 };
 
 export default styles;
