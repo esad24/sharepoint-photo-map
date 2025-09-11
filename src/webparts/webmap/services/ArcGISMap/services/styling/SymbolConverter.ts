@@ -1,44 +1,35 @@
-/* ========================================================================== */
-/* services/SymbolConverter.ts                                                */
-/* - Service for converting ESRI symbols to Leaflet styles                    */
-/* ========================================================================== */
+//Service for converting ESRI symbols to Leaflet styles                    
 
 import { esriColorToCSS } from './ColorConverter';
 import { FeatureStyle } from '../../types/ArcGISTypes';
 
 export class SymbolConverter {
-  /**
-   * Convert ESRI symbol to Leaflet style
-   */
+
+  // Convert ESRI symbol to Leaflet style
   public convertEsriSymbolToLeafletStyle(symbol: any): FeatureStyle {
-    const style: FeatureStyle = {}; // Initialize empty style object
+    const style: FeatureStyle = {}; 
     
-    // Handle Simple Line Symbol (for roads, boundaries, etc.)
+    // Handle Simple Line Symbol
     if (symbol.type === 'esriSLS') {
       this.convertLineSymbol(symbol, style);
     } 
-    // Handle Simple Fill Symbol (for areas like buildings, zones, etc.)
+    // Handle Simple Fill Symbol
     else if (symbol.type === 'esriSFS') {
       this.convertFillSymbol(symbol, style);
     } 
-    // Handle Simple Marker Symbol (for point locations like buildings, landmarks, etc.)
+    // Handle Simple Marker Symbol 
     else if (symbol.type === 'esriSMS') {
       this.convertMarkerSymbol(symbol, style);
     }
     
-    return style; // Return the converted style object for Leaflet to use
+    return style; 
   }
 
-  /**
-   * Convert ESRI Simple Line Symbol to Leaflet style
-   * 
-   * @param symbol - ESRI Simple Line Symbol (esriSLS)
-   * @param style  - Style object to populate
-   */
+  // Convert ESRI Simple Line Symbol to Leaflet style
+
   private convertLineSymbol(symbol: any, style: FeatureStyle): void {
-    style.color = esriColorToCSS(symbol.color); // Convert color format
-    style.weight = symbol.width || 2; // Line width in pixels, default to 2
-    // Calculate opacity from alpha channel if present
+    style.color = esriColorToCSS(symbol.color); 
+    style.weight = symbol.width || 2;
     style.opacity = symbol.color && symbol.color.length > 3 ? symbol.color[3] / 255 : 1;
     
     // Handle line style patterns (solid, dashed, dotted, etc.)
@@ -51,44 +42,32 @@ export class SymbolConverter {
     }
   }
 
-  /**
-   * Convert ESRI Simple Fill Symbol to Leaflet style
-   * 
-   * @param symbol - ESRI Simple Fill Symbol (esriSFS)  
-   * @param style  - Style object to populate
-   */
+  // Convert ESRI Simple Fill Symbol to Leaflet style
+
   private convertFillSymbol(symbol: any, style: FeatureStyle): void {
-    style.fillColor = esriColorToCSS(symbol.color); // Interior color of the polygon
-    // Calculate fill opacity from alpha channel
+    style.fillColor = esriColorToCSS(symbol.color);
     style.fillOpacity = symbol.color && symbol.color.length > 3 ? symbol.color[3] / 255 : 0.6;
     
-    // Handle outline (border) of polygon
+    // Handle outline of polygon
     if (symbol.outline) {
-      style.color = esriColorToCSS(symbol.outline.color); // Border color
-      style.weight = symbol.outline.width || 1; // Border width in pixels
-      // Calculate border opacity
+      style.color = esriColorToCSS(symbol.outline.color); 
+      style.weight = symbol.outline.width || 1; 
       style.opacity = symbol.outline.color && symbol.outline.color.length > 3 ? 
         symbol.outline.color[3] / 255 : 1;
     }
   }
 
-  /**
-   * Convert ESRI Simple Marker Symbol to Leaflet style
-   * 
-   * @param symbol - ESRI Simple Marker Symbol (esriSMS)
-   * @param style  - Style object to populate  
-   */
+  // Convert ESRI Simple Marker Symbol to Leaflet style
+
   private convertMarkerSymbol(symbol: any, style: FeatureStyle): void {
-    style.radius = symbol.size || 6; // Circle radius in pixels
-    style.fillColor = esriColorToCSS(symbol.color); // Fill color of the circle
-    // Calculate fill opacity
+    style.radius = symbol.size || 6; 
+    style.fillColor = esriColorToCSS(symbol.color);
     style.fillOpacity = symbol.color && symbol.color.length > 3 ? symbol.color[3] / 255 : 1;
     
-    // Handle outline (border) of point marker
+    // Handle outline of point marker
     if (symbol.outline) {
-      style.color = esriColorToCSS(symbol.outline.color); // Border color
-      style.weight = symbol.outline.width || 1; // Border width
-      // Calculate border opacity
+      style.color = esriColorToCSS(symbol.outline.color); 
+      style.weight = symbol.outline.width || 1;
       style.opacity = symbol.outline.color && symbol.outline.color.length > 3 ? 
         symbol.outline.color[3] / 255 : 1;
     }

@@ -1,7 +1,6 @@
-/* ========================================================================== */
-/* IWebmapTypes.ts                                                            */
-/* - Type definitions and interfaces for the WebMap web part                  */
-/* ========================================================================== */
+ 
+// IWebmapTypes.ts                                                            
+// - Type definitions and interfaces for the WebMap web part                  
 
 import { IPropertyPaneDropdownOption } from '@microsoft/sp-property-pane';
 import * as L from 'leaflet';
@@ -24,8 +23,8 @@ export type MapType = 'general' | 'project'; // Only two allowed values for map 
 export type MapView = 'openstreetmap' | 'satellite'
 
 export type LocationMethod = 'exif' | 'manual'; // Method for getting GPS coordinates
+
 /**
- * This is a TypeScript feature called "module augmentation".
  * We are extending the original 'leaflet' module to add a custom 'data' property
  * to the MarkerOptions interface. This allows us to attach the raw SharePoint list item
  * object directly to a Leaflet marker, making it easy to access later (e.g., in popups).
@@ -36,28 +35,20 @@ declare module 'leaflet' {
   }
 }
 
-/**
- * Defines the structure for a SharePoint list item that will be used for mapping.
- * It uses an index signature [key: string]: any to allow for dynamic property access,
- * since the actual names for latitude, longitude, and image columns are determined at
- * run-time from the web part properties.
- */
 export interface IWebmapListItem {
-  [key: string]: unknown;  // Use 'unknown' instead of 'any' for better type safety.
-  img?: string; // alias image URL - optional property for storing the image URL
+  [key: string]: unknown;  // uses an index signature [key: string]: any to allow for dynamic property access,since the actual names for latitude, longitude, and image columns are determined at run-time from the web part properties.
+  img?: string; 
 }
 
-/**
- * Defines the properties of the web part that can be configured by the user
- * in the property pane. These properties are saved with the web part instance.
- */
+// Defines the properties of the web part that can be configured by the user
+
 export interface IWebmapWebPartProps {
-  libraryName: string; // for document library - the name of the SharePoint document library to read images from
-  locationMethod: LocationMethod; // method for getting GPS coordinates - either extract from image EXIF data or use manual fields
-  latField: string; // The internal name of the column containing the latitude (only used if locationMethod is 'manual')
-  lonField: string; // The internal name of the column containing the longitude (only used if locationMethod is 'manual')
-  mapType: MapType; // The type of map to use - either 'openstreetmap' or 'arcgis'
-  arcgisMapUrl: string; // The ArcGIS web map URL (only used if mapType is 'arcgis')
+  libraryName: string; 
+  locationMethod: LocationMethod; 
+  latField: string; 
+  lonField: string; 
+  mapType: MapType; 
+  arcgisMapUrl: string; 
   mapView: MapView;
 }
 

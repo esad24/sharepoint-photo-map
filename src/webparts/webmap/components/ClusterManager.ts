@@ -1,7 +1,5 @@
-/* ========================================================================== */
-/* ClusterManager.ts                                                          */
-/* - Manages marker clustering and popup interactions                         */
-/* ========================================================================== */
+// Manages marker clustering and popup interactions                         
+
 
 import * as L from 'leaflet';
 import 'leaflet.markercluster';
@@ -10,8 +8,7 @@ import 'leaflet.markercluster/dist/MarkerCluster.Default.css';
 import { IClusterClickEvent, IWebmapListItem } from '../types/IWebmapTypes';
 import { sanitizeUrl, escAttr } from '../utils/Security';
 import styles from '../WebmapWebPart.module.scss';
-import { createClusterIconHtml } from './ClusterIcon'; // Import the new CSS file
-
+import { createClusterIconHtml } from './ClusterIcon';
 
 export class ClusterManager {
   private markerCluster: L.MarkerClusterGroup | undefined;
@@ -22,61 +19,42 @@ export class ClusterManager {
     this.initializeClusterLayer();
   }
 
-  /**
-   * Initialize the marker cluster group.
-   * This groups nearby markers together to avoid cluttering the map
-   */
+
+  //This groups nearby markers together to avoid cluttering the map
   private initializeClusterLayer(): void {
     this.markerCluster = L.markerClusterGroup({
       // `iconCreateFunction` is a customization that defines how a cluster icon looks.
-      // This function is called for each cluster to create its visual representation
       iconCreateFunction: (cluster) => {
-        // Get the first marker in the cluster to use its image for the cluster icon.
-        // This makes the cluster show a preview of what's inside
-        const first: L.Marker = cluster.getAllChildMarkers()[0];
-        const img = sanitizeUrl(first?.options.data?.img as string); // Safely get and sanitize the image URL
-        const count  = cluster.getChildCount(); // How many markers are in this cluster.
+        const first: L.Marker = cluster.getAllChildMarkers()[0]; // FIrst image for the cluster icon
+        const img = sanitizeUrl(first?.options.data?.img as string); 
+        const count  = cluster.getChildCount();
 
         const html = createClusterIconHtml(img, count);
 
         // Return a Leaflet DivIcon with our custom HTML
-        // className: '' prevents Leaflet from adding default styles
-        // iconSize: [60, 60] tells Leaflet the size of our icon
         return L.divIcon({ html, className: '', iconSize: [70, 70] });
       },
       zoomToBoundsOnClick: false, // Disable the default behavior of zooming in when a cluster is clicked.
-      showCoverageOnHover: false // Don't show the coverage area of the cluster on hover (blue outline).
+      showCoverageOnHover: false // Don't show the coverage area of the cluster on hover (blue outline)
     });
-
-    // Add the newly created cluster layer to the map.
     this.map.addLayer(this.markerCluster);
 
     // Set up gallery popup on cluster click
     this.setupClusterClickHandler();
   }
 
-  /**
-   * Gallery popup on cluster click
-   * Since zoomToBoundsOnClick is false, we can define our own click behavior.
-   * This creates a photo gallery popup when clicking on a cluster
-   */
+  // This creates a photo gallery popup when clicking on a cluster
   private setupClusterClickHandler(): void {
     if (!this.markerCluster) return;
 
-    this.markerCluster.on('clusterclick', (e: IClusterClickEvent) => { // Use a specific event type instead of 'any'.
+    this.markerCluster.on('clusterclick', (e: IClusterClickEvent) => {
       const markers = e.layer.getAllChildMarkers(); // Get all individual markers within the clicked cluster
-      if (!markers.length) return; // Exit if no markers (shouldn't happen but good to check)
+      if (!markers.length) return; 
 
       // Create a simple image gallery from all the images within the cluster.
-      const imgList = markers.map(m => sanitizeUrl(m.options.data?.img as string)); // Extract and sanitize all image URLs
+      const imgList = markers.map(m => sanitizeUrl(m.options.data?.img as string)); 
       let current = 0; // Index of the currently displayed image in the gallery.
-
-      // Programmatically create the HTML elements for the gallery popup using Leaflet's DOM utilities.
       const container = L.DomUtil.create('div', styles.galleryContainer); // Main container with gallery styles
-
-      // Create a wrapper link for the image
-      // This allows users to click the image to open it full-size in a new tab
-      const imgLink = L.DomUtil.create('a', '', container) as HTMLAnchorElement;
 
 
 
@@ -92,10 +70,11 @@ export class ClusterManager {
         window.open(imgList[current], '_blank', 'noopener,noreferrer');
       });
 
-      // Create navigation container for prev/next buttons
+
+      // navigation container for prev/next buttons
       const nav = L.DomUtil.create('div', styles.galleryNav, container);
 
-      // Create previous button
+      // previous button
       const prevBtn = L.DomUtil.create('button', '', nav);
       prevBtn.innerHTML = '';
       prevBtn.className = styles.galleryNavPrev;
@@ -103,7 +82,6 @@ export class ClusterManager {
         // Move to previous image, wrapping around to end if at beginning
         current = (current - 1 + imgList.length) % imgList.length; // Cycle backwards.
         imgEl.src = imgList[current]; // Update displayed image
-        imgLink.href = imgList[current]; // Update the link href
       };
 
       // Create next button
@@ -111,40 +89,33 @@ export class ClusterManager {
       nextBtn.innerHTML = ''; // Right arrow character
       nextBtn.className = styles.galleryNavNext;
       nextBtn.onclick = () => {
-        // Move to next image, wrapping around to beginning if at end
-        current = (current + 1) % imgList.length; // Cycle forwards.
-        imgEl.src = imgList[current]; // Update displayed image
-        imgLink.href = imgList[current]; // Update the link href
+        current = (current + 1) % imgList.length;  // Move to next image, wrapping around to beginning if at end
+        imgEl.src = imgList[current]; 
       };
 
       // Create and open the Leaflet popup at the cluster's location, containing the gallery.
       L.popup({ 
-        className: 'photoGalleryPopup', // CSS class for styling
-        maxWidth: 300 // Maximum width in pixels
+        className: 'photoGalleryPopup', 
+        maxWidth: 300 
       })
-        .setLatLng(e.latlng) // Position at cluster location
-        .setContent(container) // Set our gallery container as content
-        .openOn(this.map!); // Open on the map (! tells TypeScript map is defined)
+        .setLatLng(e.latlng) 
+        .setContent(container) 
+        .openOn(this.map!);
     });
   }
 
-  /**
-   * Clear all markers from the cluster layer
-   */
+
   public clearMarkers(): void {
     this.markerCluster?.clearLayers();
   }
 
-  /**
-   * Add a marker to the cluster layer
-   */
+
   public addMarker(lat: number, lon: number, item: IWebmapListItem, imgUrl: string): L.Marker {
-    // Create a custom icon for the individual marker (not a cluster).
-    // This shows the actual image as a small thumbnail on the map
+    // Create a custom icon for individual marker 
     const icon = L.divIcon({
       html: `<img src="${imgUrl}" style="width:60px;height:60px;border-radius:6px;" />`,
-      className: '', // Empty className prevents Leaflet default styles
-      iconSize: [60, 60] // Size of the icon in pixels
+      className: '', 
+      iconSize: [60, 60] 
     });
 
     const marker = L.marker([lat, lon], { 
@@ -164,12 +135,8 @@ export class ClusterManager {
       event.stopPropagation();
       window.open(imgUrl, '_blank', 'noopener,noreferrer');
     });
-  
     marker.bindPopup(popupContent);
-    // Add the final marker to the cluster layer.
-    // The cluster layer will automatically group it with nearby markers
     this.markerCluster!.addLayer(marker);
-
     return marker;
   }
 

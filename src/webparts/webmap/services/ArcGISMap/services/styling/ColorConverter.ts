@@ -1,7 +1,4 @@
-/* ========================================================================== */
-/* utils/ColorConverter.ts                                                    */
-/* - Utilities for converting between ESRI and CSS color formats              */
-/* ========================================================================== */
+// Utilities for converting between ESRI and CSS color formats              
 
 /**
  * @param esriColor - Array of [Red, Green, Blue, Alpha] values (0-255 each)

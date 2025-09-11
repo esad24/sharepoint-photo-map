@@ -1,7 +1,5 @@
-/* ========================================================================== */
-/* ClusterIcon.ts                                                             */
-/* - Generates HTML for cluster icons with image and count badge              */
-/* ========================================================================== */
+// Generates HTML for cluster icons with image and count badge              
+
 
 import { escAttr } from '../utils/Security';
 

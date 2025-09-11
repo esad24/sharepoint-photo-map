@@ -42,7 +42,6 @@
   text-align: center;
 }
 
-/* WebmapWebPart.module.scss (add at end)  */
 .photoGalleryPopup {
   :global {
     .leaflet-popup-content-wrapper,
@@ -60,7 +59,7 @@
   -webkit-backdrop-filter: blur(12px);
   border-radius: 12px;
   border: 1px solid rgba(255, 255, 255, 0.3);
-  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.3); /*this is the shadow */
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.3);
 }
 
 :global(.leaflet-popup-tip) {
@@ -102,23 +101,22 @@
   a {
     text-decoration: none;
     color: "[theme:link, default:#03787c]";
-    color: var(--link); // note: CSS Custom Properties support is limited to modern browsers only
-
+    color: var(--link); 
     &:hover {
       text-decoration: underline;
       color: "[theme:linkHovered, default: #014446]";
-      color: var(--linkHovered); // note: CSS Custom Properties support is limited to modern browsers only
+      color: var(--linkHovered);
     }
   }
 }
 
-/* Toast styles */
+
 .toast {
   position: fixed;
   bottom: 20px;
   left: 50%;
   transform: translateX(-50%);
-  background-color: #1976d2; // Default (info)
+  background-color: #1976d2; 
   color: white;
   padding: 16px 24px;
   border-radius: 4px;
@@ -156,23 +154,20 @@
 
 
 .textLabel {
-  background: none;       /* remove background */
-  border: none;           /* remove border */
-  box-shadow: none;       /* remove shadow */
-  color: white;           /* text color */
+  background: none;      
+  border: none;          
+  box-shadow: none;       
+  color: white;         
   text-shadow: 
     -1px -1px 0 black,
      1px -1px 0 black,
     -1px  1px 0 black,
-     1px  1px 0 black;  /* creates a fake border */
-  font-weight: normal;    /* optional */
-  padding: 0;             /* remove padding */
+     1px  1px 0 black; 
+  font-weight: normal;  
+  padding: 0;            
 }
 
 
-/* Add these styles to your existing WebmapWebPart.module.scss file */
-
-/* Loader overlay styles */
 .loader {
   position: absolute;
   top: 0;
@@ -188,18 +183,17 @@
   border-radius: 4px;
 }
 
-/* Spinner animation */
 .loaderSpinner {
   width: 40px;
   height: 40px;
   border: 4px solid #f3f3f3;
-  border-top: 4px solid #0078d4; /* Microsoft blue color */
+  border-top: 4px solid #0078d4;
   border-radius: 50%;
   animation: spin 1s linear infinite;
   margin-bottom: 16px;
 }
 
-/* Loader text */
+
 .loaderText {
   font-size: 14px;
   color: #323130;
@@ -207,7 +201,6 @@
   text-align: center;
 }
 
-/* Spinner keyframe animation */
 @keyframes spin {
   0% { transform: rotate(0deg); }
   100% { transform: rotate(360deg); }

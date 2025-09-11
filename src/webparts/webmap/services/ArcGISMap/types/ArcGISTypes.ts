@@ -1,7 +1,4 @@
-/* ========================================================================== */
-/* types/ArcGISTypes.ts                                                       */
-/* - Type definitions for ArcGIS-related data structures                      */
-/* ========================================================================== */
+// Type definitions for ArcGIS-related data structures                      
 
 export interface LayerConfig {
     title?: string;
