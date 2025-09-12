@@ -1,7 +1,7 @@
 // Service for fetching data from SharePoint document libraries             
 // Handles both manual coordinate and EXIF-based location extraction        
 
-import { SPHttpClient } from '@microsoft/sp-http';
+import { SPHttpClient, SPHttpClientResponse } from '@microsoft/sp-http';
 import { WebPartContext } from '@microsoft/sp-webpart-base';
 import * as EXIF from 'exif-js';
 import { escODataIdentifier, sanitizeUrl } from '../utils/Security';
@@ -87,18 +87,33 @@ export class DataService {
         .map(f => escODataIdentifier(f))
         .join(',');
       
-      // Build the SharePoint REST API URL
-      const url = `${site}/_api/web/lists/getByTitle('${libraryPart}')/items?$select=${selectFields}&$filter=FSObjType eq 0&$top=5000`;       // FSObjType eq 0 filters to only files, max 5000 items to fetch
+        let allItems: any[] = [];
 
-      const response = await this.context.spHttpClient.get(url, SPHttpClient.configurations.v1);
-      const json = await response.json();
-      const items = json.value;
+        // Start URL with paging enabled
+        let url: string | null = `${site}/_api/web/lists/getByTitle('${libraryPart}')/items?$select=${selectFields}&$top=500`;
+      
+        // loop for pagination
+        while (url) {
+          const response: SPHttpClientResponse = await this.context.spHttpClient.get(url, SPHttpClient.configurations.v1);
+      
+          if (!response.ok) {
+            throw new Error(`Error fetching items: ${response.statusText}`);
+          }
+      
+          const json = await response.json();
+      
+          // Collect this page
+          allItems = allItems.concat(json.value);
+      
+          // If there's a next page, continue; otherwise break
+          url = json['@odata.nextLink'] || null;
+        }
       
       // Counter for images without GPS data (for error message)
       let noGpsCount = 0;
 
       // Process each item returned from SharePoint
-      for (const item of items) {
+      for (const item of allItems) {
         const fileName = item.FileLeafRef; 
         const siteServerRelativeUrl = this.context.pageContext.web.serverRelativeUrl;
         const searchString = siteServerRelativeUrl === '/' ? '/' : siteServerRelativeUrl + '/';
