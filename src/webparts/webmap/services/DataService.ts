@@ -5,7 +5,7 @@ import { SPHttpClient } from '@microsoft/sp-http';
 import { WebPartContext } from '@microsoft/sp-webpart-base';
 import * as EXIF from 'exif-js';
 import { escODataIdentifier, sanitizeUrl } from '../utils/Security';
-import { IWebmapListItem, IWebmapWebPartProps } from '../types/IWebmapTypes';
+import { IWebmapWebPartProps } from '../types/IWebmapTypes';
 
 import { MapViewService } from './MapViewService';
 
@@ -22,7 +22,6 @@ export interface IMapItem {
 lat: number;          
 lon: number;          
 img: string;         
-data: IWebmapListItem; // Full SharePoint item data (for additional properties)
 }
 
 // Result of data fetching operations
@@ -151,19 +150,11 @@ export class DataService {
         const sanitizedImg = sanitizeUrl(img);
         if (!sanitizedImg) continue;
 
-        // Create enriched object with all item data plus image URL
-        const enriched = { 
-          ...item,          // Spread all original SharePoint fields
-          img: sanitizedImg, 
-          fileName        
-        };
-
         // Add to results array
         result.items.push({
           lat,
           lon,
-          img: sanitizedImg,
-          data: enriched
+          img: sanitizedImg
         });
       }
 

@@ -16,9 +16,6 @@ export interface LayerConfig {
   
   export interface WebmapData {
     operationalLayers?: any[];
-    baseMap?: {
-      baseMapLayers?: any[];
-    };
   }
   
   export interface FeatureStyle {

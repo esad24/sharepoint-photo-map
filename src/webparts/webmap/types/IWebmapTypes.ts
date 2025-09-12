@@ -24,22 +24,6 @@ export type MapView = 'openstreetmap' | 'satellite'
 
 export type LocationMethod = 'exif' | 'manual'; // Method for getting GPS coordinates
 
-/**
- * We are extending the original 'leaflet' module to add a custom 'data' property
- * to the MarkerOptions interface. This allows us to attach the raw SharePoint list item
- * object directly to a Leaflet marker, making it easy to access later (e.g., in popups).
- */
-declare module 'leaflet' {
-  interface MarkerOptions {
-    data?: IWebmapListItem; // Use the specific item interface instead of 'any'.
-  }
-}
-
-export interface IWebmapListItem {
-  [key: string]: unknown;  // uses an index signature [key: string]: any to allow for dynamic property access,since the actual names for latitude, longitude, and image columns are determined at run-time from the web part properties.
-  img?: string; 
-}
-
 // Defines the properties of the web part that can be configured by the user
 
 export interface IWebmapWebPartProps {

@@ -5,7 +5,7 @@ import * as L from 'leaflet';
 import 'leaflet.markercluster';
 import 'leaflet.markercluster/dist/MarkerCluster.css';
 import 'leaflet.markercluster/dist/MarkerCluster.Default.css';
-import { IClusterClickEvent, IWebmapListItem } from '../types/IWebmapTypes';
+import { IClusterClickEvent } from '../types/IWebmapTypes';
 import { sanitizeUrl, escAttr } from '../utils/Security';
 import styles from '../WebmapWebPart.module.scss';
 import { createClusterIconHtml } from './ClusterIcon';
@@ -26,7 +26,7 @@ export class ClusterManager {
       // `iconCreateFunction` is a customization that defines how a cluster icon looks.
       iconCreateFunction: (cluster) => {
         const first: L.Marker = cluster.getAllChildMarkers()[0]; // FIrst image for the cluster icon
-        const img = sanitizeUrl(first?.options.data?.img as string); 
+        const img = sanitizeUrl((first?.options as any).imgUrl as string); // Access imgUrl directly
         const count  = cluster.getChildCount();
 
         const html = createClusterIconHtml(img, count);
@@ -52,7 +52,7 @@ export class ClusterManager {
       if (!markers.length) return; 
 
       // Create a simple image gallery from all the images within the cluster.
-      const imgList = markers.map(m => sanitizeUrl(m.options.data?.img as string)); 
+      const imgList = markers.map(m => sanitizeUrl((m.options as any).imgUrl as string)); 
       let current = 0; // Index of the currently displayed image in the gallery.
       const container = L.DomUtil.create('div', styles.galleryContainer); // Main container with gallery styles
 
@@ -110,7 +110,7 @@ export class ClusterManager {
   }
 
 
-  public addMarker(lat: number, lon: number, item: IWebmapListItem, imgUrl: string): L.Marker {
+  public addMarker(lat: number, lon: number, imgUrl: string): L.Marker {
     // Create a custom icon for individual marker 
     const icon = L.divIcon({
       html: `<img src="${imgUrl}" style="width:60px;height:60px;border-radius:6px;" />`,
@@ -120,8 +120,8 @@ export class ClusterManager {
 
     const marker = L.marker([lat, lon], { 
       icon,
-      data: item
-    });
+      imgUrl // Store image URL directly in marker options
+    } as any);
   
     // Create popup content with event listener
     const popupContent = L.DomUtil.create('div');
@@ -135,6 +135,7 @@ export class ClusterManager {
       event.stopPropagation();
       window.open(imgUrl, '_blank', 'noopener,noreferrer');
     });
+    
     marker.bindPopup(popupContent);
     this.markerCluster!.addLayer(marker);
     return marker;

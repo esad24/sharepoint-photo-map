@@ -5,7 +5,7 @@
 import * as L from 'leaflet';
 
 import { FeatureLayerService } from './services/layers/FeatureLayer';
-import { WebmapData, LayerConfig } from './types/ArcGISTypes';
+import { WebmapData } from './types/ArcGISTypes';
 
 import {OPEN_STREET_MAP_TILE, IMAGERY_TILE } from '../../constants/constants';
 
@@ -28,14 +28,14 @@ export class ArcGISMapService {
       if( mapView === 'satellite') {
         L.tileLayer(IMAGERY_TILE.url, {
           attribution: IMAGERY_TILE.attribution,
-          maxZoom: 19,        
+          maxZoom: 21,        
         }).addTo(this.map);
       }
 
       else {
         L.tileLayer(OPEN_STREET_MAP_TILE.url, {
           attribution: OPEN_STREET_MAP_TILE.attribution,
-          maxZoom: 19,        
+          maxZoom: 22,        
         }).addTo(this.map);
       }
     } catch (error) {

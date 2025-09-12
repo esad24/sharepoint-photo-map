@@ -126,7 +126,7 @@ private async loadMapData(): Promise<void> {
 
     // Add marker to cluster
     result.items.forEach((item: IMapItem) => {
-      this.clusterManager!.addMarker(item.lat, item.lon, item.data, item.img);
+      this.clusterManager!.addMarker(item.lat, item.lon, item.img); //item.data, 
     });
     result.errors.forEach(error => {
       ToastManager.show(error, 'error');
