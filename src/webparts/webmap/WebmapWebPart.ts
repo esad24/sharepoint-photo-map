@@ -115,6 +115,7 @@ private renderMap(): void {
 private async loadMapData(): Promise<void> {
   if (!this.clusterManager || !this.dataService || !this.mapManager ||!this.properties.libraryName) return;
 
+  const startTime = Date.now();
   this.showLoader();
 
   try {
@@ -135,7 +136,15 @@ private async loadMapData(): Promise<void> {
     console.error('Error loading Images:', error);
   } finally {
     this.hideLoader();
-}
+    const endTime = Date.now();
+    // Dauer berechnen in Millisekunden
+    const durationMs = endTime - startTime;
+
+    // In Minuten und Sekunden umrechnen
+    const minutes = Math.floor(durationMs / 60000); // 1 Minute = 60.000 ms
+    const seconds = ((durationMs % 60000) / 1000).toFixed(2);
+
+    console.log(`Process took ${minutes} minutes and ${seconds} seconds.`);}
 }
 
 
