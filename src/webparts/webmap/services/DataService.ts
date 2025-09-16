@@ -39,6 +39,7 @@ export class DataService {
   private readonly MAX_CONCURRENT = 3; // Maximum concurrent image loads
   private readonly BATCH_DELAY = 500; // Delay between batches (ms)
 
+  
   constructor(context: WebPartContext, mapViewService?: MapViewService) {
     this.context = context;
     this.mapViewService = mapViewService;
@@ -74,10 +75,10 @@ export class DataService {
       const allItems = await this.fetchAllSharePointItems(site, libraryPart, locationMethod, latField, lonField);
       
       if (locationMethod === 'manual') {
-        // Process manual coordinates (fast)
+        // Process manual coordinates
         result.items = await this.processManualCoordinates(allItems, site, latField!, lonField!);
       } else {
-        // Process EXIF coordinates with optimizations (slower but optimized)
+        // Process EXIF coordinates
         const processResult = await this.processEXIFCoordinatesOptimized(allItems, site);
         result.items = processResult.items;
         result.errors = processResult.errors;
@@ -125,7 +126,7 @@ export class DataService {
     return allItems;
   }
 
-  // Process manual coordinates (original logic)
+  // Process manual coordinates
   private async processManualCoordinates(
     items: any[], 
     site: string, 
@@ -322,7 +323,7 @@ export class DataService {
   }
 
   private isImageFile(fileUrl: string): boolean {
-    const imageExtensions = ['.jpg', '.jpeg', '.png', '.gif', '.bmp', '.webp'];
+    const imageExtensions = ['.jpg', '.jpeg', '.png'];
     const fileName = fileUrl.split('/').pop() || fileUrl;
     const ext = fileName.toLowerCase().substring(fileName.lastIndexOf('.'));
     return imageExtensions.includes(ext);

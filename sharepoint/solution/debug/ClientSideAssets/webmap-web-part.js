@@ -273,9 +273,8 @@ class ClusterManager {
         this.markerCluster = leaflet__WEBPACK_IMPORTED_MODULE_0__.markerClusterGroup({
             // `iconCreateFunction` is a customization that defines how a cluster icon looks.
             iconCreateFunction: (cluster) => {
-                var _a;
                 const first = cluster.getAllChildMarkers()[0]; // FIrst image for the cluster icon
-                const img = (0,_utils_Security__WEBPACK_IMPORTED_MODULE_5__.sanitizeUrl)((_a = first === null || first === void 0 ? void 0 : first.options.data) === null || _a === void 0 ? void 0 : _a.img);
+                const img = (0,_utils_Security__WEBPACK_IMPORTED_MODULE_5__.sanitizeUrl)((first === null || first === void 0 ? void 0 : first.options).imgUrl); // Access imgUrl directly
                 const count = cluster.getChildCount();
                 const html = (0,_ClusterIcon__WEBPACK_IMPORTED_MODULE_6__.createClusterIconHtml)(img, count);
                 // Return a Leaflet DivIcon with our custom HTML
@@ -297,7 +296,7 @@ class ClusterManager {
             if (!markers.length)
                 return;
             // Create a simple image gallery from all the images within the cluster.
-            const imgList = markers.map(m => { var _a; return (0,_utils_Security__WEBPACK_IMPORTED_MODULE_5__.sanitizeUrl)((_a = m.options.data) === null || _a === void 0 ? void 0 : _a.img); });
+            const imgList = markers.map(m => (0,_utils_Security__WEBPACK_IMPORTED_MODULE_5__.sanitizeUrl)(m.options.imgUrl));
             let current = 0; // Index of the currently displayed image in the gallery.
             const container = leaflet__WEBPACK_IMPORTED_MODULE_0__.DomUtil.create('div', _WebmapWebPart_module_scss__WEBPACK_IMPORTED_MODULE_4__["default"].galleryContainer); // Main container with gallery styles
             // Create clickable image element
@@ -343,7 +342,7 @@ class ClusterManager {
         var _a;
         (_a = this.markerCluster) === null || _a === void 0 ? void 0 : _a.clearLayers();
     }
-    addMarker(lat, lon, item, imgUrl) {
+    addMarker(lat, lon, imgUrl) {
         // Create a custom icon for individual marker 
         const icon = leaflet__WEBPACK_IMPORTED_MODULE_0__.divIcon({
             html: `<img src="${imgUrl}" style="width:60px;height:60px;border-radius:6px;" />`,
@@ -352,7 +351,7 @@ class ClusterManager {
         });
         const marker = leaflet__WEBPACK_IMPORTED_MODULE_0__.marker([lat, lon], {
             icon,
-            data: item
+            imgUrl // Store image URL directly in marker options
         });
         // Create popup content with event listener
         const popupContent = leaflet__WEBPACK_IMPORTED_MODULE_0__.DomUtil.create('div');
@@ -416,8 +415,14 @@ class MapManager {
     }
     // Initializes or refreshes the Leaflet map instance
     initializeMap(properties) {
+        // Map-Container resetten, falls Leaflet ihn noch gebunden hat
+        const mapElement = document.getElementById(this.mapId);
+        if (mapElement && mapElement._leaflet_id) {
+            mapElement._leaflet_id = null;
+        }
         if (this.map) {
-            this.map.remove();
+            this.map.off(); // alle Event Listener entfernen
+            this.map.remove(); // Leaflet Instanz entfernen
             this.map = undefined;
         }
         // Initialize a new map on the 'map' div, setting an initial view
@@ -466,8 +471,10 @@ class MapManager {
         return this.map;
     }
     dispose() {
-        var _a;
-        (_a = this.map) === null || _a === void 0 ? void 0 : _a.remove();
+        if (this.map) {
+            this.map.off(); // Event-Listener wegräumen
+            this.map.remove(); // Map-Instanz zerstören
+        }
         this.map = undefined;
         this.arcgisMap = undefined;
     }
@@ -729,13 +736,13 @@ class ArcGISMapService {
             if (mapView === 'satellite') {
                 leaflet__WEBPACK_IMPORTED_MODULE_0__.tileLayer(_constants_constants__WEBPACK_IMPORTED_MODULE_2__.IMAGERY_TILE.url, {
                     attribution: _constants_constants__WEBPACK_IMPORTED_MODULE_2__.IMAGERY_TILE.attribution,
-                    maxZoom: 19,
+                    maxZoom: 21,
                 }).addTo(this.map);
             }
             else {
                 leaflet__WEBPACK_IMPORTED_MODULE_0__.tileLayer(_constants_constants__WEBPACK_IMPORTED_MODULE_2__.OPEN_STREET_MAP_TILE.url, {
                     attribution: _constants_constants__WEBPACK_IMPORTED_MODULE_2__.OPEN_STREET_MAP_TILE.attribution,
-                    maxZoom: 19,
+                    maxZoom: 22,
                 }).addTo(this.map);
             }
         }
@@ -1209,8 +1216,8 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony import */ var _utils_Security__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! ../utils/Security */ 415);
 /* harmony import */ var leaflet__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! leaflet */ 973);
 /* harmony import */ var leaflet__WEBPACK_IMPORTED_MODULE_2___default = /*#__PURE__*/__webpack_require__.n(leaflet__WEBPACK_IMPORTED_MODULE_2__);
-// Service for fetching data from SharePoint document libraries             
-// Handles both manual coordinate and EXIF-based location extraction        
+// Optimized Service for fetching data from SharePoint document libraries             
+// Handles both manual coordinate and EXIF-based location extraction with performance optimizations
 
 
 
@@ -1218,13 +1225,16 @@ __webpack_require__.r(__webpack_exports__);
 const bounds = []; // map boundaries
 class DataService {
     constructor(context, mapViewService) {
+        // Performance configuration
+        this.BATCH_SIZE = 20; // Process images in batches
+        this.MAX_CONCURRENT = 3; // Maximum concurrent image loads
+        this.BATCH_DELAY = 500; // Delay between batches (ms)
         this.context = context;
         this.mapViewService = mapViewService;
     }
     async fetchMapData(properties) {
-        return this.fetchDocumentLibraryData(properties); // Currently only supports document libraries, but could be extended for other data sources (lists, external APIs, etc.)
+        return this.fetchDocumentLibraryData(properties);
     }
-    // Fetches data from Document Library
     async fetchDocumentLibraryData(properties) {
         const { libraryName, locationMethod, latField, lonField } = properties;
         const result = { items: [], errors: [] };
@@ -1236,156 +1246,214 @@ class DataService {
             result.errors.push('Please select both latitude and longitude fields');
             return result;
         }
-        // Get the current SharePoint site URL
         const site = this.context.pageContext.web.absoluteUrl;
         if (!site) {
             return result;
         }
-        // Escape the library name to handle special characters safely
         const libraryPart = (0,_utils_Security__WEBPACK_IMPORTED_MODULE_3__.escODataIdentifier)(libraryName);
         try {
-            const baseFields = ['FileRef', 'FileLeafRef']; // FileRef = full path to file, FileLeafRef = just the filename
-            if (locationMethod === 'manual' && latField && lonField) {
-                baseFields.push(latField);
-                baseFields.push(lonField);
+            // Get all items from SharePoint
+            const allItems = await this.fetchAllSharePointItems(site, libraryPart, locationMethod, latField, lonField);
+            if (locationMethod === 'manual') {
+                // Process manual coordinates
+                result.items = await this.processManualCoordinates(allItems, site, latField, lonField);
             }
-            // Convert field array to comma separated string for API
-            const selectFields = baseFields
-                .map(f => (0,_utils_Security__WEBPACK_IMPORTED_MODULE_3__.escODataIdentifier)(f))
-                .join(',');
-            // Build the SharePoint REST API URL
-            const url = `${site}/_api/web/lists/getByTitle('${libraryPart}')/items?$select=${selectFields}&$filter=FSObjType eq 0&$top=5000`; // FSObjType eq 0 filters to only files, max 5000 items to fetch
-            const response = await this.context.spHttpClient.get(url, _microsoft_sp_http__WEBPACK_IMPORTED_MODULE_0__.SPHttpClient.configurations.v1);
-            const json = await response.json();
-            const items = json.value;
-            // Counter for images without GPS data (for error message)
-            let noGpsCount = 0;
-            // Process each item returned from SharePoint
-            for (const item of items) {
-                const fileName = item.FileLeafRef;
-                const siteServerRelativeUrl = this.context.pageContext.web.serverRelativeUrl;
-                const searchString = siteServerRelativeUrl === '/' ? '/' : siteServerRelativeUrl + '/';
-                const relativeFileRef = item.FileRef.replace(searchString, '');
-                const fileUrl = `${site}/${relativeFileRef}`; // Build full URL to file
-                // Check if it's an image file based on the file extension
-                if (!this.isImageFile(fileUrl))
-                    continue;
-                // For document libraries, always use the file URL as the image
-                const img = fileUrl;
-                // Initialize coordinate variables
-                let lat = null;
-                let lon = null;
-                if (locationMethod === 'manual') {
-                    if (item[latField] && item[lonField]) {
-                        // Parse string values to numbers
-                        let latString = item[latField];
-                        let lonString = item[lonField];
-                        // Replace comma with period if comma is used as decimal separator
-                        if (latString.includes(',')) {
-                            latString = latString.replace(',', '.');
-                        }
-                        if (lonString.includes(',')) {
-                            lonString = lonString.replace(',', '.');
-                        }
-                        lat = parseFloat(latString);
-                        lon = parseFloat(lonString);
-                    }
-                }
-                else {
-                    // Extract from image EXIF data
-                    const gpsData = await this.extractGPSFromExif(img);
-                    if (gpsData) {
-                        lat = gpsData.lat;
-                        lon = gpsData.lon;
-                    }
-                    else {
-                        noGpsCount++;
-                    }
-                }
-                if (!lat || !lon || isNaN(lat) || isNaN(lon))
-                    continue;
-                const sanitizedImg = (0,_utils_Security__WEBPACK_IMPORTED_MODULE_3__.sanitizeUrl)(img);
-                if (!sanitizedImg)
-                    continue;
-                // Create enriched object with all item data plus image URL
-                const enriched = Object.assign(Object.assign({}, item), { img: sanitizedImg, fileName });
-                // Add to results array
-                result.items.push({
-                    lat,
-                    lon,
-                    img: sanitizedImg,
-                    data: enriched
-                });
-            }
-            if (locationMethod === 'exif' && noGpsCount === 1) {
-                result.errors.push(`1 image has no EXIF GPS data and will not be displayed.`);
-            }
-            else if (locationMethod === 'exif' && noGpsCount > 1) {
-                result.errors.push(`${noGpsCount} images have no EXIF GPS data and will not be displayed.`);
+            else {
+                // Process EXIF coordinates
+                const processResult = await this.processEXIFCoordinatesOptimized(allItems, site);
+                result.items = processResult.items;
+                result.errors = processResult.errors;
             }
         }
         catch (err) {
             console.error('Webmap: document library fetch failed:', err);
             result.errors.push('Failed to load images from document library');
         }
-        this.getBounds(result.items); // Collect all coordinates for map bounds
+        this.getBounds(result.items);
         return result;
     }
-    // Extracts GPS coordinates from image EXIF data
-    extractGPSFromExif(imageUrl) {
+    // Fetch all items from SharePoint with pagination
+    async fetchAllSharePointItems(site, libraryPart, locationMethod, latField, lonField) {
+        const baseFields = ['FileRef', 'FileLeafRef'];
+        if (locationMethod === 'manual' && latField && lonField) {
+            baseFields.push(latField, lonField);
+        }
+        const selectFields = baseFields.map(f => (0,_utils_Security__WEBPACK_IMPORTED_MODULE_3__.escODataIdentifier)(f)).join(',');
+        let allItems = [];
+        let url = `${site}/_api/web/lists/getByTitle('${libraryPart}')/items?$select=${selectFields}&$top=500`;
+        while (url) {
+            const response = await this.context.spHttpClient.get(url, _microsoft_sp_http__WEBPACK_IMPORTED_MODULE_0__.SPHttpClient.configurations.v1);
+            if (!response.ok) {
+                throw new Error(`Error fetching items: ${response.statusText}`);
+            }
+            const json = await response.json();
+            allItems = allItems.concat(json.value);
+            url = json['@odata.nextLink'] || null;
+        }
+        return allItems;
+    }
+    // Process manual coordinates
+    async processManualCoordinates(items, site, latField, lonField) {
+        const results = [];
+        const siteServerRelativeUrl = this.context.pageContext.web.serverRelativeUrl;
+        const searchString = siteServerRelativeUrl === '/' ? '/' : siteServerRelativeUrl + '/';
+        for (const item of items) {
+            const relativeFileRef = item.FileRef.replace(searchString, '');
+            const fileUrl = `${site}/${relativeFileRef}`;
+            if (!this.isImageFile(fileUrl))
+                continue;
+            if (item[latField] && item[lonField]) {
+                let latString = item[latField];
+                let lonString = item[lonField];
+                if (latString.includes(','))
+                    latString = latString.replace(',', '.');
+                if (lonString.includes(','))
+                    lonString = lonString.replace(',', '.');
+                const lat = parseFloat(latString);
+                const lon = parseFloat(lonString);
+                if (!isNaN(lat) && !isNaN(lon)) {
+                    const sanitizedImg = (0,_utils_Security__WEBPACK_IMPORTED_MODULE_3__.sanitizeUrl)(fileUrl);
+                    if (sanitizedImg) {
+                        results.push({ lat, lon, img: sanitizedImg });
+                    }
+                }
+            }
+        }
+        return results;
+    }
+    // Process EXIF coordinates with batching
+    async processEXIFCoordinatesOptimized(items, site) {
+        const results = [];
+        const errors = [];
+        const siteServerRelativeUrl = this.context.pageContext.web.serverRelativeUrl;
+        const searchString = siteServerRelativeUrl === '/' ? '/' : siteServerRelativeUrl + '/';
+        // Filter to image files only first
+        const imageItems = items.filter(item => {
+            const relativeFileRef = item.FileRef.replace(searchString, '');
+            const fileUrl = `${site}/${relativeFileRef}`;
+            return this.isImageFile(fileUrl);
+        });
+        console.log(`Processing ${imageItems.length} images for EXIF data...`);
+        let processedCount = 0;
+        let noGpsCount = 0;
+        // Process images in batches
+        for (let i = 0; i < imageItems.length; i += this.BATCH_SIZE) {
+            const batch = imageItems.slice(i, i + this.BATCH_SIZE);
+            // Process batch with concurrency limit
+            const batchResults = await this.processBatchWithConcurrency(batch, site, searchString);
+            for (const result of batchResults) {
+                if (result.coordinates) {
+                    const sanitizedImg = (0,_utils_Security__WEBPACK_IMPORTED_MODULE_3__.sanitizeUrl)(result.fileUrl);
+                    if (sanitizedImg) {
+                        results.push({
+                            lat: result.coordinates.lat,
+                            lon: result.coordinates.lon,
+                            img: sanitizedImg
+                        });
+                    }
+                }
+                else {
+                    noGpsCount++;
+                }
+                processedCount++;
+            }
+            // Progress logging
+            if (processedCount % 100 === 0 || processedCount === imageItems.length) {
+                console.log(`Processed ${processedCount}/${imageItems.length} images`);
+            }
+            // Small delay between batches to prevent overwhelming the browser
+            if (i + this.BATCH_SIZE < imageItems.length) {
+                await this.delay(this.BATCH_DELAY);
+            }
+        }
+        // Add error messages
+        if (noGpsCount === 1) {
+            errors.push(`1 image has no EXIF GPS data and will not be displayed.`);
+        }
+        else if (noGpsCount > 1) {
+            errors.push(`${noGpsCount} images have no EXIF GPS data and will not be displayed.`);
+        }
+        console.log(`EXIF processing complete. Processed: ${processedCount} images`);
+        return { items: results, errors };
+    }
+    // Process a batch of images with concurrency control
+    async processBatchWithConcurrency(batch, site, searchString) {
+        const results = [];
+        // Process items in smaller concurrent groups
+        for (let i = 0; i < batch.length; i += this.MAX_CONCURRENT) {
+            const concurrentBatch = batch.slice(i, i + this.MAX_CONCURRENT);
+            const promises = concurrentBatch.map(async (item) => {
+                const relativeFileRef = item.FileRef.replace(searchString, '');
+                const fileUrl = `${site}/${relativeFileRef}`;
+                // Extract from EXIF
+                const coordinates = await this.extractGPSFromExifOptimized(fileUrl);
+                return { coordinates, fileUrl };
+            });
+            const concurrentResults = await Promise.all(promises);
+            results.push(...concurrentResults);
+        }
+        return results;
+    }
+    // Extract GPS from EXIF with better error handling and timeouts
+    extractGPSFromExifOptimized(imageUrl) {
         return new Promise((resolve) => {
             const img = new Image();
-            img.crossOrigin = 'anonymous'; // Enable CORS to allow reading image data
-            // Handler for when image loads successfully
+            img.crossOrigin = 'anonymous';
+            // Set timeout to prevent hanging on slow images
+            const timeout = setTimeout(() => {
+                resolve(null);
+            }, 15000); // 10 second timeout
             img.onload = function () {
-                exif_js__WEBPACK_IMPORTED_MODULE_1__.getData(img, function () {
-                    const lat = exif_js__WEBPACK_IMPORTED_MODULE_1__.getTag(this, 'GPSLatitude'); // Latitude array [degrees, minutes, seconds]
-                    const lon = exif_js__WEBPACK_IMPORTED_MODULE_1__.getTag(this, 'GPSLongitude'); // Longitude array [degrees, minutes, seconds]
-                    const latRef = exif_js__WEBPACK_IMPORTED_MODULE_1__.getTag(this, 'GPSLatitudeRef'); // N or S (North/South)
-                    const lonRef = exif_js__WEBPACK_IMPORTED_MODULE_1__.getTag(this, 'GPSLongitudeRef'); // E or W (East/West)
-                    if (lat && lon) {
-                        // Convert GPS coordinates from degrees/minutes/seconds to decimal
-                        const decimalLat = DataService.convertDMSToDD(lat, latRef);
-                        const decimalLon = DataService.convertDMSToDD(lon, lonRef);
-                        // Return coordinates if conversion was successful
-                        if (decimalLat !== null && decimalLon !== null) {
-                            resolve({ lat: decimalLat, lon: decimalLon });
+                clearTimeout(timeout);
+                try {
+                    exif_js__WEBPACK_IMPORTED_MODULE_1__.getData(img, function () {
+                        const lat = exif_js__WEBPACK_IMPORTED_MODULE_1__.getTag(this, 'GPSLatitude');
+                        const lon = exif_js__WEBPACK_IMPORTED_MODULE_1__.getTag(this, 'GPSLongitude');
+                        const latRef = exif_js__WEBPACK_IMPORTED_MODULE_1__.getTag(this, 'GPSLatitudeRef');
+                        const lonRef = exif_js__WEBPACK_IMPORTED_MODULE_1__.getTag(this, 'GPSLongitudeRef');
+                        if (lat && lon) {
+                            const decimalLat = DataService.convertDMSToDD(lat, latRef);
+                            const decimalLon = DataService.convertDMSToDD(lon, lonRef);
+                            if (decimalLat !== null && decimalLon !== null) {
+                                resolve({ lat: decimalLat, lon: decimalLon });
+                            }
+                            else {
+                                resolve(null);
+                            }
                         }
                         else {
-                            resolve(null); // Conversion failed
+                            resolve(null);
                         }
-                    }
-                    else {
-                        resolve(null); // No GPS data in EXIF
-                    }
-                });
+                    });
+                }
+                catch (error) {
+                    console.warn(`EXIF extraction failed for ${imageUrl}:`, error);
+                    resolve(null);
+                }
             };
-            // Handler for image load errors
             img.onerror = () => {
+                clearTimeout(timeout);
                 resolve(null);
             };
-            img.src = imageUrl; // Start loading the image
+            img.src = imageUrl;
         });
     }
-    // Converts GPS coordinates from degrees/minutes/seconds to decimal degrees
+    // Utility methods
     static convertDMSToDD(dms, ref) {
         if (!dms || dms.length !== 3)
             return null;
         let dd = dms[0] + dms[1] / 60 + dms[2] / 3600;
-        // Southern and Western coordinates are negative
         if (ref === 'S' || ref === 'W') {
             dd = dd * -1;
         }
         return dd;
     }
-    // Checks if a file is an image based on its extension
     isImageFile(fileUrl) {
-        const imageExtensions = ['.jpg', '.jpeg', '.png', '.gif', '.bmp', '.webp'];
+        const imageExtensions = ['.jpg', '.jpeg', '.png'];
         const fileName = fileUrl.split('/').pop() || fileUrl;
         const ext = fileName.toLowerCase().substring(fileName.lastIndexOf('.'));
         return imageExtensions.includes(ext);
     }
-    // Collect all coordinates and call MapViewService to set bounds
     getBounds(items) {
         const bounds = [];
         for (const item of items) {
@@ -1394,6 +1462,9 @@ class DataService {
         if (this.mapViewService) {
             this.mapViewService.setImageBounds(bounds);
         }
+    }
+    delay(ms) {
+        return new Promise(resolve => setTimeout(resolve, ms));
     }
 }
 
@@ -6029,26 +6100,35 @@ class WebmapWebPart extends _microsoft_sp_webpart_base__WEBPACK_IMPORTED_MODULE_
             this.clusterManager.dispose();
             this.clusterManager = undefined;
         }
-        // Create fresh map and cluster managers
-        this.mapManager = new _components_MapManager__WEBPACK_IMPORTED_MODULE_2__.MapManager(this.mapId);
-        const map = this.mapManager.initializeMap(this.properties);
-        if (!map) {
-            _utils_ToastManager__WEBPACK_IMPORTED_MODULE_6__.ToastManager.show('Failed to initialize map', 'error');
-            return;
-        }
-        this.mapViewService = new _services_MapViewService__WEBPACK_IMPORTED_MODULE_7__.MapViewService(map);
-        // Pass MapViewService to dataservice
-        this.dataService = new _services_DataService__WEBPACK_IMPORTED_MODULE_5__.DataService(this.context, this.mapViewService);
-        // Initialize cluster manager
-        this.clusterManager = new _components_ClusterManager__WEBPACK_IMPORTED_MODULE_3__.ClusterManager(map);
-        if (this.properties.libraryName) {
-            this.loadMapData();
-        }
+        // Wait for DOM to be ready
+        setTimeout(() => {
+            const mapElement = document.getElementById(this.mapId);
+            if (!mapElement) {
+                console.error('Map container not found in DOM');
+                return;
+            }
+            // Create fresh map and cluster managers
+            this.mapManager = new _components_MapManager__WEBPACK_IMPORTED_MODULE_2__.MapManager(this.mapId);
+            const map = this.mapManager.initializeMap(this.properties);
+            if (!map) {
+                _utils_ToastManager__WEBPACK_IMPORTED_MODULE_6__.ToastManager.show('Failed to initialize map', 'error');
+                return;
+            }
+            this.mapViewService = new _services_MapViewService__WEBPACK_IMPORTED_MODULE_7__.MapViewService(map);
+            // Pass MapViewService to dataservice
+            this.dataService = new _services_DataService__WEBPACK_IMPORTED_MODULE_5__.DataService(this.context, this.mapViewService);
+            // Initialize cluster manager
+            this.clusterManager = new _components_ClusterManager__WEBPACK_IMPORTED_MODULE_3__.ClusterManager(map);
+            if (this.properties.libraryName) {
+                this.loadMapData();
+            }
+        }, 100);
     }
     // Fetches data from the configured SharePoint document library and populates the map with markers.
     async loadMapData() {
         if (!this.clusterManager || !this.dataService || !this.mapManager || !this.properties.libraryName)
             return;
+        const startTime = Date.now();
         this.showLoader();
         try {
             // Use the DataService to fetch data
@@ -6057,7 +6137,7 @@ class WebmapWebPart extends _microsoft_sp_webpart_base__WEBPACK_IMPORTED_MODULE_
             this.clusterManager.clearMarkers();
             // Add marker to cluster
             result.items.forEach((item) => {
-                this.clusterManager.addMarker(item.lat, item.lon, item.data, item.img);
+                this.clusterManager.addMarker(item.lat, item.lon, item.img); //item.data, 
             });
             result.errors.forEach(error => {
                 _utils_ToastManager__WEBPACK_IMPORTED_MODULE_6__.ToastManager.show(error, 'error');
@@ -6068,6 +6148,13 @@ class WebmapWebPart extends _microsoft_sp_webpart_base__WEBPACK_IMPORTED_MODULE_
         }
         finally {
             this.hideLoader();
+            const endTime = Date.now();
+            // Dauer berechnen in Millisekunden
+            const durationMs = endTime - startTime;
+            // In Minuten und Sekunden umrechnen
+            const minutes = Math.floor(durationMs / 60000); // 1 Minute = 60.000 ms
+            const seconds = ((durationMs % 60000) / 1000).toFixed(2);
+            console.log(`Process took ${minutes} minutes and ${seconds} seconds.`);
         }
     }
     // Defines the configuration for the web part's property pane
@@ -6119,7 +6206,7 @@ class WebmapWebPart extends _microsoft_sp_webpart_base__WEBPACK_IMPORTED_MODULE_
         }
         // Re-render map whenever any data-source field changes 
         if (['libraryName', 'locationMethod', 'latField', 'lonField', 'mapType', 'arcgisMapUrl', 'mapType'].indexOf(path) !== -1) {
-            this.render();
+            this.renderMap();
         }
     }
     // Clean up resources when the web part is disposed

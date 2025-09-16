@@ -84,29 +84,38 @@ private renderMap(): void {
     this.clusterManager = undefined;
   }
 
-  // Create fresh map and cluster managers
-  this.mapManager = new MapManager(this.mapId);
+  // Wait for DOM to be ready
+  setTimeout(() => {
+    const mapElement = document.getElementById(this.mapId);
+    if (!mapElement) {
+      console.error('Map container not found in DOM');
+      return;
+    }
 
-  const map = this.mapManager.initializeMap(this.properties);
-  
-  if (!map) {
-    ToastManager.show('Failed to initialize map', 'error');
-    return;
-  }
+    // Create fresh map and cluster managers
+    this.mapManager = new MapManager(this.mapId);
 
-  this.mapViewService = new MapViewService(map);
+    const map = this.mapManager.initializeMap(this.properties);
+    
+    if (!map) {
+      ToastManager.show('Failed to initialize map', 'error');
+      return;
+    }
 
-
-  // Pass MapViewService to dataservice
-  this.dataService = new DataService(this.context, this.mapViewService);
-
-  // Initialize cluster manager
-  this.clusterManager = new ClusterManager(map);
+    this.mapViewService = new MapViewService(map);
 
 
-  if (this.properties.libraryName) {
-    this.loadMapData();
-  }
+    // Pass MapViewService to dataservice
+    this.dataService = new DataService(this.context, this.mapViewService);
+
+    // Initialize cluster manager
+    this.clusterManager = new ClusterManager(map);
+
+
+    if (this.properties.libraryName) {
+      this.loadMapData();
+    }
+  }, 100);
 }
 
 
@@ -207,7 +216,7 @@ protected onPropertyPaneFieldChanged(path: string, oldValue: unknown, newValue: 
 
   // Re-render map whenever any data-source field changes 
   if (['libraryName', 'locationMethod', 'latField', 'lonField', 'mapType', 'arcgisMapUrl', 'mapType'].indexOf(path) !== -1) {
-    this.render(); 
+    this.renderMap(); 
   }
 }
 
