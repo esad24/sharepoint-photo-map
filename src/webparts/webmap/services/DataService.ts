@@ -1,9 +1,10 @@
-// Optimized Service for fetching data from SharePoint document libraries             
+// Optimized Service for fetching data from SharePoint document libraries
 // Handles both manual coordinate and EXIF-based location extraction with performance optimizations
 
 import { SPHttpClient, SPHttpClientResponse } from '@microsoft/sp-http';
 import { WebPartContext } from '@microsoft/sp-webpart-base';
-import * as EXIF from 'exif-js';
+import * as exifr from 'exifr';
+import pLimit from 'p-limit';
 import { escODataIdentifier, sanitizeUrl } from '../utils/Security';
 import { IWebmapWebPartProps } from '../types/IWebmapTypes';
 import { MapViewService } from './MapViewService';
@@ -17,73 +18,130 @@ export interface IGPSCoordinates {
 
 // Interface for processed map item
 export interface IMapItem {
-  lat: number;          
-  lon: number;          
-  img: string;         
+  lat: number;
+  lon: number;
+  img: string;
 }
 
 // Result of data fetching operations
 export interface IDataFetchResult {
-  items: IMapItem[];    
-  errors: string[];    
+  items: IMapItem[];
+  errors: string[];
 }
-
-const bounds: L.LatLng[] = []; // map boundaries
 
 export class DataService {
   private context: WebPartContext;
   private mapViewService: MapViewService | undefined;
-  
-  // Performance configuration
-  private readonly BATCH_SIZE = 20; // Process images in batches
-  private readonly MAX_CONCURRENT = 3; // Maximum concurrent image loads
-  private readonly BATCH_DELAY = 500; // Delay between batches (ms)
 
+  private cancelProcessing = false;
   
+
   constructor(context: WebPartContext, mapViewService?: MapViewService) {
     this.context = context;
     this.mapViewService = mapViewService;
   }
 
-  public async fetchMapData(properties: IWebmapWebPartProps): Promise<IDataFetchResult> {
-    return this.fetchDocumentLibraryData(properties);
+  // Call this when library changes in property pane
+  public cancelCurrentProcess() {
+    this.cancelProcessing = true;
   }
 
+  public async fetchMapData(properties: IWebmapWebPartProps): Promise<IDataFetchResult> {
+    let result =  await this.fetchDocumentLibraryData(properties);
+    if(this.cancelProcessing) {
+      return { items: [], errors: [] };
+    }
+    return result;
+  }
+
+  // Fetch data from a SharePoint Document Library
   private async fetchDocumentLibraryData(properties: IWebmapWebPartProps): Promise<IDataFetchResult> {
     const { libraryName, locationMethod, latField, lonField } = properties;
     const result: IDataFetchResult = { items: [], errors: [] };
-    
-    if (!libraryName) {
-      return result;
-    }
 
-    // Validate manual method has required fields
+    if (!libraryName) return result;
+
+
+
     if (locationMethod === 'manual' && (!latField || !lonField)) {
       result.errors.push('Please select both latitude and longitude fields');
       return result;
     }
 
     const site = this.context.pageContext.web.absoluteUrl;
-    if (!site) {
-      return result;
-    }
+    if (!site) return result;
 
     const libraryPart = escODataIdentifier(libraryName);
 
     try {
-      // Get all items from SharePoint
-      const allItems = await this.fetchAllSharePointItems(site, libraryPart, locationMethod, latField, lonField);
-      
-      if (locationMethod === 'manual') {
-        // Process manual coordinates
-        result.items = await this.processManualCoordinates(allItems, site, latField!, lonField!);
-      } else {
-        // Process EXIF coordinates
-        const processResult = await this.processEXIFCoordinatesOptimized(allItems, site);
-        result.items = processResult.items;
-        result.errors = processResult.errors;
+      const baseFields = ['FileRef', 'FileLeafRef'];
+      if (locationMethod === 'manual' && latField && lonField) {
+        baseFields.push(latField, lonField);
       }
 
+      const selectFields = baseFields.map(f => escODataIdentifier(f)).join(',');
+
+      let allItems: any[] = [];
+      let url: string | null = `${site}/_api/web/lists/getByTitle('${libraryPart}')/items?$select=${selectFields}&$top=500`;
+
+      // Handle pagination
+      while (url) {
+        if (this.cancelProcessing) {
+          return result; // stop processing if cancelled
+        } 
+
+        const response: SPHttpClientResponse = await this.context.spHttpClient.get(url, SPHttpClient.configurations.v1);
+        if (!response.ok) throw new Error(`Error fetching items: ${response.statusText}`);
+
+        const json = await response.json();
+        allItems = allItems.concat(json.value);
+        url = json['@odata.nextLink'] || null;
+      }
+
+      let noGpsCount = 0;
+
+      if (locationMethod === 'manual') {
+        // Manual coordinates from fields
+        for (const item of allItems) {
+          const img = this.buildFileUrl(item.FileRef, site);
+          if (!this.isImageFile(img)) continue;
+
+          let lat = parseFloat((item[latField!] as string).replace(',', '.'));
+          let lon = parseFloat((item[lonField!] as string).replace(',', '.'));
+
+          if (!lat || !lon || isNaN(lat) || isNaN(lon)) continue;
+
+          const sanitizedImg = sanitizeUrl(img);
+          if (!sanitizedImg) continue;
+
+          result.items.push({ lat, lon, img: sanitizedImg });
+        }
+      } else {
+        // Extract GPS from EXIF metadata in parallel
+        const processed = await this.processExifImages(allItems);
+
+        for (const { item, gps, fileUrl } of processed) {
+          if (!gps) {
+            noGpsCount++;
+            continue;
+          }
+
+          const sanitizedImg = sanitizeUrl(fileUrl);
+          if (!sanitizedImg) continue;
+
+          result.items.push({
+            lat: gps.lat,
+            lon: gps.lon,
+            img: sanitizedImg
+          });
+        }
+
+        if (noGpsCount === 1) {
+          result.errors.push(`1 image has no EXIF GPS data and will not be displayed.`);
+        } else if (noGpsCount > 1) {
+          result.errors.push(`${noGpsCount} images have no EXIF GPS data and will not be displayed.`);
+        }
+      }
     } catch (err) {
       console.error('Webmap: document library fetch failed:', err);
       result.errors.push('Failed to load images from document library');
@@ -93,242 +151,99 @@ export class DataService {
     return result;
   }
 
-  // Fetch all items from SharePoint with pagination
-  private async fetchAllSharePointItems(
-    site: string, 
-    libraryPart: string, 
-    locationMethod: string, 
-    latField?: string, 
-    lonField?: string
-  ): Promise<any[]> {
-    const baseFields = ['FileRef', 'FileLeafRef'];
-    
-    if (locationMethod === 'manual' && latField && lonField) {
-      baseFields.push(latField, lonField);
-    }
-    
-    const selectFields = baseFields.map(f => escODataIdentifier(f)).join(',');
-    let allItems: any[] = [];
-    let url: string | null = `${site}/_api/web/lists/getByTitle('${libraryPart}')/items?$select=${selectFields}&$top=500`;
-
-    while (url) {
-      const response: SPHttpClientResponse = await this.context.spHttpClient.get(url, SPHttpClient.configurations.v1);
-      
-      if (!response.ok) {
-        throw new Error(`Error fetching items: ${response.statusText}`);
-      }
-      
-      const json = await response.json();
-      allItems = allItems.concat(json.value);
-      url = json['@odata.nextLink'] || null;
-    }
-
-    return allItems;
-  }
-
-  // Process manual coordinates
-  private async processManualCoordinates(
-    items: any[], 
-    site: string, 
-    latField: string, 
-    lonField: string
-  ): Promise<IMapItem[]> {
-    const results: IMapItem[] = [];
+  // Process images with EXIF extraction in parallel
+  private async processExifImages(allItems: any[]): Promise<{ item: any; gps: IGPSCoordinates | null; fileUrl: string }[]> {
+    const site = this.context.pageContext.web.absoluteUrl;
     const siteServerRelativeUrl = this.context.pageContext.web.serverRelativeUrl;
     const searchString = siteServerRelativeUrl === '/' ? '/' : siteServerRelativeUrl + '/';
 
-    for (const item of items) {
-      const relativeFileRef = item.FileRef.replace(searchString, '');
-      const fileUrl = `${site}/${relativeFileRef}`;
+    const LIMIT = pLimit(3); // Limit concurrency
+    const BATCH_SIZE = 20; // Process in batches
+    const BATCH_DELAY = 1000; // Delay between batches to avoid throttling
+    const total = allItems.length;
+    let completed = 0;        // Progress counter
 
-      if (!this.isImageFile(fileUrl)) continue;
 
-      if (item[latField] && item[lonField]) {
-        let latString = item[latField] as string;
-        let lonString = item[lonField] as string;
-        
-        if (latString.includes(',')) latString = latString.replace(',', '.');
-        if (lonString.includes(',')) lonString = lonString.replace(',', '.');
-        
-        const lat = parseFloat(latString);
-        const lon = parseFloat(lonString);
+    const allResults: { item: any; gps: IGPSCoordinates | null; fileUrl: string }[] = [];
 
-        if (!isNaN(lat) && !isNaN(lon)) {
-          const sanitizedImg = sanitizeUrl(fileUrl);
-          if (sanitizedImg) {
-            results.push({ lat, lon, img: sanitizedImg });
-          }
-        }
+    for(let i = 0; i < total; i += BATCH_SIZE) {
+      if (this.cancelProcessing) {
+        break; // stop processing if cancelled
       }
-    }
 
-    return results;
+      const batch = allItems.slice(i, i + BATCH_SIZE);
+
+      const tasks = batch.map(item =>
+        LIMIT(async () => {
+          if (this.cancelProcessing) {
+            return { item, gps: null, fileUrl: this.buildFileUrl(item.FileRef, site) };
+          }
+
+          const relativeFileRef = item.FileRef.replace(searchString, '');
+          const fileUrl = `${site}/${relativeFileRef}`;
+          if (!this.isImageFile(fileUrl)) return { item, gps: null, fileUrl };
+
+          const gps = await this.extractGPSFromExif(fileUrl);
+
+          completed++;
+          if (completed % 100 === 0 || completed === total) {
+            console.log(`${completed}/${total} images processed`);
+          }
+          return { item, gps, fileUrl };
+        })
+      );
+
+      const results = await Promise.all(tasks);
+      allResults.push(...results);
+
+      // Small pause between batches to avoid SharePoint throttling
+      await new Promise(resolve => setTimeout(resolve, BATCH_DELAY));
+    }
+    return allResults;
   }
 
-  // Process EXIF coordinates with batching
-  private async processEXIFCoordinatesOptimized(
-    items: any[], 
-    site: string
-  ): Promise<{ items: IMapItem[], errors: string[] }> {
-    const results: IMapItem[] = [];
-    const errors: string[] = [];
+  // Extract GPS using exifr from binary
+  private async extractGPSFromExif(imageUrl: string): Promise<IGPSCoordinates | null> {
+    try {
+      const response = await fetch(imageUrl, { mode: 'cors' });
+      const contentType = response.headers.get('content-type');
+
+      if (!response.ok || !contentType?.startsWith('image/')) {
+        console.warn('Not an image response:', await response.text());
+        return null;
+      }
+
+      if (!response.ok) return null;
+
+      const buffer = await response.arrayBuffer();
+      const gps = await exifr.gps(buffer);
+
+      if (gps?.latitude && gps?.longitude) {
+        return { lat: gps.latitude, lon: gps.longitude };
+      }
+    } catch (err) {
+      console.warn('EXIF parse failed for:', imageUrl, err);
+    }
+    return null;
+  }
+
+  // Utility: build full file URL
+  private buildFileUrl(fileRef: string, site: string): string {
     const siteServerRelativeUrl = this.context.pageContext.web.serverRelativeUrl;
     const searchString = siteServerRelativeUrl === '/' ? '/' : siteServerRelativeUrl + '/';
-
-    // Filter to image files only first
-    const imageItems = items.filter(item => {
-      const relativeFileRef = item.FileRef.replace(searchString, '');
-      const fileUrl = `${site}/${relativeFileRef}`;
-      return this.isImageFile(fileUrl);
-    });
-
-    console.log(`Processing ${imageItems.length} images for EXIF data...`);
-
-    let processedCount = 0;
-    let noGpsCount = 0;
-
-    // Process images in batches
-    for (let i = 0; i < imageItems.length; i += this.BATCH_SIZE) {
-      const batch = imageItems.slice(i, i + this.BATCH_SIZE);
-      
-      // Process batch with concurrency limit
-      const batchResults = await this.processBatchWithConcurrency(batch, site, searchString);
-      
-      for (const result of batchResults) {
-        if (result.coordinates) {
-          const sanitizedImg = sanitizeUrl(result.fileUrl);
-          if (sanitizedImg) {
-            results.push({
-              lat: result.coordinates.lat,
-              lon: result.coordinates.lon,
-              img: sanitizedImg
-            });
-          }
-        } else {
-          noGpsCount++;
-        }
-        processedCount++;
-      }
-
-      // Progress logging
-      if (processedCount % 100 === 0 || processedCount === imageItems.length) {
-        console.log(`Processed ${processedCount}/${imageItems.length} images`);
-      }
-
-      // Small delay between batches to prevent overwhelming the browser
-      if (i + this.BATCH_SIZE < imageItems.length) {
-        await this.delay(this.BATCH_DELAY);
-      }
-    }
-
-    // Add error messages
-    if (noGpsCount === 1) {
-      errors.push(`1 image has no EXIF GPS data and will not be displayed.`);
-    } else if (noGpsCount > 1) {
-      errors.push(`${noGpsCount} images have no EXIF GPS data and will not be displayed.`);
-    }
-
-    console.log(`EXIF processing complete. Processed: ${processedCount} images`);
-
-    return { items: results, errors };
+    const relativeFileRef = fileRef.replace(searchString, '');
+    return `${site}/${relativeFileRef}`;
   }
 
-  // Process a batch of images with concurrency control
-  private async processBatchWithConcurrency(
-    batch: any[], 
-    site: string, 
-    searchString: string
-  ): Promise<Array<{ coordinates: IGPSCoordinates | null, fileUrl: string }>> {
-    const results: Array<{ coordinates: IGPSCoordinates | null, fileUrl: string }> = [];
-    
-    // Process items in smaller concurrent groups
-    for (let i = 0; i < batch.length; i += this.MAX_CONCURRENT) {
-      const concurrentBatch = batch.slice(i, i + this.MAX_CONCURRENT);
-      
-      const promises = concurrentBatch.map(async (item) => {
-        const relativeFileRef = item.FileRef.replace(searchString, '');
-        const fileUrl = `${site}/${relativeFileRef}`;
-        
-        // Extract from EXIF
-        const coordinates = await this.extractGPSFromExifOptimized(fileUrl);
-        
-        return { coordinates, fileUrl };
-      });
-
-      const concurrentResults = await Promise.all(promises);
-      results.push(...concurrentResults);
-    }
-
-    return results;
-  }
-
-  // Extract GPS from EXIF with better error handling and timeouts
-  private extractGPSFromExifOptimized(imageUrl: string): Promise<IGPSCoordinates | null> {
-    return new Promise((resolve) => {
-      const img = new Image();
-      img.crossOrigin = 'anonymous';
-      
-      // Set timeout to prevent hanging on slow images
-      const timeout = setTimeout(() => {
-        resolve(null);
-      }, 15000); // 10 second timeout
-
-      img.onload = function() {
-        clearTimeout(timeout);
-        
-        try {
-          EXIF.getData(img as any, function() {
-            const lat = EXIF.getTag(this, 'GPSLatitude');
-            const lon = EXIF.getTag(this, 'GPSLongitude');
-            const latRef = EXIF.getTag(this, 'GPSLatitudeRef');
-            const lonRef = EXIF.getTag(this, 'GPSLongitudeRef')
-            
-            if (lat && lon) {
-              const decimalLat = DataService.convertDMSToDD(lat, latRef);
-              const decimalLon = DataService.convertDMSToDD(lon, lonRef);
-              
-              if (decimalLat !== null && decimalLon !== null) {
-                resolve({ lat: decimalLat, lon: decimalLon });
-              } else {
-                resolve(null);
-              }
-            } else {
-              resolve(null);
-            }
-          });
-        } catch (error) {
-          console.warn(`EXIF extraction failed for ${imageUrl}:`, error);
-          resolve(null);
-        }
-      };
-      
-      img.onerror = () => {
-        clearTimeout(timeout);
-        resolve(null);
-      };
-      
-      img.src = imageUrl;
-    });
-  }
-
-  // Utility methods
-  private static convertDMSToDD(dms: number[], ref: string): number | null {
-    if (!dms || dms.length !== 3) return null;
-    let dd = dms[0] + dms[1]/60 + dms[2]/3600;
-    
-    if (ref === 'S' || ref === 'W') {
-      dd = dd * -1;
-    }
-    return dd;
-  }
-
+  // Checks if a file is an image
   private isImageFile(fileUrl: string): boolean {
-    const imageExtensions = ['.jpg', '.jpeg', '.png'];
+    const imageExtensions = ['.jpg', '.jpeg', '.png', '.gif', '.bmp', '.webp'];
     const fileName = fileUrl.split('/').pop() || fileUrl;
     const ext = fileName.toLowerCase().substring(fileName.lastIndexOf('.'));
     return imageExtensions.includes(ext);
   }
 
+  // Collect coordinates and set bounds
   private getBounds(items: IMapItem[]): void {
     const bounds: L.LatLng[] = [];
     for (const item of items) {
@@ -337,9 +252,5 @@ export class DataService {
     if (this.mapViewService) {
       this.mapViewService.setImageBounds(bounds);
     }
-  }
-
-  private delay(ms: number): Promise<void> {
-    return new Promise(resolve => setTimeout(resolve, ms));
   }
 }

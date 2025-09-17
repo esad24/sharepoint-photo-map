@@ -26,7 +26,7 @@ export default class WebmapWebPart extends BaseClientSideWebPart<IWebmapWebPartP
 private mapManager: MapManager | undefined;
 private clusterManager: ClusterManager | undefined;
 private propertyPaneManager: PropertyPaneManager | undefined;
-private dataService: DataService | undefined;        
+private activeDataService: DataService | null = null; // Tracks currently active data service
 private mapViewService: MapViewService | undefined;
 
 // Generate a unique ID for the map container to avoid conflicts if multiple web parts are on the same page
@@ -84,6 +84,13 @@ private renderMap(): void {
     this.clusterManager = undefined;
   }
 
+  if (this.activeDataService) {
+    this.activeDataService.cancelCurrentProcess(); // Cancel any ongoing data fetch
+    this.activeDataService = null;
+  }
+
+
+
   // Wait for DOM to be ready
   setTimeout(() => {
     const mapElement = document.getElementById(this.mapId);
@@ -103,12 +110,6 @@ private renderMap(): void {
     }
 
     this.mapViewService = new MapViewService(map);
-
-
-    // Pass MapViewService to dataservice
-    this.dataService = new DataService(this.context, this.mapViewService);
-
-    // Initialize cluster manager
     this.clusterManager = new ClusterManager(map);
 
 
@@ -122,14 +123,27 @@ private renderMap(): void {
 // Fetches data from the configured SharePoint document library and populates the map with markers.
 
 private async loadMapData(): Promise<void> {
-  if (!this.clusterManager || !this.dataService || !this.mapManager ||!this.properties.libraryName) return;
+  if (!this.clusterManager || !this.mapManager ||!this.properties.libraryName) return;
+
+
+  // Cancel previous fetch if any
+  this.activeDataService?.cancelCurrentProcess();
+
+  // Create new DataService instance
+  const dataService = new DataService(this.context, this.mapViewService);
+  this.activeDataService = dataService;
+
 
   const startTime = Date.now();
-  this.showLoader();
+  //this.showLoader();
 
   try {
     // Use the DataService to fetch data
-    const result = await this.dataService.fetchMapData(this.properties);
+    const result = await dataService.fetchMapData(this.properties);
+    // If a newer dataService is active, discard results
+    if (this.activeDataService !== dataService) {
+      return;
+    }
 
     // Clear all old markers before adding new ones.
     this.clusterManager.clearMarkers();
@@ -144,7 +158,7 @@ private async loadMapData(): Promise<void> {
   } catch (error) {
     console.error('Error loading Images:', error);
   } finally {
-    this.hideLoader();
+    //this.hideLoader();
     const endTime = Date.now();
     // Dauer berechnen in Millisekunden
     const durationMs = endTime - startTime;
@@ -215,7 +229,7 @@ protected onPropertyPaneFieldChanged(path: string, oldValue: unknown, newValue: 
   }
 
   // Re-render map whenever any data-source field changes 
-  if (['libraryName', 'locationMethod', 'latField', 'lonField', 'mapType', 'arcgisMapUrl', 'mapType'].indexOf(path) !== -1) {
+  if (['libraryName', 'locationMethod', 'latField', 'lonField', 'mapType', 'arcgisMapUrl', 'mapType'].includes(path)) {
     this.renderMap(); 
   }
 }
