@@ -41,7 +41,7 @@ export class DataService {
   
   private readonly LIMIT = pLimit(3); // Limit concurrency
   private readonly BATCH_SIZE = 20; // Process in batches
-  private readonly BATCH_DELAY = 1000; // Delay between batches to avoid throttling
+  private readonly BATCH_DELAY = 3000; // Delay between batches to avoid throttling
   private fails = 0; // Track failed attempts due to throttling
 
   // Sharepoint API Limit: 3000 calls per 5 minutes
