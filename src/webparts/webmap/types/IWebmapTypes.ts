@@ -28,7 +28,7 @@ export type LocationMethod = 'exif' | 'manual'; // Method for getting GPS coordi
 
 export interface IWebmapWebPartProps {
   libraryName: string; 
-  locationMethod: LocationMethod; 
+  locationMethod: LocationMethod | undefined;
   latField: string; 
   lonField: string; 
   mapType: MapType; 

@@ -83,7 +83,7 @@ export class PropertyPaneManager {
             { key: 'exif', text: 'Extract from Image EXIF Data' },
             { key: 'manual', text: 'Select latitude and longitude fields' }
           ],
-          selectedKey: this.properties.locationMethod || 'exif' // Default to EXIF
+          selectedKey: this.properties.locationMethod || '' // Default to EXIF
         })
       ]
     });
@@ -210,5 +210,11 @@ export class PropertyPaneManager {
     this.cache.libraryForFields = null;
     this.properties.latField = '';
     this.properties.lonField = '';
+  }
+
+  public clearLocation(): void {
+    // Clear field cache and selections
+    this.clearFieldCache();
+    this.properties.locationMethod = undefined; // Reset to default
   }
 }

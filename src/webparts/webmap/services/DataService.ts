@@ -8,6 +8,8 @@ import pLimit from 'p-limit';
 import { escODataIdentifier, sanitizeUrl } from '../utils/Security';
 import { IWebmapWebPartProps } from '../types/IWebmapTypes';
 import { MapViewService } from './MapViewService';
+import { updateLoader } from '../utils/loader';
+
 import * as L from 'leaflet';
 
 // Interface for GPS coordinates
@@ -31,13 +33,27 @@ export interface IDataFetchResult {
 
 export class DataService {
   private context: WebPartContext;
+  private loaderId: string;
+  private loader: HTMLElement | null;
   private mapViewService: MapViewService | undefined;
 
   private cancelProcessing = false;
   
+  private readonly LIMIT = pLimit(3); // Limit concurrency
+  private readonly BATCH_SIZE = 20; // Process in batches
+  private readonly BATCH_DELAY = 1000; // Delay between batches to avoid throttling
+  private fails = 0; // Track failed attempts due to throttling
 
-  constructor(context: WebPartContext, mapViewService?: MapViewService) {
+  // Sharepoint API Limit: 3000 calls per 5 minutes
+  private requestCount = 0;
+  private windowStart = Date.now();
+  private readonly WINDOW_SIZE = 5 * 60 * 1000; // 5 minutes
+  private readonly MAX_REQUESTS_PER_WINDOW = 2800; // Buffer below 3000 limit
+
+  constructor(context: WebPartContext, loaderId: string, mapViewService?: MapViewService) {
     this.context = context;
+    this.loaderId = loaderId;
+    this.loader= document.getElementById(this.loaderId);
     this.mapViewService = mapViewService;
   }
 
@@ -46,9 +62,31 @@ export class DataService {
     this.cancelProcessing = true;
   }
 
+  // Check if we're approaching rate limits
+  private async checkRateLimit(): Promise<void> {
+    const now = Date.now();
+    
+    // Reset window if 5 minutes have passed
+    if (now - this.windowStart >= this.WINDOW_SIZE) {
+      this.requestCount = 0;
+      this.windowStart = now;
+    }
+    
+    // If we're approaching the limit, wait until next window
+    if (this.requestCount >= this.MAX_REQUESTS_PER_WINDOW) {
+      const timeToWait = this.WINDOW_SIZE - (now - this.windowStart);
+      if (timeToWait > 0) {
+        updateLoader(this.loaderId, `Rate limit reached. Waiting ${Math.ceil(timeToWait / 1000)}s...`);
+        await new Promise(resolve => setTimeout(resolve, timeToWait));
+        this.requestCount = 0;
+        this.windowStart = Date.now();
+      }
+    }
+  }
+
   public async fetchMapData(properties: IWebmapWebPartProps): Promise<IDataFetchResult> {
     let result =  await this.fetchDocumentLibraryData(properties);
-    if(this.cancelProcessing) {
+    if(this.cancelProcessing || this.fails >= 3) {
       return { items: [], errors: [] };
     }
     return result;
@@ -86,11 +124,14 @@ export class DataService {
 
       // Handle pagination
       while (url) {
-        if (this.cancelProcessing) {
+        if (this.cancelProcessing || this.fails >= 3) {
           return result; // stop processing if cancelled
-        } 
+        }
+        
+        await this.checkRateLimit();
 
         const response: SPHttpClientResponse = await this.context.spHttpClient.get(url, SPHttpClient.configurations.v1);
+        this.requestCount++;
         if (!response.ok) throw new Error(`Error fetching items: ${response.statusText}`);
 
         const json = await response.json();
@@ -157,25 +198,24 @@ export class DataService {
     const siteServerRelativeUrl = this.context.pageContext.web.serverRelativeUrl;
     const searchString = siteServerRelativeUrl === '/' ? '/' : siteServerRelativeUrl + '/';
 
-    const LIMIT = pLimit(3); // Limit concurrency
-    const BATCH_SIZE = 20; // Process in batches
-    const BATCH_DELAY = 1000; // Delay between batches to avoid throttling
+
     const total = allItems.length;
     let completed = 0;        // Progress counter
 
 
+
     const allResults: { item: any; gps: IGPSCoordinates | null; fileUrl: string }[] = [];
 
-    for(let i = 0; i < total; i += BATCH_SIZE) {
-      if (this.cancelProcessing) {
-        break; // stop processing if cancelled
+    for(let i = 0; i < total; i += this.BATCH_SIZE) {
+      if (this.cancelProcessing || this.fails >= 3) {
+            return allResults; // stop processing if cancelled
       }
 
-      const batch = allItems.slice(i, i + BATCH_SIZE);
+      const batch = allItems.slice(i, i + this.BATCH_SIZE);
 
       const tasks = batch.map(item =>
-        LIMIT(async () => {
-          if (this.cancelProcessing) {
+        this.LIMIT(async () => {
+          if (this.cancelProcessing || this.fails >= 3) {
             return { item, gps: null, fileUrl: this.buildFileUrl(item.FileRef, site) };
           }
 
@@ -186,9 +226,7 @@ export class DataService {
           const gps = await this.extractGPSFromExif(fileUrl);
 
           completed++;
-          if (completed % 100 === 0 || completed === total) {
-            console.log(`${completed}/${total} images processed`);
-          }
+          updateLoader(this.loaderId, `Processing images: ${completed}/${total}`);
           return { item, gps, fileUrl };
         })
       );
@@ -197,23 +235,34 @@ export class DataService {
       allResults.push(...results);
 
       // Small pause between batches to avoid SharePoint throttling
-      await new Promise(resolve => setTimeout(resolve, BATCH_DELAY));
+      await new Promise(resolve => setTimeout(resolve, this.BATCH_DELAY));
     }
     return allResults;
   }
 
-  // Extract GPS using exifr from binary
+  // Extract GPS using exifr from binary with throttling handling
   private async extractGPSFromExif(imageUrl: string): Promise<IGPSCoordinates | null> {
+    if( this.cancelProcessing || this.fails >= 3) {
+      return null; // stop processing if cancelled
+    }
     try {
-      const response = await fetch(imageUrl, { mode: 'cors' });
-      const contentType = response.headers.get('content-type');
+      await this.checkRateLimit();
+      const response = await fetch(imageUrl, { 
+        mode: 'cors',
+        headers: {
+          Range: 'bytes=0-65535' // Fetch only the first 64KB to reduce data usage
+        }
+      });
 
+      this.requestCount++;
+      
+
+      const contentType = response.headers.get('content-type');
       if (!response.ok || !contentType?.startsWith('image/')) {
         console.warn('Not an image response:', await response.text());
+        this.cancelProcessing = true;
         return null;
       }
-
-      if (!response.ok) return null;
 
       const buffer = await response.arrayBuffer();
       const gps = await exifr.gps(buffer);
@@ -221,10 +270,12 @@ export class DataService {
       if (gps?.latitude && gps?.longitude) {
         return { lat: gps.latitude, lon: gps.longitude };
       }
+
+      return null; // no GPS data
     } catch (err) {
-      console.warn('EXIF parse failed for:', imageUrl, err);
+      console.warn(`EXIF parse failed:`, imageUrl, err);
+      return null;
     }
-    return null;
   }
 
   // Utility: build full file URL

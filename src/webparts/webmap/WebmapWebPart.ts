@@ -7,9 +7,9 @@ import { Version } from '@microsoft/sp-core-library';
 import { IPropertyPaneConfiguration } from '@microsoft/sp-property-pane';
 import { BaseClientSideWebPart } from '@microsoft/sp-webpart-base'; 
 
-import * as L from 'leaflet';              
-
 import { IWebmapWebPartProps } from './types/IWebmapTypes';
+
+import { showLoader, hideLoader } from './utils/loader';
 
 import { MapManager } from './components/MapManager';
 import { ClusterManager } from './components/ClusterManager';
@@ -55,22 +55,6 @@ public render(): void {
 }
 
 
-// Show loader
-private showLoader(): void {
-  const loader = document.getElementById(this.loaderId);
-  if (loader) {
-    loader.style.display = 'flex';
-  }
-}
-
-// Hide loader
-private hideLoader(): void {
-  const loader = document.getElementById(this.loaderId);
-  if (loader) {
-    loader.style.display = 'none';
-  }
-}
-
 // Initializes or refreshes the Leaflet map instance
 
 private renderMap(): void {
@@ -83,11 +67,11 @@ private renderMap(): void {
     this.clusterManager.dispose();
     this.clusterManager = undefined;
   }
-
   if (this.activeDataService) {
     this.activeDataService.cancelCurrentProcess(); // Cancel any ongoing data fetch
     this.activeDataService = null;
   }
+
 
 
 
@@ -113,8 +97,13 @@ private renderMap(): void {
     this.clusterManager = new ClusterManager(map);
 
 
-    if (this.properties.libraryName) {
-      this.loadMapData();
+    if (this.properties.libraryName && this.properties.locationMethod) {
+      if(this.properties.locationMethod === 'manual' && this.properties.latField && this.properties.lonField) {
+        this.loadMapData();
+      } 
+      else if (this.properties.locationMethod === 'exif') {
+        this.loadMapData();
+      }
     }
   }, 100);
 }
@@ -123,19 +112,19 @@ private renderMap(): void {
 // Fetches data from the configured SharePoint document library and populates the map with markers.
 
 private async loadMapData(): Promise<void> {
-  if (!this.clusterManager || !this.mapManager ||!this.properties.libraryName) return;
+  if (!this.clusterManager || !this.mapManager ||!this.properties.libraryName || !this.properties.locationMethod) return;
 
 
   // Cancel previous fetch if any
   this.activeDataService?.cancelCurrentProcess();
 
   // Create new DataService instance
-  const dataService = new DataService(this.context, this.mapViewService);
+  const dataService = new DataService(this.context, this.loaderId, this.mapViewService);
   this.activeDataService = dataService;
 
 
   const startTime = Date.now();
-  //this.showLoader();
+  showLoader(this.loaderId);
 
   try {
     // Use the DataService to fetch data
@@ -155,10 +144,7 @@ private async loadMapData(): Promise<void> {
     result.errors.forEach(error => {
       ToastManager.show(error, 'error');
     });
-  } catch (error) {
-    console.error('Error loading Images:', error);
-  } finally {
-    //this.hideLoader();
+    hideLoader(this.loaderId);
     const endTime = Date.now();
     // Dauer berechnen in Millisekunden
     const durationMs = endTime - startTime;
@@ -167,7 +153,11 @@ private async loadMapData(): Promise<void> {
     const minutes = Math.floor(durationMs / 60000); // 1 Minute = 60.000 ms
     const seconds = ((durationMs % 60000) / 1000).toFixed(2);
 
-    console.log(`Process took ${minutes} minutes and ${seconds} seconds.`);}
+    console.log(`Process took ${minutes} minutes and ${seconds} seconds.`);
+  } catch (error) {
+    console.error('Error loading Images:', error);
+  } finally {
+  }
 }
 
 
@@ -198,12 +188,12 @@ protected onPropertyPaneFieldChanged(path: string, oldValue: unknown, newValue: 
 
   // Handle map type change
   if (path === 'mapType') {
+    this.propertyPaneManager.clearLocation();
     if (newValue !== 'project') {
       this.properties.arcgisMapUrl = ''; // Clear ArcGIS URL if switching away from ArcGIS
     }
     this.context.propertyPane.refresh(); // Refresh to show/hide ArcGIS URL field
   }
-
 
   // Validate ArcGIS URL when it changes
   if (path === 'arcgisMapUrl' && newValue) {
@@ -217,19 +207,41 @@ protected onPropertyPaneFieldChanged(path: string, oldValue: unknown, newValue: 
   if (path === 'locationMethod') {
     // Clear field selections when switching methods
     this.propertyPaneManager.clearFieldCache();
-    if (newValue === 'manual' && this.properties.libraryName) {           // If switching to manual method, trigger field loading
+    if (newValue === 'manual' && this.properties.libraryName) {
+      // If switching to manual method, trigger field loading
       this.propertyPaneManager.loadFields(this.properties.libraryName); 
     } 
     this.context.propertyPane.refresh();
   }
 
-  // Reload field dropdowns when the library changes 
-  if (path === 'libraryName' && newValue) {
-    this.propertyPaneManager.loadFields(newValue as string);
+  // Handle library name change - clear all dependent configurations
+  if (path === 'libraryName') {
+    if (newValue) {
+      // Clear all dependent dropdowns and reset to defaults
+      this.propertyPaneManager.clearLocation();
+      
+      // If the current location method is manual, load fields for the new library
+      if (this.properties.locationMethod === 'manual') {
+        this.propertyPaneManager.loadFields(newValue as string);
+      }
+    } else {
+      // If library is cleared, also clear all dependent configurations
+      this.propertyPaneManager.clearLocation();
+    }
+    // Refresh property pane to reflect the changes
+    this.context.propertyPane.refresh();
+  }
+
+  // Load fields when switching to a library (but not when clearing all configs)
+  if (path === 'libraryName' && newValue && oldValue !== newValue) {
+    // Only load fields if we're in manual mode
+    if (this.properties.locationMethod === 'manual') {
+      this.propertyPaneManager.loadFields(newValue as string);
+    }
   }
 
   // Re-render map whenever any data-source field changes 
-  if (['libraryName', 'locationMethod', 'latField', 'lonField', 'mapType', 'arcgisMapUrl', 'mapType'].includes(path)) {
+  if (['libraryName', 'locationMethod', 'latField', 'lonField', 'mapType', 'arcgisMapUrl', 'mapView'].includes(path)) {
     this.renderMap(); 
   }
 }
