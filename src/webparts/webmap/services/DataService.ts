@@ -165,7 +165,7 @@ export class DataService {
       */
 
     } catch (err) {
-      //result.errors.push('Failed to load images from document library');
+      result.errors.push('Failed to load images from document library');
     }
 
     this.getBounds(result.items);
