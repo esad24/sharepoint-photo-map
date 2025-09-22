@@ -80,10 +80,10 @@ export class PropertyPaneManager {
         PropertyPaneDropdown('locationMethod', {
           label: 'Location Method',
           options: [
-            { key: 'exif', text: 'Extract from Image EXIF Data' },
+            //{ key: 'exif', text: 'Extract from Image EXIF Data' }, // Currently not production ready
             { key: 'manual', text: 'Select latitude and longitude fields' }
           ],
-          selectedKey: this.properties.locationMethod || '' // Default to EXIF
+          selectedKey: this.properties.locationMethod || '' 
         })
       ]
     });

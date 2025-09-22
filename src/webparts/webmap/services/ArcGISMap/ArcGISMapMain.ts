@@ -39,7 +39,6 @@ export class ArcGISMapService {
         }).addTo(this.map);
       }
     } catch (error) {
-      console.error('Failed to add ArcGIS tile layer:', error);
     }
     this.addArcGISVectorLayer(webmapId, domain);
   }
@@ -64,8 +63,6 @@ export class ArcGISMapService {
         }
       })
       .catch(error => {
-        console.warn('Could not load webmap data:', error);
-        console.warn(`Please check if the domain '${domain}' and webmap ID '${webmapId}' are correct.`);
       });
   }
 

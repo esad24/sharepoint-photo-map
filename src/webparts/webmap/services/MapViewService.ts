@@ -60,17 +60,17 @@ private updateMapView(): void {
     this.setDefaultView()  }
 }
 
-public forceUpdateView(): void {
-  this.updateMapView();
-}
+  public forceUpdateView(): void {
+    this.updateMapView();
+  }
 
 
-public hasContent(): boolean {
-  return this.imageBounds.length > 0;
-}
+  public hasContent(): boolean {
+    return this.imageBounds.length > 0;
+  }
 
 
-public setDefaultView(): void {
-  this.map.setView([HOCHTIEF_DEFAULT_VIEW.lat, HOCHTIEF_DEFAULT_VIEW.lon], HOCHTIEF_DEFAULT_VIEW.zoom);
-}
+  public setDefaultView(): void {
+    this.map.setView([HOCHTIEF_DEFAULT_VIEW.lat, HOCHTIEF_DEFAULT_VIEW.lon], HOCHTIEF_DEFAULT_VIEW.zoom);
+  }
 }

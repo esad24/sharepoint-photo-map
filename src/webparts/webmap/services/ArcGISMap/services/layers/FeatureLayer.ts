@@ -11,13 +11,11 @@ import { MapViewService } from '../../../MapViewService';
 export class FeatureLayerService {
   private map: L.Map;
   private styleService: StyleService;
-  private mapViewService: MapViewService | undefined;
 
 
-  constructor(map: L.Map, mapViewService?: MapViewService) {
+  constructor(map: L.Map) {
     this.map = map;
     this.styleService = new StyleService();
-    this.mapViewService = mapViewService;
   }
 
   // Add an ArcGIS Feature Layer with proper styling (Optimized for performance)
@@ -45,7 +43,6 @@ export class FeatureLayerService {
       }
     } 
     catch (error) {
-      console.error(`Failed to load feature layer ${layerConfig.title || 'Unknown'}:`, error);
     }
   }
 
@@ -58,14 +55,12 @@ export class FeatureLayerService {
       // Fetch layer metadata (information about the layer)
       const response = await fetch(layerInfoUrl);
       if (!response.ok) {
-        console.warn(`Failed to fetch layer info: ${response.status}`);
         return null;
       }
       
       const layerInfo = await response.json();
       return layerInfo.drawingInfo || null;
     } catch (error) {
-        console.error('Failed to get layer drawing info:', error);
       return null;
     }
   }

@@ -1,6 +1,6 @@
 // Entry Point
 // SPFx web part: Leaflet map with clustered picture markers                  
-// Loads images from SharePoint document libraries (EXIF or manual GPS)       
+// Loads images from SharePoint document libraries
 
 
 import { Version } from '@microsoft/sp-core-library'; 
@@ -9,7 +9,7 @@ import { BaseClientSideWebPart } from '@microsoft/sp-webpart-base';
 
 import { IWebmapWebPartProps } from './types/IWebmapTypes';
 
-import { showLoader, hideLoader } from './utils/loader';
+import { showLoader, hideLoader, updateLoader } from './utils/loader';
 
 import { MapManager } from './components/MapManager';
 import { ClusterManager } from './components/ClusterManager';
@@ -18,6 +18,7 @@ import { DataService, IMapItem } from './services/DataService';
 import { ToastManager } from './utils/ToastManager';
 import { validateArcGISUrl } from './utils/Security';
 import { MapViewService } from './services/MapViewService';
+import { RateLimiter } from './utils/RateLimit';
 
 import styles from './WebmapWebPart.module.scss';
 
@@ -33,6 +34,7 @@ private mapViewService: MapViewService | undefined;
 private mapId: string = `map-${Math.random().toString(36).substr(2, 9)}`;
 private loaderId: string = `loader-${Math.random().toString(36).substr(2, 9)}`;
 
+private rateLimiter: RateLimiter | undefined;
 
 
 public render(): void {
@@ -51,6 +53,11 @@ public render(): void {
     </div>
   </div>
   `;
+
+  if (!this.rateLimiter) {
+    this.rateLimiter = new RateLimiter(this.loaderId);
+  }
+
   this.renderMap();
 }
 
@@ -76,10 +83,10 @@ private renderMap(): void {
 
 
   // Wait for DOM to be ready
-  setTimeout(() => {
+  //setTimeout(() => {
     const mapElement = document.getElementById(this.mapId);
     if (!mapElement) {
-      console.error('Map container not found in DOM');
+      //console.error('Map container not found in DOM');
       return;
     }
 
@@ -101,11 +108,11 @@ private renderMap(): void {
       if(this.properties.locationMethod === 'manual' && this.properties.latField && this.properties.lonField) {
         this.loadMapData();
       } 
-      else if (this.properties.locationMethod === 'exif') {
-        this.loadMapData();
-      }
+      // else if (this.properties.locationMethod === 'exif') {  // currently not production ready
+      //   this.loadMapData();
+      // }
     }
-  }, 100);
+  //}, 100);
 }
 
 
@@ -119,11 +126,9 @@ private async loadMapData(): Promise<void> {
   this.activeDataService?.cancelCurrentProcess();
 
   // Create new DataService instance
-  const dataService = new DataService(this.context, this.loaderId, this.mapViewService);
+  const dataService = new DataService(this.context, this.loaderId, this.mapViewService, this.rateLimiter);
   this.activeDataService = dataService;
 
-
-  const startTime = Date.now();
   showLoader(this.loaderId);
 
   try {
@@ -145,17 +150,8 @@ private async loadMapData(): Promise<void> {
       ToastManager.show(error, 'error');
     });
     hideLoader(this.loaderId);
-    const endTime = Date.now();
-    // Dauer berechnen in Millisekunden
-    const durationMs = endTime - startTime;
-
-    // In Minuten und Sekunden umrechnen
-    const minutes = Math.floor(durationMs / 60000); // 1 Minute = 60.000 ms
-    const seconds = ((durationMs % 60000) / 1000).toFixed(2);
-
-    console.log(`Process took ${minutes} minutes and ${seconds} seconds.`);
   } catch (error) {
-    console.error('Error loading Images:', error);
+    //console.error('Error loading Images:', error);
   } finally {
   }
 }
@@ -245,6 +241,8 @@ protected onPropertyPaneFieldChanged(path: string, oldValue: unknown, newValue: 
     this.renderMap(); 
   }
 }
+
+
 
 // Clean up resources when the web part is disposed
 protected onDispose(): void {
