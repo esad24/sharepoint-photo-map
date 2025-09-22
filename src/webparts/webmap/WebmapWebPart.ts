@@ -80,39 +80,34 @@ private renderMap(): void {
   }
 
 
+  const mapElement = document.getElementById(this.mapId);
+  if (!mapElement) {
+    return;
+  }
+
+  // Create fresh map and cluster managers
+  this.mapManager = new MapManager(this.mapId);
+
+  const map = this.mapManager.initializeMap(this.properties);
+  
+  if (!map) {
+    ToastManager.show('Failed to initialize map', 'error');
+    return;
+  }
+
+  this.mapViewService = new MapViewService(map);
+  this.clusterManager = new ClusterManager(map);
 
 
-  // Wait for DOM to be ready
-  //setTimeout(() => {
-    const mapElement = document.getElementById(this.mapId);
-    if (!mapElement) {
-      //console.error('Map container not found in DOM');
-      return;
-    }
+  if (this.properties.libraryName && this.properties.locationMethod) {
+    if(this.properties.locationMethod === 'manual' && this.properties.latField && this.properties.lonField) {
+      this.loadMapData();
+    } 
+    // else if (this.properties.locationMethod === 'exif') {  // currently not production ready
+    //   this.loadMapData();
+    // }
+  }
 
-    // Create fresh map and cluster managers
-    this.mapManager = new MapManager(this.mapId);
-
-    const map = this.mapManager.initializeMap(this.properties);
-    
-    if (!map) {
-      ToastManager.show('Failed to initialize map', 'error');
-      return;
-    }
-
-    this.mapViewService = new MapViewService(map);
-    this.clusterManager = new ClusterManager(map);
-
-
-    if (this.properties.libraryName && this.properties.locationMethod) {
-      if(this.properties.locationMethod === 'manual' && this.properties.latField && this.properties.lonField) {
-        this.loadMapData();
-      } 
-      // else if (this.properties.locationMethod === 'exif') {  // currently not production ready
-      //   this.loadMapData();
-      // }
-    }
-  //}, 100);
 }
 
 

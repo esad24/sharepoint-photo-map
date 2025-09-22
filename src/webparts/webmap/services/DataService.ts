@@ -132,10 +132,11 @@ export class DataService {
           });
         }
       } 
-      else {
-        /*
-        // Image Exif processing currently not production ready
 
+      /*
+      // Image Exif processing currently not production ready
+
+      else {
         this.exifExtraction = new ExifExtraction(allItems, this.context, this.loaderId, this.rateLimiter);
         const processed = await this.exifExtraction.processExifImages();
 
@@ -160,12 +161,11 @@ export class DataService {
         } else if (noGpsCount > 1) {
           result.errors.push(`${noGpsCount} images have no EXIF GPS data and will not be displayed.`);
         }
-        */
       }
+      */
 
     } catch (err) {
-      console.error('Webmap: document library fetch failed:', err);
-      result.errors.push('Failed to load images from document library');
+      //result.errors.push('Failed to load images from document library');
     }
 
     this.getBounds(result.items);
