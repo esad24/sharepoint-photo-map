@@ -62,7 +62,7 @@ export class MapManager {
 
     L.tileLayer(OPEN_STREET_MAP_TILE.url, {
       attribution: OPEN_STREET_MAP_TILE.attribution,
-      maxZoom: 19
+      maxZoom: 22
     }).addTo(this.map);
   }
 

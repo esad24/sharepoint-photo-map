@@ -10,9 +10,18 @@ import { sanitizeUrl, escAttr } from '../utils/Security';
 import styles from '../WebmapWebPart.module.scss';
 import { createClusterIconHtml } from './ClusterIcon';
 
+export interface IMapItemData {
+  lat: number;
+  lon: number;
+  imgUrl: string;
+}
+
 export class ClusterManager {
   private markerCluster: L.MarkerClusterGroup | undefined;
   private map: L.Map;
+
+  private allItems: IMapItemData[] = [];
+
 
   constructor(map: L.Map) {
     this.map = map;
@@ -35,7 +44,8 @@ export class ClusterManager {
         return L.divIcon({ html, className: '', iconSize: [70, 70] });
       },
       zoomToBoundsOnClick: false, // Disable the default behavior of zooming in when a cluster is clicked.
-      showCoverageOnHover: false // Don't show the coverage area of the cluster on hover (blue outline)
+      showCoverageOnHover: false, // Don't show the coverage area of the cluster on hover (blue outline)
+      spiderfyOnMaxZoom: false // Disable spiderfying to avoid cluttered popups
     });
     this.map.addLayer(this.markerCluster);
 
@@ -93,6 +103,8 @@ export class ClusterManager {
         imgEl.src = imgList[current]; 
       };
 
+      
+
       // Create and open the Leaflet popup at the cluster's location, containing the gallery.
       L.popup({ 
         className: 'photoGalleryPopup', 
@@ -107,13 +119,18 @@ export class ClusterManager {
 
   public clearMarkers(): void {
     this.markerCluster?.clearLayers();
+    this.allItems = [];
   }
 
 
   public addMarker(lat: number, lon: number, imgUrl: string): L.Marker {
+    // Store data without loading image
+    this.allItems.push({ lat, lon, imgUrl });
+
     // Create a custom icon for individual marker 
     const icon = L.divIcon({
       html: `<img src="${imgUrl}" style="width:60px;height:60px;border-radius:6px;" />`,
+      //html: `<div style="width:60px;height:60px;border-radius:6px;background:#f0f0f0;border:2px solid #ddd;display:flex;align-items:center;justify-content:center;font-size:24px;">📍</div>`,
       className: '', 
       iconSize: [60, 60] 
     });
@@ -122,21 +139,24 @@ export class ClusterManager {
       icon,
       imgUrl // Store image URL directly in marker options
     } as any);
+
   
     // Create popup content with event listener
-    const popupContent = L.DomUtil.create('div');
-    const imgElement = L.DomUtil.create('img', styles.popupImg, popupContent) as HTMLImageElement;
-    imgElement.src = imgUrl;
-    imgElement.style.cursor = 'pointer';
-    
-    // Add event listener for new tab opening
-    imgElement.addEventListener('click', (event) => {
-      event.preventDefault();
-      event.stopPropagation();
-      window.open(imgUrl, '_blank', 'noopener,noreferrer');
+    marker.bindPopup(() => {
+      const popupContent = L.DomUtil.create('div');
+      const imgElement = L.DomUtil.create('img', styles.popupImg, popupContent) as HTMLImageElement;
+      imgElement.src = imgUrl;
+      imgElement.style.cursor = 'pointer';
+      
+      // Add event listener for new tab opening
+      imgElement.addEventListener('click', (event) => {
+        event.preventDefault();
+        event.stopPropagation();
+        window.open(imgUrl, '_blank', 'noopener,noreferrer');
+      });
+      return popupContent;
     });
     
-    marker.bindPopup(popupContent);
     this.markerCluster!.addLayer(marker);
     return marker;
   }
@@ -148,5 +168,7 @@ export class ClusterManager {
   public dispose(): void {
     this.markerCluster?.clearLayers();
     this.markerCluster = undefined;
+    this.allItems = [];
+
   }
 }
