@@ -43,6 +43,7 @@ export class FeatureLayerService {
       }
     } 
     catch (error) {
+      //
     }
   }
 

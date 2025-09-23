@@ -6,7 +6,6 @@ import 'leaflet.markercluster';
 import 'leaflet.markercluster/dist/MarkerCluster.css';
 import 'leaflet.markercluster/dist/MarkerCluster.Default.css';
 import { IClusterClickEvent } from '../types/IWebmapTypes';
-import { sanitizeUrl, escAttr } from '../utils/Security';
 import styles from '../WebmapWebPart.module.scss';
 import { createClusterIconHtml } from './ClusterIcon';
 
@@ -20,18 +19,13 @@ export class ClusterManager {
   private markerCluster: L.MarkerClusterGroup | undefined;
   private map: L.Map;
 
-  private allItems: IMapItemData[] = [];
-
   // Cache for Cluster Icons HTML
   private clusterIconCache: Map<string, L.DivIcon> = new Map();
-
 
   constructor(map: L.Map) {
     this.map = map;
     this.initializeClusterLayer();
   }
-
-
   //This groups nearby markers together to avoid cluttering the map
   private initializeClusterLayer(): void {
     this.markerCluster = L.markerClusterGroup({
@@ -53,6 +47,11 @@ export class ClusterManager {
       showCoverageOnHover: false, // Don't show the coverage area of the cluster on hover (blue outline)
       spiderfyOnMaxZoom: false, // Disable spiderfying to avoid cluttered popups
       chunkedLoading: true, // Load markers in chunks for better performance with many markers
+      chunkInterval: 200, // Time in ms between chunks
+
+      removeOutsideVisibleBounds: true, // Remove markers outside the current view to save memory
+      animate: false,
+      animateAddingMarkers: false
 
     });
     this.map.addLayer(this.markerCluster);
@@ -72,13 +71,13 @@ export class ClusterManager {
       // Create a simple image gallery from all the images within the cluster.
       const imgList = markers.map(m => (m.options as any).imgUrl as string); 
       let current = 0; // Index of the currently displayed image in the gallery.
+
       const container = L.DomUtil.create('div', styles.galleryContainer); // Main container with gallery styles
-
-
 
       // Create clickable image element
       const imgEl = L.DomUtil.create('img', styles.popupImg, container) as HTMLImageElement;
       imgEl.src = imgList[0];
+      imgEl.loading = 'lazy'
       imgEl.style.cursor = 'pointer';
       
       // Add event listener for new tab opening
@@ -125,19 +124,10 @@ export class ClusterManager {
   }
 
 
-  public clearMarkers(): void {
-    this.markerCluster?.clearLayers();
-    this.allItems = [];
-  }
-
-
   public addMarker(lat: number, lon: number, imgUrl: string): L.Marker {
-    this.allItems.push({ lat, lon, imgUrl });
-
     // Create a custom icon for individual marker 
     const icon = L.divIcon({
-      html: `<img src="${imgUrl}"  style="width:60px;height:60px;border-radius:6px;" />`,
-      //html: `<div style="width:60px;height:60px;border-radius:6px;background:#f0f0f0;border:2px solid #ddd;display:flex;align-items:center;justify-content:center;font-size:24px;">📍</div>`,
+      html: `<img src="${imgUrl}" loading="lazy" style="width:60px;height:60px;border-radius:6px;" />`,
       className: '', 
       iconSize: [60, 60] 
     });
@@ -146,13 +136,13 @@ export class ClusterManager {
       icon,
       imgUrl // Store image URL directly in marker options
     } as any);
-
   
     // Create popup content with event listener
     marker.bindPopup(() => {
       const popupContent = L.DomUtil.create('div');
       const imgElement = L.DomUtil.create('img', styles.popupImg, popupContent) as HTMLImageElement;
       imgElement.src = imgUrl;
+      imgElement.loading = 'lazy';
       imgElement.style.cursor = 'pointer';
       
       // Add event listener for new tab opening
@@ -172,10 +162,14 @@ export class ClusterManager {
     return this.markerCluster;
   }
 
+  public clearMarkers(): void {
+    this.markerCluster?.clearLayers();
+  }
+
   public dispose(): void {
     this.markerCluster?.clearLayers();
+    this.markerCluster?.off(); // Remove all event listeners
     this.markerCluster = undefined;
-    this.allItems = [];
     this.clusterIconCache.clear(); // Cache auch leeren
   }
 }

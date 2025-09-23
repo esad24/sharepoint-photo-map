@@ -39,6 +39,7 @@ export class ArcGISMapService {
         }).addTo(this.map);
       }
     } catch (error) {
+      //
     }
     this.addArcGISVectorLayer(webmapId, domain);
   }

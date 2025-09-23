@@ -36,7 +36,6 @@ private loaderId: string = `loader-${Math.random().toString(36).substr(2, 9)}`;
 
 private rateLimiter: RateLimiter | undefined;
 
-
 public render(): void {
 
   if (!this.propertyPaneManager) {
@@ -112,7 +111,6 @@ private renderMap(): void {
 
 
 // Fetches data from the configured SharePoint document library and populates the map with markers.
-
 private async loadMapData(): Promise<void> {
   if (!this.clusterManager || !this.mapManager ||!this.properties.libraryName || !this.properties.locationMethod) return;
 
@@ -147,7 +145,6 @@ private async loadMapData(): Promise<void> {
     hideLoader(this.loaderId);
   } catch (error) {
     //console.error('Error loading Images:', error);
-  } finally {
   }
 }
 
@@ -179,7 +176,7 @@ protected onPropertyPaneFieldChanged(path: string, oldValue: unknown, newValue: 
 
   // Handle map type change
   if (path === 'mapType') {
-    this.propertyPaneManager.clearLocation();
+    this.propertyPaneManager.clearLocation();    
     if (newValue !== 'project') {
       this.properties.arcgisMapUrl = ''; // Clear ArcGIS URL if switching away from ArcGIS
     }
@@ -196,10 +193,8 @@ protected onPropertyPaneFieldChanged(path: string, oldValue: unknown, newValue: 
 
   // Handle location method change
   if (path === 'locationMethod') {
-    // Clear field selections when switching methods
     this.propertyPaneManager.clearFieldCache();
     if (newValue === 'manual' && this.properties.libraryName) {
-      // If switching to manual method, trigger field loading
       this.propertyPaneManager.loadFields(this.properties.libraryName); 
     } 
     this.context.propertyPane.refresh();
@@ -207,37 +202,19 @@ protected onPropertyPaneFieldChanged(path: string, oldValue: unknown, newValue: 
 
   // Handle library name change - clear all dependent configurations
   if (path === 'libraryName') {
-    if (newValue) {
-      // Clear all dependent dropdowns and reset to defaults
-      this.propertyPaneManager.clearLocation();
-      
-      // If the current location method is manual, load fields for the new library
-      if (this.properties.locationMethod === 'manual') {
-        this.propertyPaneManager.loadFields(newValue as string);
-      }
-    } else {
-      // If library is cleared, also clear all dependent configurations
-      this.propertyPaneManager.clearLocation();
-    }
-    // Refresh property pane to reflect the changes
-    this.context.propertyPane.refresh();
-  }
-
-  // Load fields when switching to a library (but not when clearing all configs)
-  if (path === 'libraryName' && newValue && oldValue !== newValue) {
-    // Only load fields if we're in manual mode
+    this.propertyPaneManager.clearLocation();      
     if (this.properties.locationMethod === 'manual') {
       this.propertyPaneManager.loadFields(newValue as string);
     }
-  }
+  } 
+  // Refresh property pane to reflect the changes
+  this.context.propertyPane.refresh();
 
   // Re-render map whenever any data-source field changes 
   if (['libraryName', 'locationMethod', 'latField', 'lonField', 'mapType', 'arcgisMapUrl', 'mapView'].includes(path)) {
-    this.renderMap(); 
-  }
+      this.renderMap();
+    }
 }
-
-
 
 // Clean up resources when the web part is disposed
 protected onDispose(): void {

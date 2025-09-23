@@ -252,11 +252,9 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony import */ var leaflet_markercluster__WEBPACK_IMPORTED_MODULE_1___default = /*#__PURE__*/__webpack_require__.n(leaflet_markercluster__WEBPACK_IMPORTED_MODULE_1__);
 /* harmony import */ var leaflet_markercluster_dist_MarkerCluster_css__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! leaflet.markercluster/dist/MarkerCluster.css */ 897);
 /* harmony import */ var leaflet_markercluster_dist_MarkerCluster_Default_css__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! leaflet.markercluster/dist/MarkerCluster.Default.css */ 152);
-/* harmony import */ var _utils_Security__WEBPACK_IMPORTED_MODULE_5__ = __webpack_require__(/*! ../utils/Security */ 415);
 /* harmony import */ var _WebmapWebPart_module_scss__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(/*! ../WebmapWebPart.module.scss */ 641);
-/* harmony import */ var _ClusterIcon__WEBPACK_IMPORTED_MODULE_6__ = __webpack_require__(/*! ./ClusterIcon */ 940);
+/* harmony import */ var _ClusterIcon__WEBPACK_IMPORTED_MODULE_5__ = __webpack_require__(/*! ./ClusterIcon */ 940);
 // Manages marker clustering and popup interactions                         
-
 
 
 
@@ -265,6 +263,8 @@ __webpack_require__.r(__webpack_exports__);
 
 class ClusterManager {
     constructor(map) {
+        // Cache for Cluster Icons HTML
+        this.clusterIconCache = new Map();
         this.map = map;
         this.initializeClusterLayer();
     }
@@ -274,14 +274,24 @@ class ClusterManager {
             // `iconCreateFunction` is a customization that defines how a cluster icon looks.
             iconCreateFunction: (cluster) => {
                 const first = cluster.getAllChildMarkers()[0]; // FIrst image for the cluster icon
-                const img = (0,_utils_Security__WEBPACK_IMPORTED_MODULE_5__.sanitizeUrl)((first === null || first === void 0 ? void 0 : first.options).imgUrl); // Access imgUrl directly
+                const img = (first === null || first === void 0 ? void 0 : first.options).imgUrl; // Access imgUrl directly
                 const count = cluster.getChildCount();
-                const html = (0,_ClusterIcon__WEBPACK_IMPORTED_MODULE_6__.createClusterIconHtml)(img, count);
-                // Return a Leaflet DivIcon with our custom HTML
-                return leaflet__WEBPACK_IMPORTED_MODULE_0__.divIcon({ html, className: '', iconSize: [70, 70] });
+                const cacheKey = `${img}-${count}`;
+                if (this.clusterIconCache.has(cacheKey))
+                    return this.clusterIconCache.get(cacheKey);
+                const html = (0,_ClusterIcon__WEBPACK_IMPORTED_MODULE_5__.createClusterIconHtml)(img, count);
+                const icon = leaflet__WEBPACK_IMPORTED_MODULE_0__.divIcon({ html, className: '', iconSize: [70, 70] });
+                this.clusterIconCache.set(cacheKey, icon); // save cache
+                return icon;
             },
             zoomToBoundsOnClick: false, // Disable the default behavior of zooming in when a cluster is clicked.
-            showCoverageOnHover: false // Don't show the coverage area of the cluster on hover (blue outline)
+            showCoverageOnHover: false, // Don't show the coverage area of the cluster on hover (blue outline)
+            spiderfyOnMaxZoom: false, // Disable spiderfying to avoid cluttered popups
+            chunkedLoading: true, // Load markers in chunks for better performance with many markers
+            chunkInterval: 200, // Time in ms between chunks
+            removeOutsideVisibleBounds: true, // Remove markers outside the current view to save memory
+            animate: false,
+            animateAddingMarkers: false
         });
         this.map.addLayer(this.markerCluster);
         // Set up gallery popup on cluster click
@@ -296,12 +306,13 @@ class ClusterManager {
             if (!markers.length)
                 return;
             // Create a simple image gallery from all the images within the cluster.
-            const imgList = markers.map(m => (0,_utils_Security__WEBPACK_IMPORTED_MODULE_5__.sanitizeUrl)(m.options.imgUrl));
+            const imgList = markers.map(m => m.options.imgUrl);
             let current = 0; // Index of the currently displayed image in the gallery.
             const container = leaflet__WEBPACK_IMPORTED_MODULE_0__.DomUtil.create('div', _WebmapWebPart_module_scss__WEBPACK_IMPORTED_MODULE_4__["default"].galleryContainer); // Main container with gallery styles
             // Create clickable image element
             const imgEl = leaflet__WEBPACK_IMPORTED_MODULE_0__.DomUtil.create('img', _WebmapWebPart_module_scss__WEBPACK_IMPORTED_MODULE_4__["default"].popupImg, container);
             imgEl.src = imgList[0];
+            imgEl.loading = 'lazy';
             imgEl.style.cursor = 'pointer';
             // Add event listener for new tab opening
             imgEl.addEventListener('click', (event) => {
@@ -338,14 +349,10 @@ class ClusterManager {
                 .openOn(this.map);
         });
     }
-    clearMarkers() {
-        var _a;
-        (_a = this.markerCluster) === null || _a === void 0 ? void 0 : _a.clearLayers();
-    }
     addMarker(lat, lon, imgUrl) {
         // Create a custom icon for individual marker 
         const icon = leaflet__WEBPACK_IMPORTED_MODULE_0__.divIcon({
-            html: `<img src="${imgUrl}" style="width:60px;height:60px;border-radius:6px;" />`,
+            html: `<img src="${imgUrl}" loading="lazy" style="width:60px;height:60px;border-radius:6px;" />`,
             className: '',
             iconSize: [60, 60]
         });
@@ -354,27 +361,36 @@ class ClusterManager {
             imgUrl // Store image URL directly in marker options
         });
         // Create popup content with event listener
-        const popupContent = leaflet__WEBPACK_IMPORTED_MODULE_0__.DomUtil.create('div');
-        const imgElement = leaflet__WEBPACK_IMPORTED_MODULE_0__.DomUtil.create('img', _WebmapWebPart_module_scss__WEBPACK_IMPORTED_MODULE_4__["default"].popupImg, popupContent);
-        imgElement.src = imgUrl;
-        imgElement.style.cursor = 'pointer';
-        // Add event listener for new tab opening
-        imgElement.addEventListener('click', (event) => {
-            event.preventDefault();
-            event.stopPropagation();
-            window.open(imgUrl, '_blank', 'noopener,noreferrer');
+        marker.bindPopup(() => {
+            const popupContent = leaflet__WEBPACK_IMPORTED_MODULE_0__.DomUtil.create('div');
+            const imgElement = leaflet__WEBPACK_IMPORTED_MODULE_0__.DomUtil.create('img', _WebmapWebPart_module_scss__WEBPACK_IMPORTED_MODULE_4__["default"].popupImg, popupContent);
+            imgElement.src = imgUrl;
+            imgElement.loading = 'lazy';
+            imgElement.style.cursor = 'pointer';
+            // Add event listener for new tab opening
+            imgElement.addEventListener('click', (event) => {
+                event.preventDefault();
+                event.stopPropagation();
+                window.open(imgUrl, '_blank', 'noopener,noreferrer');
+            });
+            return popupContent;
         });
-        marker.bindPopup(popupContent);
         this.markerCluster.addLayer(marker);
         return marker;
     }
     getClusterGroup() {
         return this.markerCluster;
     }
-    dispose() {
+    clearMarkers() {
         var _a;
         (_a = this.markerCluster) === null || _a === void 0 ? void 0 : _a.clearLayers();
+    }
+    dispose() {
+        var _a, _b;
+        (_a = this.markerCluster) === null || _a === void 0 ? void 0 : _a.clearLayers();
+        (_b = this.markerCluster) === null || _b === void 0 ? void 0 : _b.off(); // Remove all event listeners
         this.markerCluster = undefined;
+        this.clusterIconCache.clear(); // Cache auch leeren
     }
 }
 
@@ -444,7 +460,7 @@ class MapManager {
             return;
         leaflet__WEBPACK_IMPORTED_MODULE_0__.tileLayer(_constants_constants__WEBPACK_IMPORTED_MODULE_4__.OPEN_STREET_MAP_TILE.url, {
             attribution: _constants_constants__WEBPACK_IMPORTED_MODULE_4__.OPEN_STREET_MAP_TILE.attribution,
-            maxZoom: 19
+            maxZoom: 22
         }).addTo(this.map);
     }
     addArcGISLayer(arcgisMapUrl, mapView) {
@@ -584,6 +600,9 @@ class PropertyPaneManager {
                 ]
             });
         }
+        if (this.properties.locationMethod === 'manual' && this.properties.libraryName && !this.cache.fields.length) {
+            this.loadFields(this.properties.libraryName);
+        }
         return {
             pages: [
                 {
@@ -598,12 +617,7 @@ class PropertyPaneManager {
         const site = this.context.pageContext.web.absoluteUrl; // Get current site URL
         // Check if we need to fetch libraries (i.e., if the site context has changed. This caching prevents unnecessary API calls
         if (site !== this.cache.siteForLibraries) {
-            // Clear all cached options and selections.
             this.cache.libraries = [];
-            this.cache.fields = [];
-            this.properties.libraryName = '';
-            this.properties.latField = '';
-            this.properties.lonField = '';
             this.cache.siteForLibraries = site; // Update the cache key.
             try {
                 // Fetch all non-hidden document libraries from the current site.
@@ -629,10 +643,7 @@ class PropertyPaneManager {
         if (this.properties.locationMethod !== 'manual')
             return;
         if (libraryName !== this.cache.libraryForFields) {
-            // Clear old field options and selections.
             this.cache.fields = [];
-            this.properties.latField = '';
-            this.properties.lonField = '';
             this.cache.libraryForFields = libraryName; // Update the cache key.
             try {
                 const site = this.context.pageContext.web.absoluteUrl;
@@ -668,9 +679,8 @@ class PropertyPaneManager {
         this.properties.lonField = '';
     }
     clearLocation() {
-        // Clear field cache and selections
         this.clearFieldCache();
-        this.properties.locationMethod = undefined; // Reset to default
+        this.properties.locationMethod = undefined;
     }
 }
 
@@ -752,6 +762,7 @@ class ArcGISMapService {
             }
         }
         catch (error) {
+            //
         }
         this.addArcGISVectorLayer(webmapId, domain);
     }
@@ -895,6 +906,7 @@ class FeatureLayerService {
             }
         }
         catch (error) {
+            //
         }
     }
     // Get layer styling information from ArcGIS service
@@ -1231,7 +1243,7 @@ class DataService {
         this.cancelProcessing = true;
     }
     async fetchMapData(properties) {
-        let result = await this.fetchDocumentLibraryData(properties);
+        const result = await this.fetchDocumentLibraryData(properties);
         if (this.cancelProcessing) {
             return { items: [], errors: [] };
         }
@@ -1274,15 +1286,15 @@ class DataService {
                 allItems = allItems.concat(json.value);
                 url = json['@odata.nextLink'] || null;
             }
-            let noGpsCount = 0;
+            const noGpsCount = 0;
             if (locationMethod === 'manual') {
                 // Manual coordinates from fields
                 for (const item of allItems) {
                     const img = this.buildFileUrl(item.FileRef, site);
                     if (!this.isImageFile(img))
                         continue;
-                    let lat = parseFloat(item[latField].replace(',', '.'));
-                    let lon = parseFloat(item[lonField].replace(',', '.'));
+                    const lat = parseFloat(item[latField].replace(',', '.'));
+                    const lon = parseFloat(item[lonField].replace(',', '.'));
                     if (!lat || !lon || isNaN(lat) || isNaN(lon))
                         continue;
                     const sanitizedImg = (0,_utils_Security__WEBPACK_IMPORTED_MODULE_2__.sanitizeUrl)(img);
@@ -1327,8 +1339,7 @@ class DataService {
             */
         }
         catch (err) {
-            //console.error('Webmap: document library fetch failed:', err);
-            result.errors.push('Failed to load images from document library');
+            //result.errors.push('Failed to load images from document library');
         }
         this.getBounds(result.items);
         return result;
@@ -1448,6 +1459,7 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony import */ var _loader__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ./loader */ 537);
 
 // Sharepoint Api Limit: 3000 calls per 5 minutes per User
+// More relevant for exif extraction method
 class RateLimiter {
     constructor(loaderId) {
         this.requestCount = 0;
@@ -5085,8 +5097,6 @@ class WebmapWebPart extends _microsoft_sp_webpart_base__WEBPACK_IMPORTED_MODULE_
         catch (error) {
             //console.error('Error loading Images:', error);
         }
-        finally {
-        }
     }
     // Defines the configuration for the web part's property pane
     getPropertyPaneConfiguration() {
@@ -5125,38 +5135,21 @@ class WebmapWebPart extends _microsoft_sp_webpart_base__WEBPACK_IMPORTED_MODULE_
         }
         // Handle location method change
         if (path === 'locationMethod') {
-            // Clear field selections when switching methods
             this.propertyPaneManager.clearFieldCache();
             if (newValue === 'manual' && this.properties.libraryName) {
-                // If switching to manual method, trigger field loading
                 this.propertyPaneManager.loadFields(this.properties.libraryName);
             }
             this.context.propertyPane.refresh();
         }
         // Handle library name change - clear all dependent configurations
         if (path === 'libraryName') {
-            if (newValue) {
-                // Clear all dependent dropdowns and reset to defaults
-                this.propertyPaneManager.clearLocation();
-                // If the current location method is manual, load fields for the new library
-                if (this.properties.locationMethod === 'manual') {
-                    this.propertyPaneManager.loadFields(newValue);
-                }
-            }
-            else {
-                // If library is cleared, also clear all dependent configurations
-                this.propertyPaneManager.clearLocation();
-            }
-            // Refresh property pane to reflect the changes
-            this.context.propertyPane.refresh();
-        }
-        // Load fields when switching to a library (but not when clearing all configs)
-        if (path === 'libraryName' && newValue && oldValue !== newValue) {
-            // Only load fields if we're in manual mode
+            this.propertyPaneManager.clearLocation();
             if (this.properties.locationMethod === 'manual') {
                 this.propertyPaneManager.loadFields(newValue);
             }
         }
+        // Refresh property pane to reflect the changes
+        this.context.propertyPane.refresh();
         // Re-render map whenever any data-source field changes 
         if (['libraryName', 'locationMethod', 'latField', 'lonField', 'mapType', 'arcgisMapUrl', 'mapView'].includes(path)) {
             this.renderMap();

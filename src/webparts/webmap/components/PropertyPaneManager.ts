@@ -106,7 +106,9 @@ export class PropertyPaneManager {
         ]
       });
     }
-
+    if (this.properties.locationMethod === 'manual' && this.properties.libraryName && !this.cache.fields.length) {
+      this.loadFields(this.properties.libraryName);
+    }
     return {
       pages: [
         {
@@ -118,21 +120,13 @@ export class PropertyPaneManager {
   }
 
   // Load available SharePoint document libraries
-
   public async loadLibraries(): Promise<void> {
     const site = this.context.pageContext.web.absoluteUrl; // Get current site URL
     
     // Check if we need to fetch libraries (i.e., if the site context has changed. This caching prevents unnecessary API calls
     if (site !== this.cache.siteForLibraries) {
-      // Clear all cached options and selections.
       this.cache.libraries = [];
-      this.cache.fields = [];
-      this.properties.libraryName = '';
-      this.properties.latField = '';
-      this.properties.lonField = '';
-
       this.cache.siteForLibraries = site; // Update the cache key.
-
       try {
         // Fetch all non-hidden document libraries from the current site.
         const librariesUrl = `${site}/_api/web/lists?$filter=Hidden eq false and BaseTemplate eq 101`;        // BaseTemplate 101 = Document Library in SharePoint
@@ -161,14 +155,9 @@ export class PropertyPaneManager {
   public async loadFields(libraryName: string): Promise<void> {
     // Only load fields if we're using manual method
     if (this.properties.locationMethod !== 'manual') return;
-    
     if (libraryName !== this.cache.libraryForFields) {
-      // Clear old field options and selections.
       this.cache.fields = [];
-      this.properties.latField = '';
-      this.properties.lonField = '';
       this.cache.libraryForFields = libraryName; // Update the cache key.
-
       try {
         const site = this.context.pageContext.web.absoluteUrl;
         // Fetch all non-hidden, non-readonly fields for the newly selected library.
@@ -176,7 +165,6 @@ export class PropertyPaneManager {
         const fieldsUrl =
           `${site}/_api/web/lists/getByTitle('${escODataIdentifier(libraryName)}')/fields` +
           `?$filter=Hidden eq false and ReadOnlyField eq false`;
-
         const response: SPHttpClientResponse = await this.context.spHttpClient.get(
           fieldsUrl,
           SPHttpClient.configurations.v1
@@ -184,7 +172,6 @@ export class PropertyPaneManager {
         const json = await response.json();
 
         // Only show field types that are likely to contain the required data.
-
         const okTypes = ['Text', 'Number', 'URL'];
         this.cache.fields = json.value
           .filter((f: ISPField) => okTypes.indexOf(f.TypeAsString) !== -1) // Filter to allowed types
@@ -213,8 +200,7 @@ export class PropertyPaneManager {
   }
 
   public clearLocation(): void {
-    // Clear field cache and selections
     this.clearFieldCache();
-    this.properties.locationMethod = undefined; // Reset to default
+    this.properties.locationMethod = undefined;
   }
 }

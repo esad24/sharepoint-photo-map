@@ -2,6 +2,8 @@ import { updateLoader } from "./loader";
 
 // Sharepoint Api Limit: 3000 calls per 5 minutes per User
 
+// More relevant for exif extraction method
+
 export class RateLimiter {
     private static instance: RateLimiter;
     private requestCount = 0;

@@ -48,14 +48,14 @@ export class DataService {
   }
 
   // Call this when library changes in property pane
-  public cancelCurrentProcess() {
+  public cancelCurrentProcess(): void {
     this.cancelProcessing = true;
   }
 
   
 
   public async fetchMapData(properties: IWebmapWebPartProps): Promise<IDataFetchResult> {
-    let result =  await this.fetchDocumentLibraryData(properties);
+    const result =  await this.fetchDocumentLibraryData(properties);
     if(this.cancelProcessing) {
       return { items: [], errors: [] };
     }
@@ -109,7 +109,7 @@ export class DataService {
         url = json['@odata.nextLink'] || null;
       }
 
-      let noGpsCount = 0;
+      const noGpsCount = 0;
 
       if (locationMethod === 'manual') {
         // Manual coordinates from fields
@@ -117,8 +117,8 @@ export class DataService {
           const img = this.buildFileUrl(item.FileRef, site);
           if (!this.isImageFile(img)) continue;
 
-          let lat = parseFloat((item[latField!] as string).replace(',', '.'));
-          let lon = parseFloat((item[lonField!] as string).replace(',', '.'));
+          const lat = parseFloat((item[latField!] as string).replace(',', '.'));
+          const lon = parseFloat((item[lonField!] as string).replace(',', '.'));
 
           if (!lat || !lon || isNaN(lat) || isNaN(lon)) continue;
 
@@ -165,7 +165,7 @@ export class DataService {
       */
 
     } catch (err) {
-      result.errors.push('Failed to load images from document library');
+      //result.errors.push('Failed to load images from document library');
     }
 
     this.getBounds(result.items);
