@@ -22,6 +22,9 @@ export class ClusterManager {
 
   private allItems: IMapItemData[] = [];
 
+  // Cache for Cluster Icons HTML
+  private clusterIconCache: Map<string, L.DivIcon> = new Map();
+
 
   constructor(map: L.Map) {
     this.map = map;
@@ -35,17 +38,22 @@ export class ClusterManager {
       // `iconCreateFunction` is a customization that defines how a cluster icon looks.
       iconCreateFunction: (cluster) => {
         const first: L.Marker = cluster.getAllChildMarkers()[0]; // FIrst image for the cluster icon
-        const img = sanitizeUrl((first?.options as any).imgUrl as string); // Access imgUrl directly
+        const img = (first?.options as any).imgUrl as string; // Access imgUrl directly
         const count  = cluster.getChildCount();
 
-        const html = createClusterIconHtml(img, count);
+        const cacheKey = `${img}-${count}`;
+        if (this.clusterIconCache.has(cacheKey)) return this.clusterIconCache.get(cacheKey)!;
 
-        // Return a Leaflet DivIcon with our custom HTML
-        return L.divIcon({ html, className: '', iconSize: [70, 70] });
+        const html = createClusterIconHtml(img, count);
+        const icon = L.divIcon({ html, className: '', iconSize: [70, 70] });
+        this.clusterIconCache.set(cacheKey, icon); // save cache
+        return icon;
       },
       zoomToBoundsOnClick: false, // Disable the default behavior of zooming in when a cluster is clicked.
       showCoverageOnHover: false, // Don't show the coverage area of the cluster on hover (blue outline)
-      spiderfyOnMaxZoom: false // Disable spiderfying to avoid cluttered popups
+      spiderfyOnMaxZoom: false, // Disable spiderfying to avoid cluttered popups
+      chunkedLoading: true, // Load markers in chunks for better performance with many markers
+
     });
     this.map.addLayer(this.markerCluster);
 
@@ -62,7 +70,7 @@ export class ClusterManager {
       if (!markers.length) return; 
 
       // Create a simple image gallery from all the images within the cluster.
-      const imgList = markers.map(m => sanitizeUrl((m.options as any).imgUrl as string)); 
+      const imgList = markers.map(m => (m.options as any).imgUrl as string); 
       let current = 0; // Index of the currently displayed image in the gallery.
       const container = L.DomUtil.create('div', styles.galleryContainer); // Main container with gallery styles
 
@@ -124,12 +132,11 @@ export class ClusterManager {
 
 
   public addMarker(lat: number, lon: number, imgUrl: string): L.Marker {
-    // Store data without loading image
     this.allItems.push({ lat, lon, imgUrl });
 
     // Create a custom icon for individual marker 
     const icon = L.divIcon({
-      html: `<img src="${imgUrl}" style="width:60px;height:60px;border-radius:6px;" />`,
+      html: `<img src="${imgUrl}"  style="width:60px;height:60px;border-radius:6px;" />`,
       //html: `<div style="width:60px;height:60px;border-radius:6px;background:#f0f0f0;border:2px solid #ddd;display:flex;align-items:center;justify-content:center;font-size:24px;">📍</div>`,
       className: '', 
       iconSize: [60, 60] 
@@ -169,6 +176,6 @@ export class ClusterManager {
     this.markerCluster?.clearLayers();
     this.markerCluster = undefined;
     this.allItems = [];
-
+    this.clusterIconCache.clear(); // Cache auch leeren
   }
 }
