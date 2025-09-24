@@ -25,15 +25,15 @@ export class MapManager {
 
   // Initializes or refreshes the Leaflet map instance
   public initializeMap(properties: IWebmapWebPartProps): L.Map {
-    // Map-Container resetten, falls Leaflet ihn noch gebunden hat
+
+    // Reset map container in case Leaflet still has it bound
     const mapElement = document.getElementById(this.mapId);
     if (mapElement && (mapElement as any)._leaflet_id) {
       (mapElement as any)._leaflet_id = null;
     }
-
     if (this.map) {
-      this.map.off();     // alle Event Listener entfernen
-      this.map.remove();  // Leaflet Instanz entfernen
+      this.map.off();     
+      this.map.remove(); 
       this.map = undefined;
     }
 
@@ -93,8 +93,8 @@ export class MapManager {
 
   public dispose(): void {
     if (this.map) {
-      this.map.off();     // Event-Listener wegräumen
-      this.map.remove();  // Map-Instanz zerstören
+      this.map.off();    
+      this.map.remove();  
     }
     this.map = undefined;
     this.arcgisMap = undefined;

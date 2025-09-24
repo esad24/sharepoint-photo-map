@@ -362,6 +362,7 @@ class ClusterManager {
         });
         // Create popup content with event listener
         marker.bindPopup(() => {
+            this.markerCluster = leaflet__WEBPACK_IMPORTED_MODULE_0__.markerClusterGroup();
             const popupContent = leaflet__WEBPACK_IMPORTED_MODULE_0__.DomUtil.create('div');
             const imgElement = leaflet__WEBPACK_IMPORTED_MODULE_0__.DomUtil.create('img', _WebmapWebPart_module_scss__WEBPACK_IMPORTED_MODULE_4__["default"].popupImg, popupContent);
             imgElement.src = imgUrl;
@@ -431,14 +432,14 @@ class MapManager {
     }
     // Initializes or refreshes the Leaflet map instance
     initializeMap(properties) {
-        // Map-Container resetten, falls Leaflet ihn noch gebunden hat
+        // Reset map container in case Leaflet still has it bound
         const mapElement = document.getElementById(this.mapId);
         if (mapElement && mapElement._leaflet_id) {
             mapElement._leaflet_id = null;
         }
         if (this.map) {
-            this.map.off(); // alle Event Listener entfernen
-            this.map.remove(); // Leaflet Instanz entfernen
+            this.map.off();
+            this.map.remove();
             this.map = undefined;
         }
         // Initialize a new map on the 'map' div, setting an initial view
@@ -488,8 +489,8 @@ class MapManager {
     }
     dispose() {
         if (this.map) {
-            this.map.off(); // Event-Listener wegräumen
-            this.map.remove(); // Map-Instanz zerstören
+            this.map.off();
+            this.map.remove();
         }
         this.map = undefined;
         this.arcgisMap = undefined;
@@ -5150,7 +5151,7 @@ class WebmapWebPart extends _microsoft_sp_webpart_base__WEBPACK_IMPORTED_MODULE_
         }
         // Refresh property pane to reflect the changes
         this.context.propertyPane.refresh();
-        // Re-render map whenever any data-source field changes 
+        // Re-render map
         if (['libraryName', 'locationMethod', 'latField', 'lonField', 'mapType', 'arcgisMapUrl', 'mapView'].includes(path)) {
             this.renderMap();
         }

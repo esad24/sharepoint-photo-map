@@ -176,7 +176,7 @@ protected onPropertyPaneFieldChanged(path: string, oldValue: unknown, newValue: 
 
   // Handle map type change
   if (path === 'mapType') {
-    //this.propertyPaneManager.clearLocation();    
+    this.propertyPaneManager.clearLocation();    
     if (newValue !== 'project') {
       this.properties.arcgisMapUrl = ''; // Clear ArcGIS URL if switching away from ArcGIS
     }
