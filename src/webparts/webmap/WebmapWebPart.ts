@@ -176,7 +176,7 @@ protected onPropertyPaneFieldChanged(path: string, oldValue: unknown, newValue: 
 
   // Handle map type change
   if (path === 'mapType') {
-    this.propertyPaneManager.clearLocation();    
+    //this.propertyPaneManager.clearLocation();    
     if (newValue !== 'project') {
       this.properties.arcgisMapUrl = ''; // Clear ArcGIS URL if switching away from ArcGIS
     }
@@ -210,7 +210,7 @@ protected onPropertyPaneFieldChanged(path: string, oldValue: unknown, newValue: 
   // Refresh property pane to reflect the changes
   this.context.propertyPane.refresh();
 
-  // Re-render map whenever any data-source field changes 
+  // Re-render map
   if (['libraryName', 'locationMethod', 'latField', 'lonField', 'mapType', 'arcgisMapUrl', 'mapView'].includes(path)) {
       this.renderMap();
     }

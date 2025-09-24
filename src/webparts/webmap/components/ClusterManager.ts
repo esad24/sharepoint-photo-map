@@ -138,7 +138,8 @@ export class ClusterManager {
     } as any);
   
     // Create popup content with event listener
-    marker.bindPopup(() => {
+    marker.bindPopup(() => {this.markerCluster = L.markerClusterGroup();
+
       const popupContent = L.DomUtil.create('div');
       const imgElement = L.DomUtil.create('img', styles.popupImg, popupContent) as HTMLImageElement;
       imgElement.src = imgUrl;
