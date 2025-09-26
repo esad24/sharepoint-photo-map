@@ -87,10 +87,14 @@ export class ClusterManager {
         window.open(imgList[current], '_blank', 'noopener,noreferrer');
       });
 
+      
+      const caption = L.DomUtil.create('div', '', container);
+      caption.innerHTML = `${current + 1} of ${imgList.length}`;
+      caption.style.paddingTop = '4px';
+
 
       // navigation container for prev/next buttons
       const nav = L.DomUtil.create('div', styles.galleryNav, container);
-
       // previous button
       const prevBtn = L.DomUtil.create('button', '', nav);
       prevBtn.innerHTML = '';
@@ -99,6 +103,7 @@ export class ClusterManager {
         // Move to previous image, wrapping around to end if at beginning
         current = (current - 1 + imgList.length) % imgList.length; // Cycle backwards.
         imgEl.src = imgList[current]; // Update displayed image
+        caption.innerHTML = `${current + 1} of ${imgList.length}`;
       };
 
       // Create next button
@@ -107,10 +112,9 @@ export class ClusterManager {
       nextBtn.className = styles.galleryNavNext;
       nextBtn.onclick = () => {
         current = (current + 1) % imgList.length;  // Move to next image, wrapping around to beginning if at end
-        imgEl.src = imgList[current]; 
+        imgEl.src = imgList[current];
+        caption.innerHTML = `${current + 1} of ${imgList.length}`;
       };
-
-      
 
       // Create and open the Leaflet popup at the cluster's location, containing the gallery.
       L.popup({ 

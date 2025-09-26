@@ -22,6 +22,7 @@ import { RateLimiter } from './utils/RateLimit';
 
 import styles from './WebmapWebPart.module.scss';
 
+
 export default class WebmapWebPart extends BaseClientSideWebPart<IWebmapWebPartProps> {
 
 private mapManager: MapManager | undefined;
@@ -36,10 +37,13 @@ private loaderId: string = `loader-${Math.random().toString(36).substr(2, 9)}`;
 
 private rateLimiter: RateLimiter | undefined;
 
+private isInitialRender: boolean = false; // Track if it's the initial render
+
 public render(): void {
+  if(this.isInitialRender) return;
 
   if (!this.propertyPaneManager) {
-    this.propertyPaneManager = new PropertyPaneManager(this.context, this.properties);
+    this.propertyPaneManager = new PropertyPaneManager(this.context, this.properties, this);
   }
 
   // Sets the basic HTML structure for the web part
@@ -58,6 +62,7 @@ public render(): void {
   }
 
   this.renderMap();
+  this.isInitialRender = true;
 }
 
 
@@ -127,6 +132,7 @@ private async loadMapData(): Promise<void> {
   try {
     // Use the DataService to fetch data
     const result = await dataService.fetchMapData(this.properties);
+    console.log('Data fetch result:', result);
     // If a newer dataService is active, discard results
     if (this.activeDataService !== dataService) {
       return;
@@ -176,7 +182,7 @@ protected onPropertyPaneFieldChanged(path: string, oldValue: unknown, newValue: 
 
   // Handle map type change
   if (path === 'mapType') {
-    this.propertyPaneManager.clearLocation();    
+    //this.propertyPaneManager.clearLocation();    
     if (newValue !== 'project') {
       this.properties.arcgisMapUrl = ''; // Clear ArcGIS URL if switching away from ArcGIS
     }
@@ -209,11 +215,6 @@ protected onPropertyPaneFieldChanged(path: string, oldValue: unknown, newValue: 
   } 
   // Refresh property pane to reflect the changes
   this.context.propertyPane.refresh();
-
-  // Re-render map
-  if (['libraryName', 'locationMethod', 'latField', 'lonField', 'mapType', 'arcgisMapUrl', 'mapView'].includes(path)) {
-      this.renderMap();
-    }
 }
 
 // Clean up resources when the web part is disposed
@@ -227,3 +228,4 @@ protected get dataVersion(): Version {
   return Version.parse('1.0');
 }
 }
+

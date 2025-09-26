@@ -6,6 +6,8 @@ import {
     IPropertyPaneDropdownOption,
     IPropertyPaneGroup,
     PropertyPaneTextField,
+    PropertyPaneButton,
+    PropertyPaneButtonType
   } from '@microsoft/sp-property-pane';
 
 import { SPHttpClient, SPHttpClientResponse } from '@microsoft/sp-http';
@@ -17,10 +19,12 @@ export class PropertyPaneManager {
   private context: WebPartContext;
   private properties: IWebmapWebPartProps;
   private cache: IPropertyPaneCache;
+  private webPartInstance: any;
 
-  constructor(context: WebPartContext, properties: IWebmapWebPartProps) {
+  constructor(context: WebPartContext, properties: IWebmapWebPartProps, webPartInstance?: any) {
     this.context = context;
     this.properties = properties;
+    this.webPartInstance = webPartInstance;
     this.cache = {
       libraries: [],
       fields: [],
@@ -102,13 +106,29 @@ export class PropertyPaneManager {
             label: 'Longitude Field',
             options: this.cache.fields, // Same list of fields
             disabled: !this.cache.fields.length
-          })
+          }),
         ]
       });
     }
+    groups.push({
+      //groupName: 'Coordinate Fields',
+      groupFields: [
+        PropertyPaneButton('LoadData', {
+          text: 'Load',
+          buttonType: PropertyPaneButtonType.Normal,
+          onClick: () => {
+            this.webPartInstance.renderMap();
+          }
+        })
+      ]
+    });
+    
+    
     if (this.properties.locationMethod === 'manual' && this.properties.libraryName && !this.cache.fields.length) {
       this.loadFields(this.properties.libraryName);
     }
+
+
     return {
       pages: [
         {

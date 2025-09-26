@@ -9,6 +9,9 @@ import { IWebmapWebPartProps } from '../types/IWebmapTypes';
 import { MapViewService } from './MapViewService';
 import { RateLimiter } from '../utils/RateLimit';
 
+import { libraries } from '../cache/SPLibraryItems';
+
+
 // import { ExifExtraction } from './ExifExtraction';
 
 import * as L from 'leaflet';
@@ -68,6 +71,16 @@ export class DataService {
     const result: IDataFetchResult = { items: [], errors: [] };
 
     if (!libraryName) return result;
+
+
+    // fetching from Cache instead of reloading -> currently doesnt work somehow
+    
+    // if (libraries[properties.libraryName] && libraries[properties.libraryName].items.length > 0) {
+    //   console.log(`${properties.libraryName} already loaded, skipping fetch.`);
+    //   console.log(libraries[properties.libraryName]);
+    //   await new Promise(resolve => setTimeout(resolve, 5000)); // pause 500ms
+    //   return libraries[properties.libraryName];
+    // }
 
 
 
@@ -169,6 +182,7 @@ export class DataService {
     }
 
     this.getBounds(result.items);
+    libraries[libraryName] = result;
     return result;
   }
 
