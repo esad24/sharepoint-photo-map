@@ -9,6 +9,7 @@ import { IWebmapWebPartProps } from '../types/IWebmapTypes';
 import { MapViewService } from './MapViewService';
 import { RateLimiter } from '../utils/RateLimit';
 
+
 import { libraries } from '../cache/SPLibraryItems';
 
 
@@ -75,12 +76,12 @@ export class DataService {
 
     // fetching from Cache instead of reloading -> currently doesnt work somehow
 
-    if (libraries[properties.libraryName] && libraries[properties.libraryName].items.length > 0) {
-      const cached = await libraries[properties.libraryName];
-      this.getBounds(cached.items);
-      //await new Promise(resolve => setTimeout(resolve, 50)); // simulate delay
-      return cached;
-    }
+    // if (libraries[properties.libraryName] && libraries[properties.libraryName].items.length > 0) {
+    //   const cached = libraries[properties.libraryName];
+    //   this.getBounds(cached.items);
+    //   await new Promise(resolve => setTimeout(resolve, 1)); // simulate delay
+    //   return cached;
+    // }
 
 
 

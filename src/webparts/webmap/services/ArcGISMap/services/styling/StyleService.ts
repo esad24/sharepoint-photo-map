@@ -32,10 +32,9 @@ export class StyleService {
       const renderer = drawingInfo.renderer;
       
       // Handle simple renderer
-      if (renderer.type === 'simple' && renderer.symbol) {
+      if (renderer.type === 'simple' && renderer.symbol) {   // test für render type 'uniqueValue'
         return this.symbolConverter.convertEsriSymbolToLeafletStyle(renderer.symbol);
       }
-      
       return defaultStyle; // Fallback to default style if nothing else works
     };
   }

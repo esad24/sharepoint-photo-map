@@ -172,7 +172,7 @@ export class FeatureLayerService {
         },
         // Add text labels for each feature
         onEachFeature: (feature, layer) => {
-          const textValue = feature.properties?.Text;
+          const textValue = feature.properties?.TextString;  // changed from 'Text' to 'TextString'
           if (textValue && textValue.trim()) {
               let position: L.LatLng;
               if (feature.geometry.type === 'Point') {
