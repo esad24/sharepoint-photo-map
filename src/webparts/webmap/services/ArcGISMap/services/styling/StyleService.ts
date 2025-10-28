@@ -35,6 +35,34 @@ export class StyleService {
       if (renderer.type === 'simple' && renderer.symbol) {   // test für render type 'uniqueValue'
         return this.symbolConverter.convertEsriSymbolToLeafletStyle(renderer.symbol);
       }
+
+      // Handle unique value renderer
+      if (renderer.type === 'uniqueValue' && renderer.uniqueValueInfos && renderer.field1) {
+        const fieldName = renderer.field1;
+        const fieldValue = feature?.properties?.[fieldName];
+  
+        if (fieldValue != null) {
+          const match = renderer.uniqueValueInfos.find(
+            (info: any) => info.value === fieldValue
+          );
+  
+          if (match && match.symbol) {
+            return this.symbolConverter.convertEsriSymbolToLeafletStyle(match.symbol);
+          }
+        }
+      }
+
+      // If a default symbol is defined, use it
+      if (renderer.defaultSymbol) {
+        return this.symbolConverter.convertEsriSymbolToLeafletStyle(renderer.defaultSymbol);
+      }
+
+
+      // More cases (like class breaks) can be added here as needed
+
+      //
+
+
       return defaultStyle; // Fallback to default style if nothing else works
     };
   }
