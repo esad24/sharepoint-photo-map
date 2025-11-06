@@ -198,6 +198,22 @@ function addWatermark(map) {
 
 /***/ }),
 
+/***/ 117:
+/*!*****************************************************!*\
+  !*** ./lib/webparts/webmap/cache/SPLibraryItems.js ***!
+  \*****************************************************/
+/***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony export */ __webpack_require__.d(__webpack_exports__, {
+/* harmony export */   libraries: () => (/* binding */ libraries)
+/* harmony export */ });
+const libraries = {};
+
+
+/***/ }),
+
 /***/ 940:
 /*!*******************************************************!*\
   !*** ./lib/webparts/webmap/components/ClusterIcon.js ***!
@@ -320,6 +336,9 @@ class ClusterManager {
                 event.stopPropagation();
                 window.open(imgList[current], '_blank', 'noopener,noreferrer');
             });
+            const caption = leaflet__WEBPACK_IMPORTED_MODULE_0__.DomUtil.create('div', '', container);
+            caption.innerHTML = `${current + 1} of ${imgList.length}`;
+            caption.style.paddingTop = '4px';
             // navigation container for prev/next buttons
             const nav = leaflet__WEBPACK_IMPORTED_MODULE_0__.DomUtil.create('div', _WebmapWebPart_module_scss__WEBPACK_IMPORTED_MODULE_4__["default"].galleryNav, container);
             // previous button
@@ -330,6 +349,7 @@ class ClusterManager {
                 // Move to previous image, wrapping around to end if at beginning
                 current = (current - 1 + imgList.length) % imgList.length; // Cycle backwards.
                 imgEl.src = imgList[current]; // Update displayed image
+                caption.innerHTML = `${current + 1} of ${imgList.length}`;
             };
             // Create next button
             const nextBtn = leaflet__WEBPACK_IMPORTED_MODULE_0__.DomUtil.create('button', '', nav);
@@ -338,6 +358,7 @@ class ClusterManager {
             nextBtn.onclick = () => {
                 current = (current + 1) % imgList.length; // Move to next image, wrapping around to beginning if at end
                 imgEl.src = imgList[current];
+                caption.innerHTML = `${current + 1} of ${imgList.length}`;
             };
             // Create and open the Leaflet popup at the cluster's location, containing the gallery.
             leaflet__WEBPACK_IMPORTED_MODULE_0__.popup({
@@ -521,9 +542,10 @@ __webpack_require__.r(__webpack_exports__);
 
 
 class PropertyPaneManager {
-    constructor(context, properties) {
+    constructor(context, properties, webPartInstance) {
         this.context = context;
         this.properties = properties;
+        this.webPartInstance = webPartInstance;
         this.cache = {
             libraries: [],
             fields: [],
@@ -597,10 +619,22 @@ class PropertyPaneManager {
                         label: 'Longitude Field',
                         options: this.cache.fields, // Same list of fields
                         disabled: !this.cache.fields.length
-                    })
+                    }),
                 ]
             });
         }
+        groups.push({
+            //groupName: 'Coordinate Fields',
+            groupFields: [
+                (0,_microsoft_sp_property_pane__WEBPACK_IMPORTED_MODULE_0__.PropertyPaneButton)('LoadData', {
+                    text: 'Load',
+                    buttonType: _microsoft_sp_property_pane__WEBPACK_IMPORTED_MODULE_0__.PropertyPaneButtonType.Normal,
+                    onClick: () => {
+                        this.webPartInstance.renderMap();
+                    }
+                })
+            ]
+        });
         if (this.properties.locationMethod === 'manual' && this.properties.libraryName && !this.cache.fields.length) {
             this.loadFields(this.properties.libraryName);
         }
@@ -1017,7 +1051,7 @@ class FeatureLayerService {
             // Add text labels for each feature
             onEachFeature: (feature, layer) => {
                 var _a;
-                const textValue = (_a = feature.properties) === null || _a === void 0 ? void 0 : _a.Text;
+                const textValue = (_a = feature.properties) === null || _a === void 0 ? void 0 : _a.TextString; // changed from 'Text' to 'TextString'
                 if (textValue && textValue.trim()) {
                     let position;
                     if (feature.geometry.type === 'Point') {
@@ -1106,6 +1140,7 @@ class StyleService {
     // Create style function for GeoJSON layer based on ArcGIS renderer
     createStyleFunction(drawingInfo) {
         return (feature) => {
+            var _a;
             // Default style if no drawing info is available
             const defaultStyle = {
                 color: '#3388ff', // Line/border color (blue)
@@ -1120,9 +1155,26 @@ class StyleService {
             }
             const renderer = drawingInfo.renderer;
             // Handle simple renderer
-            if (renderer.type === 'simple' && renderer.symbol) {
+            if (renderer.type === 'simple' && renderer.symbol) { // test für render type 'uniqueValue'
                 return this.symbolConverter.convertEsriSymbolToLeafletStyle(renderer.symbol);
             }
+            // Handle unique value renderer
+            if (renderer.type === 'uniqueValue' && renderer.uniqueValueInfos && renderer.field1) {
+                const fieldName = renderer.field1;
+                const fieldValue = (_a = feature === null || feature === void 0 ? void 0 : feature.properties) === null || _a === void 0 ? void 0 : _a[fieldName];
+                if (fieldValue !== null) {
+                    const match = renderer.uniqueValueInfos.find((info) => info.value === fieldValue);
+                    if (match && match.symbol) {
+                        return this.symbolConverter.convertEsriSymbolToLeafletStyle(match.symbol);
+                    }
+                }
+            }
+            // If a default symbol is defined, use it
+            if (renderer.defaultSymbol) {
+                return this.symbolConverter.convertEsriSymbolToLeafletStyle(renderer.defaultSymbol);
+            }
+            // More cases (like class breaks) can be added here as needed
+            //
             return defaultStyle; // Fallback to default style if nothing else works
         };
     }
@@ -1222,11 +1274,13 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony export */ });
 /* harmony import */ var _microsoft_sp_http__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! @microsoft/sp-http */ 909);
 /* harmony import */ var _microsoft_sp_http__WEBPACK_IMPORTED_MODULE_0___default = /*#__PURE__*/__webpack_require__.n(_microsoft_sp_http__WEBPACK_IMPORTED_MODULE_0__);
-/* harmony import */ var _utils_Security__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ../utils/Security */ 415);
-/* harmony import */ var leaflet__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! leaflet */ 973);
-/* harmony import */ var leaflet__WEBPACK_IMPORTED_MODULE_1___default = /*#__PURE__*/__webpack_require__.n(leaflet__WEBPACK_IMPORTED_MODULE_1__);
+/* harmony import */ var _utils_Security__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! ../utils/Security */ 415);
+/* harmony import */ var _cache_SPLibraryItems__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ../cache/SPLibraryItems */ 117);
+/* harmony import */ var leaflet__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! leaflet */ 973);
+/* harmony import */ var leaflet__WEBPACK_IMPORTED_MODULE_2___default = /*#__PURE__*/__webpack_require__.n(leaflet__WEBPACK_IMPORTED_MODULE_2__);
 // Optimized Service for fetching data from SharePoint document libraries
 // Handles both manual coordinate and EXIF-based location extraction with performance optimizations
+
 
 
 // import { ExifExtraction } from './ExifExtraction';
@@ -1257,6 +1311,13 @@ class DataService {
         const result = { items: [], errors: [] };
         if (!libraryName)
             return result;
+        // fetching from Cache instead of reloading -> currently doesnt work correctly
+        // if (libraries[properties.libraryName] && libraries[properties.libraryName].items.length > 0) {
+        //   const cached = libraries[properties.libraryName];
+        //   this.getBounds(cached.items);
+        //   await new Promise(resolve => setTimeout(resolve, 1)); // simulate delay
+        //   return cached;
+        // }
         if (locationMethod === 'manual' && (!latField || !lonField)) {
             result.errors.push('Please select both latitude and longitude fields');
             return result;
@@ -1264,13 +1325,13 @@ class DataService {
         const site = this.context.pageContext.web.absoluteUrl;
         if (!site)
             return result;
-        const libraryPart = (0,_utils_Security__WEBPACK_IMPORTED_MODULE_2__.escODataIdentifier)(libraryName);
+        const libraryPart = (0,_utils_Security__WEBPACK_IMPORTED_MODULE_3__.escODataIdentifier)(libraryName);
         try {
             const baseFields = ['FileRef', 'FileLeafRef'];
             if (locationMethod === 'manual' && latField && lonField) {
                 baseFields.push(latField, lonField);
             }
-            const selectFields = baseFields.map(f => (0,_utils_Security__WEBPACK_IMPORTED_MODULE_2__.escODataIdentifier)(f)).join(',');
+            const selectFields = baseFields.map(f => (0,_utils_Security__WEBPACK_IMPORTED_MODULE_3__.escODataIdentifier)(f)).join(',');
             let allItems = [];
             let url = `${site}/_api/web/lists/getByTitle('${libraryPart}')/items?$select=${selectFields}&$top=500`;
             // Handle pagination
@@ -1298,7 +1359,7 @@ class DataService {
                     const lon = parseFloat(item[lonField].replace(',', '.'));
                     if (!lat || !lon || isNaN(lat) || isNaN(lon))
                         continue;
-                    const sanitizedImg = (0,_utils_Security__WEBPACK_IMPORTED_MODULE_2__.sanitizeUrl)(img);
+                    const sanitizedImg = (0,_utils_Security__WEBPACK_IMPORTED_MODULE_3__.sanitizeUrl)(img);
                     if (!sanitizedImg)
                         continue;
                     result.items.push({
@@ -1343,6 +1404,7 @@ class DataService {
             //result.errors.push('Failed to load images from document library');
         }
         this.getBounds(result.items);
+        _cache_SPLibraryItems__WEBPACK_IMPORTED_MODULE_1__.libraries[libraryName] = result;
         return result;
     }
     // build full file URL
@@ -1363,7 +1425,7 @@ class DataService {
     getBounds(items) {
         const bounds = [];
         for (const item of items) {
-            bounds.push(leaflet__WEBPACK_IMPORTED_MODULE_1__.latLng(item.lat, item.lon));
+            bounds.push(leaflet__WEBPACK_IMPORTED_MODULE_2__.latLng(item.lat, item.lon));
         }
         if (this.mapViewService) {
             this.mapViewService.setImageBounds(bounds);
@@ -5009,10 +5071,13 @@ class WebmapWebPart extends _microsoft_sp_webpart_base__WEBPACK_IMPORTED_MODULE_
         // Generate a unique ID for the map container to avoid conflicts if multiple web parts are on the same page
         this.mapId = `map-${Math.random().toString(36).substr(2, 9)}`;
         this.loaderId = `loader-${Math.random().toString(36).substr(2, 9)}`;
+        this.isInitialRender = false; // Track if it's the initial render
     }
     render() {
+        if (this.isInitialRender)
+            return;
         if (!this.propertyPaneManager) {
-            this.propertyPaneManager = new _components_PropertyPaneManager__WEBPACK_IMPORTED_MODULE_5__.PropertyPaneManager(this.context, this.properties);
+            this.propertyPaneManager = new _components_PropertyPaneManager__WEBPACK_IMPORTED_MODULE_5__.PropertyPaneManager(this.context, this.properties, this);
         }
         // Sets the basic HTML structure for the web part
         this.domElement.innerHTML = `
@@ -5028,6 +5093,7 @@ class WebmapWebPart extends _microsoft_sp_webpart_base__WEBPACK_IMPORTED_MODULE_
             this.rateLimiter = new _utils_RateLimit__WEBPACK_IMPORTED_MODULE_9__.RateLimiter(this.loaderId);
         }
         this.renderMap();
+        this.isInitialRender = true;
     }
     // Initializes or refreshes the Leaflet map instance
     renderMap() {
@@ -5080,6 +5146,7 @@ class WebmapWebPart extends _microsoft_sp_webpart_base__WEBPACK_IMPORTED_MODULE_
         try {
             // Use the DataService to fetch data
             const result = await dataService.fetchMapData(this.properties);
+            //console.log('Data fetch result:', result);
             // If a newer dataService is active, discard results
             if (this.activeDataService !== dataService) {
                 return;
@@ -5121,7 +5188,7 @@ class WebmapWebPart extends _microsoft_sp_webpart_base__WEBPACK_IMPORTED_MODULE_
         }
         // Handle map type change
         if (path === 'mapType') {
-            this.propertyPaneManager.clearLocation();
+            //this.propertyPaneManager.clearLocation();    
             if (newValue !== 'project') {
                 this.properties.arcgisMapUrl = ''; // Clear ArcGIS URL if switching away from ArcGIS
             }
@@ -5151,10 +5218,6 @@ class WebmapWebPart extends _microsoft_sp_webpart_base__WEBPACK_IMPORTED_MODULE_
         }
         // Refresh property pane to reflect the changes
         this.context.propertyPane.refresh();
-        // Re-render map
-        if (['libraryName', 'locationMethod', 'latField', 'lonField', 'mapType', 'arcgisMapUrl', 'mapView'].includes(path)) {
-            this.renderMap();
-        }
     }
     // Clean up resources when the web part is disposed
     onDispose() {

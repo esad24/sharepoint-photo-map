@@ -41,7 +41,7 @@ export class StyleService {
         const fieldName = renderer.field1;
         const fieldValue = feature?.properties?.[fieldName];
   
-        if (fieldValue != null) {
+        if (fieldValue !== null) {
           const match = renderer.uniqueValueInfos.find(
             (info: any) => info.value === fieldValue
           );

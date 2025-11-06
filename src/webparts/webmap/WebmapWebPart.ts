@@ -132,7 +132,7 @@ private async loadMapData(): Promise<void> {
   try {
     // Use the DataService to fetch data
     const result = await dataService.fetchMapData(this.properties);
-    console.log('Data fetch result:', result);
+    //console.log('Data fetch result:', result);
     // If a newer dataService is active, discard results
     if (this.activeDataService !== dataService) {
       return;

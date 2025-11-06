@@ -74,7 +74,7 @@ export class DataService {
     if (!libraryName) return result;
 
 
-    // fetching from Cache instead of reloading -> currently doesnt work somehow
+    // fetching from Cache instead of reloading -> currently doesnt work correctly
 
     // if (libraries[properties.libraryName] && libraries[properties.libraryName].items.length > 0) {
     //   const cached = libraries[properties.libraryName];
