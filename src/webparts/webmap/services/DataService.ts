@@ -104,6 +104,10 @@ export class DataService {
       const selectFields = baseFields.map(f => escODataIdentifier(f)).join(',');
 
       let allItems: any[] = [];
+
+
+      // potentially add a filter to only get items with lat/lon values
+
       let url: string | null = `${site}/_api/web/lists/getByTitle('${libraryPart}')/items?$select=${selectFields}&$top=500`;
 
       // Handle pagination
@@ -131,8 +135,15 @@ export class DataService {
           const img = this.buildFileUrl(item.FileRef, site);
           if (!this.isImageFile(img)) continue;
 
-          const lat = parseFloat((item[latField!] as string).replace(',', '.'));
-          const lon = parseFloat((item[lonField!] as string).replace(',', '.'));
+          const rawLat = item[latField!];
+          const rawLon = item[lonField!];
+          if (!rawLat || !rawLon) continue;
+
+          const latStr = String(rawLat).replace(',', '.');  
+          const lonStr = String(rawLon).replace(',', '.');
+
+          const lat = parseFloat(latStr);
+          const lon = parseFloat(lonStr);
 
           if (!lat || !lon || isNaN(lat) || isNaN(lon)) continue;
 
