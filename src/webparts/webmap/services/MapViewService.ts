@@ -3,7 +3,7 @@
 
 import * as L from 'leaflet';
 
-import { HOCHTIEF_DEFAULT_VIEW } from '../constants/constants';
+import { DEFAULT_VIEW } from '../constants/constants';
 
 
 export class MapViewService {
@@ -33,7 +33,6 @@ private updateMapView(): void {
     const allBounds = [...this.imageBounds];
     
     if (allBounds.length === 0) {
-      // No content available - set Hochtief default view
       this.setDefaultView();
       return;
     }
@@ -71,6 +70,6 @@ private updateMapView(): void {
 
 
   public setDefaultView(): void {
-    this.map.setView([HOCHTIEF_DEFAULT_VIEW.lat, HOCHTIEF_DEFAULT_VIEW.lon], HOCHTIEF_DEFAULT_VIEW.zoom);
+    this.map.setView([DEFAULT_VIEW.lat, DEFAULT_VIEW.lon], DEFAULT_VIEW.zoom);
   }
 }

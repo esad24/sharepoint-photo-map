@@ -9,11 +9,12 @@ import { IWebmapWebPartProps } from '../types/IWebmapTypes';
 import { MapViewService } from './MapViewService';
 import { RateLimiter } from '../utils/RateLimit';
 
+import { ExifExtraction } from './ExifExtraction';
+
 
 import { libraries } from '../cache/SPLibraryItems';
 
 
-// import { ExifExtraction } from './ExifExtraction';
 
 import * as L from 'leaflet';
 
@@ -40,7 +41,7 @@ export class DataService {
   private context: WebPartContext;
   private loaderId: string;
   private mapViewService: MapViewService | undefined;
-  //private exifExtraction: ExifExtraction | undefined;
+  private exifExtraction: ExifExtraction | undefined;
   private rateLimiter: RateLimiter | undefined;
   private cancelProcessing = false;
 
@@ -127,7 +128,7 @@ export class DataService {
         url = json['@odata.nextLink'] || null;
       }
 
-      const noGpsCount = 0;
+      let noGpsCount = 0;
 
       if (locationMethod === 'manual') {
         // Manual coordinates from fields
@@ -158,7 +159,7 @@ export class DataService {
         }
       } 
 
-      /*
+      
       // Image Exif processing currently not production ready
 
       else {
@@ -187,7 +188,7 @@ export class DataService {
           result.errors.push(`${noGpsCount} images have no EXIF GPS data and will not be displayed.`);
         }
       }
-      */
+      
 
     } catch (err) {
       //result.errors.push('Failed to load images from document library');

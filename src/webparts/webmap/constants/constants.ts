@@ -10,7 +10,7 @@ export const IMAGERY_TILE = {
   }
   
 
-  export const HOCHTIEF_DEFAULT_VIEW = {
+  export const DEFAULT_VIEW = {
     lat: 51.4239,
     lon: 6.9985,
     zoom: 15

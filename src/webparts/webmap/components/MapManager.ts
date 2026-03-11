@@ -11,7 +11,7 @@ import { addWatermark } from '../assets/ViconWatermark';
 
 import { extractArcGISDomain, extractWebmapId } from '../services/ArcGISMap/services/ArcGISUrlService';
 
-import {OPEN_STREET_MAP_TILE, HOCHTIEF_DEFAULT_VIEW } from '../constants/constants';
+import {OPEN_STREET_MAP_TILE, DEFAULT_VIEW } from '../constants/constants';
 
 
 export class MapManager {
@@ -39,7 +39,7 @@ export class MapManager {
 
 
     // Initialize a new map on the 'map' div, setting an initial view
-    this.map = L.map(this.mapId).setView([HOCHTIEF_DEFAULT_VIEW.lat, HOCHTIEF_DEFAULT_VIEW.lon], HOCHTIEF_DEFAULT_VIEW.zoom); // Default view over Hochtief location
+    this.map = L.map(this.mapId).setView([DEFAULT_VIEW.lat, DEFAULT_VIEW.lon], DEFAULT_VIEW.zoom); // Default view location
 
 
     // Add base layer based on map type 
@@ -50,7 +50,7 @@ export class MapManager {
       this.addOpenStreetMapLayer();
     }
 
-    addWatermark(this.map); // Add the Hochtief ViCon watermark to the map
+    //addWatermark(this.map); // Add watermark to the map
 
     return this.map;
   }

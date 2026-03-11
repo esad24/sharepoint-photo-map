@@ -1,14 +1,14 @@
 // Image Exif processing currently not production ready
 // commented out for future use
 
-/*
+
 
 import { WebPartContext } from '@microsoft/sp-webpart-base';
 import { RateLimiter } from '../utils/RateLimit';
 import { updateLoader } from '../utils/loader';
 
 
-import * as exifr from 'exifr';
+import * as ex from 'exifr';
 import pLimit from 'p-limit';
 
 export interface IGPSCoordinates {
@@ -32,7 +32,8 @@ export class ExifExtraction {
 
     private fails = 0;
 
-    constructor(allItems: any[],  context: WebPartContext, loaderId: string, rateLimiter?: RateLimiter) {
+    constructor(allItems: any[], context: WebPartContext, loaderId: string, rateLimiter?: RateLimiter) {
+        this.allItems = allItems;  // <-- add this
         this.context = context;
         this.loaderId = loaderId;
         this.rateLimiter = rateLimiter;
@@ -43,7 +44,7 @@ export class ExifExtraction {
     this.cancelProcessing = true;
     }
     
-    // Process images with EXIF extraction in parallel
+    //Process images with EXIF extraction in parallel
     public async processExifImages(): Promise<{ item: any; gps: IGPSCoordinates | null; fileUrl: string }[]> {
         const site = this.context.pageContext.web.absoluteUrl;
         const siteServerRelativeUrl = this.context.pageContext.web.serverRelativeUrl;
@@ -85,13 +86,13 @@ export class ExifExtraction {
         const results = await Promise.all(tasks);
         allResults.push(...results);
 
-        // Small pause between batches to avoid SharePoint throttling
-        //await new Promise(resolve => setTimeout(resolve, this.BATCH_DELAY));
+        //Small pause between batches to avoid SharePoint throttling
+        await new Promise(resolve => setTimeout(resolve, this.BATCH_DELAY));
         }
         return allResults;
     }
 
-    // Extract GPS using exifr from binary with throttling handling
+    //Extract GPS using exifr from binary with throttling handling
     private async extractGPSFromExif(imageUrl: string): Promise<IGPSCoordinates | null> {
         if( this.cancelProcessing) {
         return null; // stop processing if cancelled
@@ -126,7 +127,7 @@ export class ExifExtraction {
         }
 
         const buffer = await response.arrayBuffer();
-        const gps = await exifr.gps(buffer);
+        const gps = await ex.gps(buffer);
 
         if (gps?.latitude && gps?.longitude) {
             return { lat: gps.latitude, lon: gps.longitude };
@@ -139,7 +140,7 @@ export class ExifExtraction {
         }
     }
 
-    // build full file URL
+    //build full file URL
     private buildFileUrl(fileRef: string, site: string): string {
         const siteServerRelativeUrl = this.context.pageContext.web.serverRelativeUrl;
         const searchString = siteServerRelativeUrl === '/' ? '/' : siteServerRelativeUrl + '/';
@@ -147,7 +148,7 @@ export class ExifExtraction {
         return `${site}/${relativeFileRef}`;
     }
 
-    // Checks if a file is an image
+    //Checks if a file is an image
     private isImageFile(fileUrl: string): boolean {
         const imageExtensions = ['.jpg', '.jpeg', '.png'];
         const fileName = fileUrl.split('/').pop() || fileUrl;
@@ -156,4 +157,3 @@ export class ExifExtraction {
     }
 }
 
-*/

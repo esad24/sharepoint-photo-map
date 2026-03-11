@@ -85,7 +85,8 @@ export class PropertyPaneManager {
           label: 'Location Method',
           options: [
             //{ key: 'exif', text: 'Extract from Image EXIF Data' }, // Currently not production ready
-            { key: 'manual', text: 'Select latitude and longitude fields' }
+            { key: 'manual', text: 'Select latitude and longitude fields' },
+            { key: 'exif', text: 'Extract GPS from EXIF' }
           ],
           selectedKey: this.properties.locationMethod || '' 
         })

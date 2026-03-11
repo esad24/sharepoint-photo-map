@@ -22,7 +22,7 @@ export type MapType = 'general' | 'project'; // Only two allowed values for map 
 
 export type MapView = 'openstreetmap' | 'satellite'
 
-export type LocationMethod = 'manual'; // currently only 'manual' is supported -> in future version also exif extraction p
+export type LocationMethod = 'manual' | 'exif'; // currently only 'manual' is supported -> in future version also exif extraction p
 
 // Defines the properties of the web part that can be configured by the user
 
