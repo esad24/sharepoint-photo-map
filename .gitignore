@@ -33,6 +33,4 @@ obj
 # Styles Generated Code
 #*.scss.ts
 
-**/src/webparts/webmap/assets/ViconWatermark.ts
-
 **/images/
